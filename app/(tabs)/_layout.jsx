@@ -4,10 +4,12 @@ import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Colors } from "../../constants/Colors";
+import TabBar from "../../components/TabBar";
 
 export default function TabLayout() {
   return (
     <Tabs
+    tabBar={props=><TabBar{...props}/>}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.PRIMARY,
