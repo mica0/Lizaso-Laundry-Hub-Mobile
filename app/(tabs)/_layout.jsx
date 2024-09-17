@@ -9,7 +9,7 @@ import TabBar from "../../components/TabBar";
 export default function TabLayout() {
   return (
     <Tabs
-    tabBar={props=><TabBar{...props}/>}
+      tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.PRIMARY,
@@ -28,6 +28,15 @@ export default function TabLayout() {
         name="explore"
         options={{
           tabBarLabel: "Explore",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="search" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="payment"
+        options={{
+          tabBarLabel: "Payment",
           tabBarIcon: ({ color }) => (
             <Ionicons name="search" size={24} color={color} />
           ),
