@@ -1,0 +1,72 @@
+lizaso-laundry-hub/
+│
+├── .expo/  
+├── app/
+│   ├── (tabs)/
+│   │   ├── layout.jsx
+│   │   ├── home.jsx
+│   │   └── profile.jsx 
+│   └── layout.tsx   
+├── assets/
+├── components/
+│   ├── Tabbar.jsx
+│   ├── Popup.jsx
+│   └── 
+├── constants/
+├── hooks/
+├── node_modules/
+├── scripts/
+├── .gitignore
+├── app.json
+├── babel.config.js
+├── expo-env.d.ts
+├── package-lock.json
+├── package.json
+├── README.md
+└── tsconfig.json 
+
+
+
+
+
+
+
+
+
+
+
+
+
+│   ├── src/
+│   │   ├── assets/
+│   │   │     ├── image/
+│   │   │     └── upload/               
+│   │   ├── components/
+│   │   │     ├──ProtectedRoute/jsx
+│   │   │     ├──common/
+│   │   │     │    ├── ProtectedRoute.jsx   
+│   │   │     │    └── Navbar.jsx   
+│   │   │     └──landing-page/          
+│   │   ├── contexts/
+│   │   │     └──AuthContext.jsx/           
+│   │   ├── hooks/
+│   │   │     ├──useLoginForm.jsx/ 
+│   │   │     └──useRegisterForm.jsx/              
+│   │   ├── pages/
+│   │   │     ├──admin/                          
+│   │   │     │     └──main.jsx/               
+│   │   │     └──customer/                                    
+│   │   │           └──mainCustomer.jsx/                          
+│   │   ├── services/
+│   │   │     └──api/
+│   │   │          └──authClient.jsx/              
+│   │   ├── styles/             
+│   │   ├── utils/              
+│   │   ├── App.jsx            
+│   │   ├── index.jsx           
+│   │   └── main.jsx            
+│   ├── .gitignore              
+│   ├── package.json           
+│   ├── postcss.config.js      
+│   ├── tailwind.config.js     
+│   └── vite.config.js      
