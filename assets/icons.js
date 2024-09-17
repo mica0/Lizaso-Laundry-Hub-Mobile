@@ -7,4 +7,5 @@ export const icons = {
   explore: (props) => <AntDesign name="search1" size={26} {...props} />,
   payment: (props) => <MaterialIcons name="payments" size={26} {...props} />,
   profile: (props) => <FontAwesome5 name="user-alt" size={24} {...props} />,
+  ss: (props) => <FontAwesome5 name="user-alt" size={24} {...props} />,
 };
