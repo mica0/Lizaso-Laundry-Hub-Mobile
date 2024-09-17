@@ -1,1 +1,17 @@
 rnf
+npx expo
+// INSTALLING NATIVEWIND
+npm i nativewind
+npm i -D tailwindcss@3.3.2
+npx tailwindcss init
+
+
+// INSTALLING NATIVEWIND V4
+npm install nativewind@^4.0.1 react-native-reanimated tailwindcss
+npx pod-install
+npm i -D tailwindcss@3.3.2
+npx tailwindcss init
+
+
+// UNINSTALL
+npm uninstall nativewind
