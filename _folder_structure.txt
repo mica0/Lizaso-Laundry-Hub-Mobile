@@ -5,14 +5,24 @@ lizaso-laundry-hub/
 │   ├── (tabs)/
 │   │   ├── layout.jsx
 │   │   ├── home.jsx
-│   │   └── profile.jsx 
-│   └── layout.tsx   
+│   │   └── profile.jsx
+│   ├── auth/
+│   │   ├── sign-in/index.js
+│   │   ├── sign-ip/index.js
+│   │   └── profile.jsx  
+│   ├── _layout.tsx   
+│   └── index.tsx   
 ├── assets/
 ├── components/
+│   ├── Onboarding.jsx
+│   ├── Login.jsx
+│   ├── Signup.jsx
 │   ├── Tabbar.jsx
 │   ├── Popup.jsx
 │   └── 
 ├── constants/
+├── data/
+│   └──api
 ├── hooks/
 ├── node_modules/
 ├── scripts/
