@@ -137,7 +137,7 @@ export default function index() {
         </View>
 
         <View style={{ flexDirection: "row", marginVertical: 6 }}>
-          <Checkbox style={{ marginRight: 8 }} />
+          {/* <Checkbox style={{ marginRight: 8 }} /> */}
         </View>
       </View>
     </SafeAreaView>

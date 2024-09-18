@@ -9,7 +9,42 @@ lizaso-laundry-hub/
 │   ├── auth/
 │   │   ├── sign-in/index.js
 │   │   ├── sign-ip/index.js
-│   │   └── profile.jsx  
+│   ├── _layout.tsx   
+│   └── index.tsx   
+├── assets/
+├── components/
+│   ├── Onboarding.jsx
+│   ├── Tabbar.jsx
+│   ├── Popup.jsx
+│   └── 
+├── constants/
+├── data/
+│   └──api
+├── hooks/
+├── node_modules/
+├── scripts/
+├── .gitignore
+├── app.json
+├── babel.config.js
+├── expo-env.d.ts
+├── package-lock.json
+├── package.json
+├── README.md
+└── tsconfig.json 
+
+
+
+lizaso-laundry-hub/
+│
+├── .expo/  
+├── app/
+│   ├── (tabs)/
+│   │   ├── layout.jsx
+│   │   ├── home.jsx
+│   │   └── profile.jsx
+│   ├── auth/
+│   │   ├── sign-in/index.js
+│   │   ├── sign-ip/index.js
 │   ├── _layout.tsx   
 │   └── index.tsx   
 ├── assets/
@@ -34,6 +69,7 @@ lizaso-laundry-hub/
 ├── package.json
 ├── README.md
 └── tsconfig.json 
+
 
 
 
