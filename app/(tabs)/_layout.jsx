@@ -1,7 +1,6 @@
 import { View, Text } from "react-native";
 import { Tabs } from "expo-router";
 import React from "react";
-import { Colors } from "../../constants/Colors";
 import TabBar from "../../components/TabBar";
 
 export default function TabLayout() {
@@ -10,7 +9,7 @@ export default function TabLayout() {
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.PRIMARY,
+        // tabBarActiveTintColor: Colors.PRIMARY,
       }}
     >
       <Tabs.Screen

@@ -14,7 +14,6 @@ import { useRouter } from "expo-router";
 export default function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigation = useNavigation();
 
   const router = useRouter();
 
@@ -47,7 +46,7 @@ export default function SignIn() {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push('auth/sign-up')}>
+        <TouchableOpacity onPress={() => router.push("auth/sign-up")}>
           <Text style={styles.signupText}>
             Don't have an account yet? Sign Up
           </Text>
