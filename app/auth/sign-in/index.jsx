@@ -11,6 +11,7 @@ import {
 import { useNavigation, useRouter } from "expo-router";
 import COLORS from "../../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
+import { fonts } from "../../../constants/fonts";
 
 export default function SignIn() {
   const [username, setUsername] = useState("");
@@ -61,7 +62,7 @@ export default function SignIn() {
             <Text
               style={{
                 fontSize: 16,
-                fontWeight: 500,
+                fontFamily: fonts.Medium,
                 marginVertical: 8,
                 color: COLORS.primary,
                 marginStart: 5,
@@ -85,12 +86,19 @@ export default function SignIn() {
                 placeholder="Enter your username"
                 placeholderTextColor={COLORS.grey}
                 keyboardType="default"
-                style={{ width: "100%" }}
+                style={{ width: "100%", fontFamily: fonts.Regular }}
               />
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: 400, marginVertical: 8 }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontFamily: fonts.Medium,
+                color: COLORS.primary,
+                marginVertical: 8,
+              }}
+            >
               Password
             </Text>
             <View
@@ -109,7 +117,7 @@ export default function SignIn() {
                 placeholder="Enter your password"
                 placeholderTextColor={COLORS.grey}
                 secureTextEntry={isPasswordShown}
-                style={{ width: "100%" }}
+                style={{ width: "100%", fontFamily: fonts.Regular }}
               />
 
               <TouchableOpacity
@@ -130,6 +138,7 @@ export default function SignIn() {
                 textAlign: "right",
                 color: COLORS.primary,
                 marginVertical: 5,
+                fontFamily: fonts.Regular,
               }}
             >
               Forget Password?
@@ -138,17 +147,17 @@ export default function SignIn() {
           <TouchableOpacity
             style={{
               backgroundColor: COLORS.secondary,
-              borderRadius: 100,
-              marginTop: 20,
+              borderRadius: 10,
+              marginTop: 10,
+              padding: 10,
             }}
           >
             <Text
               style={{
                 color: COLORS.white,
                 fontSize: 20,
-                fontWeight: 800,
+                fontFamily: fonts.Bold,
                 textAlign: "center",
-                padding: 15,
               }}
             >
               Login
@@ -157,8 +166,9 @@ export default function SignIn() {
           <Text
             style={{
               textAlign: "center",
-              marginVertical: 20,
+              marginVertical: 10,
               fontSize: 14,
+              fontFamily: fonts.Regular,
               color: COLORS.primary,
             }}
           >
@@ -169,10 +179,10 @@ export default function SignIn() {
               flexDirection: "row",
               borderWidth: 2,
               borderColor: COLORS.grayMedium,
-              borderRadius: 100,
+              borderRadius: 10,
               justifyContent: "center",
               alignItems: "center",
-              padding: 10,
+              padding: 8,
               gap: 10,
             }}
           >
@@ -180,7 +190,15 @@ export default function SignIn() {
               source={require("../../../assets/images/google_icon.png")}
               style={{ height: 20, width: 20 }}
             />
-            <Text style={{ fontSize: 20, color: COLORS.primary }}>Google</Text>
+            <Text
+              style={{
+                fontSize: 20,
+                color: COLORS.primary,
+                fontFamily: fonts.Medium,
+              }}
+            >
+              Google
+            </Text>
           </TouchableOpacity>
           <View
             style={{
@@ -191,8 +209,16 @@ export default function SignIn() {
               gap: 2,
             }}
           >
-            <Text style={{ color: COLORS.primary }}>New User?</Text>
-            <Text style={{ color: COLORS.secondary }}>Register Now</Text>
+            <Text style={{ color: COLORS.primary, fontFamily: fonts.Regular }}>
+              New User?
+            </Text>
+            <TouchableOpacity>
+              <Text
+                style={{ color: COLORS.secondary, fontFamily: fonts.SemiBold }}
+              >
+                Register Now
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </SafeAreaView>

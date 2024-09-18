@@ -24,4 +24,5 @@ npm install axios
 expo install expo-checkbox
 
 npx expo install expo-font
+npx expo install @react-native-async-storage/async-storage
 
