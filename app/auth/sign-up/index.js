@@ -4,15 +4,17 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
+  ScrollView,
 } from "react-native";
-import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState } from "react";
 import COLORS from "../../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../../constants/fonts";
 import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import Checkbox from "expo-checkbox";
+import { register } from "../../../data/api/authApi";
 
 export default function SignUp() {
   const router = useRouter();
@@ -20,6 +22,7 @@ export default function SignUp() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [username, setUsername] = useState("");
   const [fullname, setFullName] = useState("");
+
   const [password, setPassword] = useState("");
   const [isChecked, setIsChecked] = useState(false);
   const [errors, setErrors] = useState({});
@@ -30,6 +33,26 @@ export default function SignUp() {
     setFullName("");
     setPassword("");
     setIsChecked(false);
+  };
+
+  const getNameParts = (fullname) => {
+    const parts = fullname.split(" ");
+
+    let firstName = "";
+    let middleName = "";
+    let lastName = "";
+
+    if (parts.length > 0) {
+      firstName = parts[0];
+    }
+    if (parts.length > 1) {
+      lastName = parts[parts.length - 1];
+    }
+    if (parts.length > 2) {
+      middleName = parts.slice(1, -1).join(" ");
+    }
+
+    return { firstName, middleName, lastName };
   };
 
   const validateFields = () => {
@@ -64,12 +87,51 @@ export default function SignUp() {
     }));
   };
 
+  const handleSignup = async () => {
+    const { firstName, middleName, lastName } = getNameParts(fullname);
+    const data = {
+      c_number: phoneNumber,
+      c_username: username,
+      c_firstname: firstName,
+      c_middlename: middleName,
+      c_lastname: lastName,
+      c_password: password,
+      isAgreement: isChecked,
+    };
+    try {
+      const response = await register(data);
+      console.log("Registration successful:", response);
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
+  };
+
+  // const handleSignup = async () => {
+  //   const data = {
+  //     phone: phoneNumber,
+  //     username: username,
+  //     fullname: fullname,
+  //     password: password,
+  //     isChecked: isChecked,
+  //   };
+
+  //   try {
+  //     setTimeout(async () => {
+  //       const response = await register(data);
+  //       console.log("Registration successful:", response);
+  //     }, 500);
+  //   } catch (error) {
+  //     console.error("Registration failed:", error);
+  //   }
+  // };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={{ flex: 1, marginHorizontal: 22 }}>
-        <View style={{ marginVertical: "auto" }}>
+        <View style={{ marginVertical: 10 }}>
           <Text
             style={{
+              marginTop: 15,
               fontSize: 22,
               fontFamily: fonts.Bold,
               marginVertical: 12,
@@ -137,41 +199,6 @@ export default function SignUp() {
           </View>
         </View>
 
-        {/* Username */}
-        <View style={{ marginBottom: 12 }}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontFamily: fonts.Medium,
-              marginVertical: 8,
-              color: COLORS.primary,
-            }}
-          >
-            Username
-          </Text>
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: COLORS.primary,
-              borderWidth: 1,
-              borderRadius: 8,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: 22,
-            }}
-          >
-            <TextInput
-              placeholder="Enter your username"
-              placeholderTextColor={COLORS.grey}
-              keyboardType="default"
-              value={username}
-              onChangeText={handleInputChange("username")}
-              style={{ width: "100%", fontFamily: fonts.Regular }}
-            />
-          </View>
-        </View>
-
         {/* Fullname */}
         <View style={{ marginBottom: 12 }}>
           <Text
@@ -202,6 +229,41 @@ export default function SignUp() {
               keyboardType="default"
               value={fullname}
               onChangeText={handleInputChange("fullname")}
+              style={{ width: "100%", fontFamily: fonts.Regular }}
+            />
+          </View>
+        </View>
+
+        {/* Username */}
+        <View style={{ marginBottom: 12 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: fonts.Medium,
+              marginVertical: 8,
+              color: COLORS.primary,
+            }}
+          >
+            Username
+          </Text>
+          <View
+            style={{
+              width: "100%",
+              height: 48,
+              borderColor: COLORS.primary,
+              borderWidth: 1,
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingLeft: 22,
+            }}
+          >
+            <TextInput
+              placeholder="Enter your username"
+              placeholderTextColor={COLORS.grey}
+              keyboardType="default"
+              value={username}
+              onChangeText={handleInputChange("username")}
               style={{ width: "100%", fontFamily: fonts.Regular }}
             />
           </View>
@@ -254,7 +316,7 @@ export default function SignUp() {
         </View>
 
         {/* Terms and Conditons */}
-        <View style={{ marginBottom: 12 }}>
+        <View style={{ marginBottom: 5 }}>
           <View style={{ flexDirection: "row", marginVertical: 6 }}>
             <Checkbox
               value={isChecked}
@@ -287,6 +349,7 @@ export default function SignUp() {
 
         {/* Login Button */}
         <TouchableOpacity
+          onPress={handleSignup}
           style={{
             backgroundColor: COLORS.secondary,
             borderRadius: 10,
@@ -360,35 +423,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-{
-  /* <Picker
-              selectedValue={selectedCode}
-              onValueChange={(itemValue) => setSelectedCode(itemValue)}
-              style={{
-                width: "20%",
-                height: "100%",
-                borderRightWidth: 1,
-                borderRightColor: COLORS.grey,
-                fontFamily: fonts.Regular,
-              }}
-            >
-              {countryCodes.map((code) => (
-                <Picker.Item
-                  key={code.value}
-                  label={code.label}
-                  value={code.value}
-                />
-              ))}
-            </Picker> */
-}
-{
-  /* <View
-              style={{
-                width: "10%",
-                borderRightWidth: 1,
-                borderLeftColor: COLORS.grey,
-                height: "100%",
-              }}
-            ></View> */
-}
