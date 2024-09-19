@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   Image,
 } from "react-native";
-import { useNavigation } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import COLORS from "../../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../../constants/fonts";
@@ -21,10 +21,7 @@ export default function SignIn() {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const navigation = useNavigation();
-
-  const handleGoRegister = () => {
-    // Handle navigation to register screen
-  };
+  const router = useRouter();
 
   const handleLogin = () => {
     let hasError = false;
@@ -47,7 +44,6 @@ export default function SignIn() {
     if (!hasError) {
       console.log("Username:", username);
       console.log("Password:", password);
-      // Proceed with login action
     }
   };
 
@@ -236,13 +232,14 @@ export default function SignIn() {
               flexDirection: "row",
               justifyContent: "center",
               alignItems: "center",
-              marginVertical: 15,
+              marginVertical: 5,
+              gap:2
             }}
           >
             <Text style={{ color: COLORS.primary, fontFamily: fonts.Regular }}>
               New User?
             </Text>
-            <TouchableOpacity onPress={handleGoRegister}>
+            <TouchableOpacity onPress={() => router.push('/auth/sign-up')}>
               <Text
                 style={{ color: COLORS.secondary, fontFamily: fonts.SemiBold }}
               >

@@ -8,7 +8,7 @@ lizaso-laundry-hub/
 │   │   └── profile.jsx
 │   ├── auth/
 │   │   ├── sign-in/index.js
-│   │   ├── sign-ip/index.js
+│   │   ├── sign-ups/index.js
 │   ├── _layout.tsx   
 │   └── index.tsx   
 ├── assets/

@@ -3,8 +3,11 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from "../../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
+import { fonts } from "../../../constants/fonts";
+import { useRouter } from "expo-router";
 
-export default function index() {
+export default function SignUp() {
+  const router = useRouter();
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   return (
@@ -14,14 +17,14 @@ export default function index() {
           <Text
             style={{
               fontSize: 22,
-              fontWeight: "bold",
+              fontFamily: fonts.Bold,
               marginVertical: 12,
               color: COLORS.primary,
             }}
           >
             Create Accounts
           </Text>
-          <Text style={{ fontSize: 16, color: COLORS.primary }}>
+          <Text style={{ fontSize: 16, fontFamily: fonts.Regular, color: COLORS.primary }}>
             Connect with your friend today!
           </Text>
         </View>
@@ -136,9 +139,48 @@ export default function index() {
           </TouchableOpacity>
         </View>
 
-        <View style={{ flexDirection: "row", marginVertical: 6 }}>
-          {/* <Checkbox style={{ marginRight: 8 }} /> */}
-        </View>
+        <View style={{ flexDirection: "row", marginVertical: 6 }}></View>
+
+        {/* Login Button */}
+        <TouchableOpacity
+          style={{
+            backgroundColor: COLORS.secondary,
+            borderRadius: 10,
+            marginTop: 10,
+            padding: 10,
+          }}
+        >
+          <Text
+            style={{
+              color: COLORS.white,
+              fontSize: 15,
+              fontFamily: fonts.Bold,
+              textAlign: "center",
+            }}
+          >
+            Register
+          </Text>
+        </TouchableOpacity>
+        <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              marginVertical: 15,
+              gap:2
+            }}
+          >
+            <Text style={{ color: COLORS.primary, fontFamily: fonts.Regular }}>
+            Already have account?
+            </Text>
+            <TouchableOpacity onPress={() => router.navigate('/auth/sign-in')}>
+              <Text
+                style={{ color: COLORS.secondary, fontFamily: fonts.SemiBold }}
+              >
+                Sign in
+              </Text>
+            </TouchableOpacity>
+          </View>
       </View>
     </SafeAreaView>
   );

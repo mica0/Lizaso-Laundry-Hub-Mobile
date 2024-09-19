@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import COLORS from "../../../constants/colors";
+import COLORS from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function index() {

@@ -1,3 +1,18 @@
+
+import { Text } from "react-native";
+import { Stack } from "expo-router";
+import useFonts from "../hooks/useFonts";
+
+export default function RootLayout() {
+  const fontsLoaded = useFonts();
+  if (!fontsLoaded) {
+    return <Text>Loading...</Text>;
+  }
+  return <Stack screenOptions={{ headerShown: false }}></Stack>;
+}
+
+
+
 // import React from 'react';
 // import { Text, View, StyleSheet } from 'react-native';
 // import { Stack } from 'expo-router';
@@ -37,49 +52,28 @@
 // });
 
 
-import { View, Text, StyleSheet } from 'react-native';
-import { Stack } from 'expo-router';
-import useFonts from '../hooks/useFonts'; 
+// <Stack screenOptions={{ headerShown: false }}>
+//   {/* <Stack.Screen name="(tabs)" /> */}
+//   <Stack.Screen name="index" />
+//   {/* <Stack.Screen name={""}  /> */}
+//   <Stack.Screen name="auth/sign-in" />
+//   <Stack.Screen name="auth/sign-up" />
+// </Stack>
 
-export default function RootLayout() {
-  const fontsLoaded = useFonts();
-  if (!fontsLoaded) {
-    return <Text>Loading...</Text>; 
-  }
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      {/* <Stack.Screen name="(tabs)" /> */}
-      <Stack.Screen name="index" />
-    </Stack>
-  );
-}
+// const [fontsLoaded] = useFonts({
+//   'poppins-regular': require("../assets/fonts/Poppins-Regular.ttf"),
+//   'poppins-semibold': require("../assets/fonts/Poppins-SemiBold.ttf"),
+//   'poppins-bold': require("../assets/fonts/Poppins-Bold.ttf"),
+// });
 
+// const [isAuthenticated, setIsAuthenticated] = useState(null);
+// const router = useRouter();
 
-
-
-
-
-
-
-
-
-
-
-
-  // const [fontsLoaded] = useFonts({
-  //   'poppins-regular': require("../assets/fonts/Poppins-Regular.ttf"),
-  //   'poppins-semibold': require("../assets/fonts/Poppins-SemiBold.ttf"),
-  //   'poppins-bold': require("../assets/fonts/Poppins-Bold.ttf"),
-  // });
-
-  // const [isAuthenticated, setIsAuthenticated] = useState(null);
-  // const router = useRouter();
-
-  // If fonts are not loaded, render fallback content (like a loader or placeholder)
-  // if (!fontsLoaded) {
-  //   return (
-  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-  //       <Text>Loading fonts...</Text>
-  //     </View>
-  //   );
-  // }
+// If fonts are not loaded, render fallback content (like a loader or placeholder)
+// if (!fontsLoaded) {
+//   return (
+//     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+//       <Text>Loading fonts...</Text>
+//     </View>
+//   );
+// }

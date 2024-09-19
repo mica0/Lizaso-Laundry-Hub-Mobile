@@ -21,7 +21,7 @@ export default function Onboarding() {
       await AsyncStorage.setItem("@onboarding_complete", "true");
 
       // Navigate to the login screen
-      router.push("auth/sign-in");
+      router.replace("auth/sign-in");
     } catch (error) {
       console.error("Error saving onboarding status:", error);
     }
