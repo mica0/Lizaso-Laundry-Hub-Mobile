@@ -1,19 +1,73 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+} from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from "../../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../../constants/fonts";
 import { useRouter } from "expo-router";
+import { Picker } from "@react-native-picker/picker";
+import Checkbox from "expo-checkbox";
 
 export default function SignUp() {
   const router = useRouter();
   const [isPasswordShown, setIsPasswordShown] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [username, setUsername] = useState("");
+  const [fullname, setFullName] = useState("");
+  const [password, setPassword] = useState("");
   const [isChecked, setIsChecked] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const handleClear = async () => {
+    setPhoneNumber("");
+    setUsername("");
+    setFullName("");
+    setPassword("");
+    setIsChecked(false);
+  };
+
+  const validateFields = () => {
+    const newErrors = {};
+    // if (!serviceName) {
+    //   newErrors.serviceName = "Service name is required";
+    // }
+    // if (!defaultPrice) {
+    //   newErrors.defaultPrice = "Price is required";
+    // } else if (defaultPrice <= 0) {
+    //   newErrors.defaultPrice = "Price must be greater than 0";
+    // }
+    return newErrors;
+  };
+
+  const handleInputChange = (field) => (value) => {
+    // Update state based on the field
+    if (field === "phoneNumber") {
+      setPhoneNumber(value);
+    } else if (field === "username") {
+      setUsername(value);
+    } else if (field === "fullname") {
+      setFullName(value);
+    } else if (field === "password") {
+      setPassword(value);
+    }
+
+    // Clear errors related to the field
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [field]: "",
+    }));
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={{ flex: 1, marginHorizontal: 22 }}>
-        <View style={{ marginVertical: 22 }}>
+        <View style={{ marginVertical: "auto" }}>
           <Text
             style={{
               fontSize: 22,
@@ -22,10 +76,16 @@ export default function SignUp() {
               color: COLORS.primary,
             }}
           >
-            Create Accounts
+            Create an Account
           </Text>
-          <Text style={{ fontSize: 16, fontFamily: fonts.Regular, color: COLORS.primary }}>
-            Connect with your friend today!
+          <Text
+            style={{
+              fontSize: 15,
+              fontFamily: fonts.Regular,
+              color: COLORS.primary,
+            }}
+          >
+            Fast and easy laundry service at hand!
           </Text>
         </View>
 
@@ -34,8 +94,9 @@ export default function SignUp() {
           <Text
             style={{
               fontSize: 16,
-              fontWeight: 400,
+              fontFamily: fonts.Medium,
               marginVertical: 8,
+              color: COLORS.primary,
             }}
           >
             Mobile Number
@@ -56,29 +117,34 @@ export default function SignUp() {
             <TextInput
               placeholder="+63"
               placeholderTextColor={COLORS.primary}
-              keyboardType="numeric"
+              editable={false}
               style={{
                 width: "12%",
                 borderRightWidth: 1,
                 borderLeftColor: COLORS.grey,
                 height: "100%",
+                fontFamily: fonts.Medium,
               }}
             />
             <TextInput
               placeholder="Enter your phone number"
               placeholderTextColor={COLORS.grey}
               keyboardType="numeric"
-              style={{ width: "80%" }}
+              value={phoneNumber}
+              onChangeText={handleInputChange("phoneNumber")}
+              style={{ width: "80%", fontFamily: fonts.Regular }}
             />
           </View>
         </View>
 
+        {/* Username */}
         <View style={{ marginBottom: 12 }}>
           <Text
             style={{
               fontSize: 16,
-              fontWeight: 400,
+              fontFamily: fonts.Medium,
               marginVertical: 8,
+              color: COLORS.primary,
             }}
           >
             Username
@@ -98,48 +164,126 @@ export default function SignUp() {
             <TextInput
               placeholder="Enter your username"
               placeholderTextColor={COLORS.grey}
-              keyboardType="email"
-              style={{ width: "100%" }}
+              keyboardType="default"
+              value={username}
+              onChangeText={handleInputChange("username")}
+              style={{ width: "100%", fontFamily: fonts.Regular }}
+            />
+          </View>
+        </View>
+
+        {/* Fullname */}
+        <View style={{ marginBottom: 12 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: fonts.Medium,
+              marginVertical: 8,
+              color: COLORS.primary,
+            }}
+          >
+            Fullname
+          </Text>
+          <View
+            style={{
+              width: "100%",
+              height: 48,
+              borderColor: COLORS.primary,
+              borderWidth: 1,
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingLeft: 22,
+            }}
+          >
+            <TextInput
+              placeholder="Full Name (First, Middle, Last)"
+              placeholderTextColor={COLORS.grey}
+              keyboardType="default"
+              value={fullname}
+              onChangeText={handleInputChange("fullname")}
+              style={{ width: "100%", fontFamily: fonts.Regular }}
             />
           </View>
         </View>
 
         {/* PASSWORD */}
-        <Text style={{ fontSize: 16, fontWeight: 400, marginVertical: 8 }}>
-          Password
-        </Text>
-        <View
-          style={{
-            width: "100%",
-            height: 48,
-            borderColor: COLORS.primary,
-            borderWidth: 1,
-            borderRadius: 8,
-            alignItems: "center",
-            justifyContent: "center",
-            paddingLeft: 22,
-          }}
-        >
-          <TextInput
-            placeholder="Enter your password"
-            placeholderTextColor={COLORS.grey}
-            secureTextEntry={isPasswordShown}
-            style={{ width: "100%" }}
-          />
-
-          <TouchableOpacity
-            onPress={() => setIsPasswordShown(!isPasswordShown)}
-            style={{ position: "absolute", right: 12 }}
+        <View style={{ marginBottom: 15 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: fonts.Medium,
+              marginVertical: 8,
+              color: COLORS.primary,
+            }}
           >
-            {isPasswordShown == true ? (
-              <Ionicons name="eye-off" size={24} color={COLORS.primary} />
-            ) : (
-              <Ionicons name="eye" size={24} color={COLORS.primary} />
-            )}
-          </TouchableOpacity>
+            Password
+          </Text>
+          <View
+            style={{
+              width: "100%",
+              height: 48,
+              borderColor: COLORS.primary,
+              borderWidth: 1,
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingLeft: 22,
+            }}
+          >
+            <TextInput
+              placeholder="Enter your password"
+              placeholderTextColor={COLORS.grey}
+              secureTextEntry={isPasswordShown}
+              value={password}
+              onChangeText={handleInputChange("password")}
+              style={{ width: "100%", fontFamily: fonts.Regular }}
+            />
+
+            <TouchableOpacity
+              onPress={() => setIsPasswordShown(!isPasswordShown)}
+              style={{ position: "absolute", right: 12 }}
+            >
+              {isPasswordShown == true ? (
+                <Ionicons name="eye-off" size={24} color={COLORS.primary} />
+              ) : (
+                <Ionicons name="eye" size={24} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={{ flexDirection: "row", marginVertical: 6 }}></View>
+        {/* Terms and Conditons */}
+        <View style={{ marginBottom: 12 }}>
+          <View style={{ flexDirection: "row", marginVertical: 6 }}>
+            <Checkbox
+              value={isChecked}
+              onValueChange={setIsChecked}
+              color={isChecked ? COLORS.secondary : undefined}
+              style={{ marginRight: 8 }}
+            />
+            <Text
+              style={{
+                color: COLORS.primary,
+                fontSize: 13,
+                fontFamily: fonts.Regular,
+              }}
+            >
+              I agree with terms the{" "}
+            </Text>
+            <TouchableOpacity>
+              <Text
+                style={{
+                  color: COLORS.secondary,
+                  fontSize: 13,
+                  fontFamily: fonts.Regular,
+                }}
+              >
+                terms and conditions.{" "}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {/* Login Button */}
         <TouchableOpacity
@@ -162,111 +306,89 @@ export default function SignUp() {
           </Text>
         </TouchableOpacity>
         <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              marginVertical: 15,
-              gap:2
-            }}
-          >
-            <Text style={{ color: COLORS.primary, fontFamily: fonts.Regular }}>
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            marginVertical: 15,
+            gap: 2,
+          }}
+        >
+          <Text style={{ color: COLORS.primary, fontFamily: fonts.Regular }}>
             Already have account?
+          </Text>
+          <TouchableOpacity onPress={() => router.navigate("/auth/sign-in")}>
+            <Text
+              style={{ color: COLORS.secondary, fontFamily: fonts.SemiBold }}
+            >
+              Sign in
             </Text>
-            <TouchableOpacity onPress={() => router.navigate('/auth/sign-in')}>
-              <Text
-                style={{ color: COLORS.secondary, fontFamily: fonts.SemiBold }}
-              >
-                Sign in
-              </Text>
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
 }
 
-// import React, { useState } from 'react';
-// import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
-// import { useNavigation } from '@react-navigation/native'; // For navigation
-// import { useRouter } from 'expo-router';
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 16,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  input: {
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  backButton: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  backButtonText: {
+    color: "#007bff",
+    fontSize: 16,
+  },
+});
 
-// export default function SignUp() {
-//   const navigation = useNavigation();
-//   const [username, setUsername] = useState('');
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-
-//   const router = useRouter();
-
-//   const handleSignUp = () => {
-//     // Handle sign-up logic here
-//     console.log('Sign Up:', { username, email, password });
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.title}>Sign Up</Text>
-
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Username"
-//         value={username}
-//         onChangeText={setUsername}
-//       />
-
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Email"
-//         value={email}
-//         onChangeText={setEmail}
-//         keyboardType="email-address"
-//       />
-
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Password"
-//         value={password}
-//         onChangeText={setPassword}
-//         secureTextEntry
-//       />
-
-//       <Button title="Sign Up" onPress={handleSignUp} />
-
-//       <TouchableOpacity onPress={() => router.push('auth/sign-in') } style={styles.backButton}>
-//         <Text style={styles.backButtonText}>Back to Login</Text>
-//       </TouchableOpacity>
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     padding: 16,
-//     backgroundColor: '#fff',
-//   },
-//   title: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     marginBottom: 20,
-//     textAlign: 'center',
-//   },
-//   input: {
-//     height: 40,
-//     borderColor: '#ccc',
-//     borderWidth: 1,
-//     marginBottom: 10,
-//     paddingHorizontal: 8,
-//     borderRadius: 4,
-//   },
-//   backButton: {
-//     marginTop: 20,
-//     alignItems: 'center',
-//   },
-//   backButtonText: {
-//     color: '#007bff',
-//     fontSize: 16,
-//   },
-// });
+{
+  /* <Picker
+              selectedValue={selectedCode}
+              onValueChange={(itemValue) => setSelectedCode(itemValue)}
+              style={{
+                width: "20%",
+                height: "100%",
+                borderRightWidth: 1,
+                borderRightColor: COLORS.grey,
+                fontFamily: fonts.Regular,
+              }}
+            >
+              {countryCodes.map((code) => (
+                <Picker.Item
+                  key={code.value}
+                  label={code.label}
+                  value={code.value}
+                />
+              ))}
+            </Picker> */
+}
+{
+  /* <View
+              style={{
+                width: "10%",
+                borderRightWidth: 1,
+                borderLeftColor: COLORS.grey,
+                height: "100%",
+              }}
+            ></View> */
+}

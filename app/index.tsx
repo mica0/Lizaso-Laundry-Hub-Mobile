@@ -42,8 +42,8 @@
 //   );
 // }
 
-import { View } from 'react-native';
-import Onboarding from '../components/Onboarding';
+import { View } from "react-native";
+import Onboarding from "../components/Onboarding";
 
 export default function Index() {
   return (
