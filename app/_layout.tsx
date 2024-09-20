@@ -1,4 +1,3 @@
-
 import { Text } from "react-native";
 import { Stack } from "expo-router";
 import useFonts from "../hooks/useFonts";
@@ -8,10 +7,15 @@ export default function RootLayout() {
   if (!fontsLoaded) {
     return <Text>Loading...</Text>;
   }
-  return <Stack screenOptions={{ headerShown: false }}></Stack>;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="(tabs)" />
+      {/* <Stack.Screen name="auth/sign-in" />
+      <Stack.Screen name="auth/sign-up" /> */}
+    </Stack>
+  );
 }
-
-
 
 // import React from 'react';
 // import { Text, View, StyleSheet } from 'react-native';
@@ -50,7 +54,6 @@ export default function RootLayout() {
 //     fontSize: 18,
 //   },
 // });
-
 
 // <Stack screenOptions={{ headerShown: false }}>
 //   {/* <Stack.Screen name="(tabs)" /> */}

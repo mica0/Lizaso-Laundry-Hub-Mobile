@@ -100,7 +100,7 @@ export default function TabBar({ state, descriptors, navigation }) {
 const styles = StyleSheet.create({
   tabbar: {
     position: "absolute",
-    bottom: 10,
+    bottom: 15,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

@@ -18,8 +18,6 @@ import { login } from "../../../data/api/authApi";
 export default function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [usernameError, setUsernameError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -80,17 +78,22 @@ export default function SignIn() {
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         const response = await login(data);
-        if (!response) {
-          console.log(response.message);
+        if (response.success) {
+          router.push("/(staff)/home");
         } else {
-          console.log(ulol);
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            username: response.message,
+          }));
         }
       } catch (error) {
-        console.error("Login failed:", error);
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          global: "Login failed. Please try again.",
-        }));
+        if (error.response && error.response.data) {
+          console.log(error.response.data.message);
+        } else {
+          console.log(
+            "An unexpected error occurred while creating the service type."
+          );
+        }
         setLoading(false);
       } finally {
         setLoading(false);

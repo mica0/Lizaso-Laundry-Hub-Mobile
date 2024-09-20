@@ -158,11 +158,6 @@ export default function SignUp() {
             "An unexpected error occurred while creating the service type."
           );
         }
-        // // console.error("Registration failed:", error);
-        // setErrors((prevErrors) => ({
-        //   ...prevErrors,
-        //   global: "Registration failed. Please try again.",
-        // }));
         setLoading(false);
       } finally {
         setLoading(false);

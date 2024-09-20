@@ -2,22 +2,22 @@ lizaso-laundry-hub/
 │
 ├── .expo/  
 ├── app/
+│   ├── (customer)/
+│   ├── (staff)/
 │   ├── (tabs)/
 │   │   ├── layout.jsx
 │   │   ├── home.jsx
 │   │   └── profile.jsx
 │   ├── auth/
-│   │   ├── sign-in/index.js
-│   │   ├── sign-ups/index.js
+│   │   ├── sign-in/
+│   │   │    └── index.js
+│   │   └── sign-ups/
+│   │        └── index.js
 │   ├── _layout.tsx   
 │   └── index.tsx   
 ├── assets/
 ├── components/
 │   ├── Onboarding.jsx
-│   ├── Login.jsx
-│   ├── Signup.jsx
-│   ├── Tabbar.jsx
-│   ├── Popup.jsx
 │   └── 
 ├── constants/
 ├── data/
