@@ -7,11 +7,13 @@ import {
   StyleSheet,
   SafeAreaView,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation, useRouter } from "expo-router";
 import COLORS from "../../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../../constants/fonts";
+import { login } from "../../../data/api/authApi";
 
 export default function SignIn() {
   const [username, setUsername] = useState("");
@@ -19,45 +21,80 @@ export default function SignIn() {
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [isPasswordShown, setIsPasswordShown] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const navigation = useNavigation();
   const router = useRouter();
 
-  const handleLogin = () => {
-    let hasError = false;
-
-    // Validate inputs
-    if (username.trim() === "") {
-      setUsernameError("Username is required");
-      hasError = true;
-    } else {
-      setUsernameError("");
-    }
-
-    if (password.trim() === "") {
-      setPasswordError("Password is required");
-      hasError = true;
-    } else {
-      setPasswordError("");
-    }
-
-    if (!hasError) {
-      console.log("Username:", username);
-      console.log("Password:", password);
-    }
+  const Clear = () => {
+    setUsername("");
+    setPassword("");
   };
 
-  const handleUsernameChange = (text) => {
-    setUsername(text);
-    if (text.trim() !== "") {
-      setUsernameError("");
+  const validateFields = () => {
+    const newErrors = {};
+
+    if (!username) {
+      newErrors.username = "Username is required";
     }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+    }
+
+    return newErrors;
   };
 
-  const handlePasswordChange = (text) => {
-    setPassword(text);
-    if (text.trim() !== "") {
-      setPasswordError("");
+  const handleInputChange = (field) => (value) => {
+    switch (field) {
+      case "username":
+        setUsername(value);
+        break;
+      case "password":
+        setPassword(value);
+      default:
+        break;
+    }
+
+    // Clear errors related to the field
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [field]: "",
+    }));
+  };
+
+  const handleLogin = async () => {
+    const newErrors = validateFields();
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      const data = {
+        username: username,
+        password: password,
+      };
+
+      setLoading(true);
+
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        const response = await login(data);
+        if (!response) {
+          console.log(response.message);
+        } else {
+          console.log(ulol);
+        }
+      } catch (error) {
+        console.error("Login failed:", error);
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          global: "Login failed. Please try again.",
+        }));
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -84,10 +121,16 @@ export default function SignIn() {
               Username
             </Text>
             <View
-              style={[
-                styles.inputContainer,
-                usernameError ? styles.errorBorder : {},
-              ]}
+              style={{
+                width: "100%",
+                height: 48,
+                borderColor: errors.username ? COLORS.error : COLORS.primary,
+                borderWidth: 1,
+                borderRadius: 8,
+                alignItems: "center",
+                justifyContent: "center",
+                paddingLeft: 22,
+              }}
             >
               <TextInput
                 placeholder="Enter your username"
@@ -95,14 +138,21 @@ export default function SignIn() {
                 keyboardType="default"
                 style={{ width: "100%", fontFamily: fonts.Regular }}
                 value={username}
-                onChangeText={handleUsernameChange}
+                onChangeText={handleInputChange("username")}
               />
             </View>
-            {usernameError ? (
-              <Text style={{ color: "red", fontSize: 12 }}>
-                {usernameError}
+            {errors.username && (
+              <Text
+                style={{
+                  color: COLORS.error,
+                  fontSize: 12,
+                  marginTop: 4,
+                  marginStart: 10,
+                }}
+              >
+                {errors.username}
               </Text>
-            ) : null}
+            )}
           </View>
 
           {/* Password Field */}
@@ -118,10 +168,16 @@ export default function SignIn() {
               Password
             </Text>
             <View
-              style={[
-                styles.inputContainer,
-                passwordError ? styles.errorBorder : {},
-              ]}
+              style={{
+                width: "100%",
+                height: 48,
+                borderColor: errors.password ? COLORS.error : COLORS.primary,
+                borderWidth: 1,
+                borderRadius: 8,
+                alignItems: "center",
+                justifyContent: "center",
+                paddingLeft: 22,
+              }}
             >
               <TextInput
                 placeholder="Enter your password"
@@ -129,7 +185,7 @@ export default function SignIn() {
                 secureTextEntry={!isPasswordShown}
                 style={{ width: "100%", fontFamily: fonts.Regular }}
                 value={password}
-                onChangeText={handlePasswordChange}
+                onChangeText={handleInputChange("password")}
               />
               <TouchableOpacity
                 onPress={() => setIsPasswordShown(!isPasswordShown)}
@@ -142,11 +198,18 @@ export default function SignIn() {
                 />
               </TouchableOpacity>
             </View>
-            {passwordError ? (
-              <Text style={{ color: "red", fontSize: 12 }}>
-                {passwordError}
+            {errors.password && (
+              <Text
+                style={{
+                  color: COLORS.error,
+                  fontSize: 12,
+                  marginTop: 4,
+                  marginStart: 10,
+                }}
+              >
+                {errors.password}
               </Text>
-            ) : null}
+            )}
           </View>
 
           <TouchableOpacity>
@@ -170,18 +233,25 @@ export default function SignIn() {
               borderRadius: 10,
               marginTop: 10,
               padding: 10,
+              opacity: loading ? 0.7 : 1,
+              height: 50,
+              justifyContent: "center",
             }}
           >
-            <Text
-              style={{
-                color: COLORS.white,
-                fontSize: 15,
-                fontFamily: fonts.Bold,
-                textAlign: "center",
-              }}
-            >
-              Login
-            </Text>
+            {loading ? (
+              <ActivityIndicator size="large" color={COLORS.white} />
+            ) : (
+              <Text
+                style={{
+                  color: COLORS.white,
+                  fontSize: 15,
+                  fontFamily: fonts.Bold,
+                  textAlign: "center",
+                }}
+              >
+                Login
+              </Text>
+            )}
           </TouchableOpacity>
 
           <Text

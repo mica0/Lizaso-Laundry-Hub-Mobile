@@ -7,6 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  ToastAndroid,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
@@ -17,6 +18,7 @@ import { useNavigation, useRouter } from "expo-router";
 import Checkbox from "expo-checkbox";
 import { register } from "../../../data/api/authApi";
 // import { initializeApi } from "../../../data/api/authApi";
+import Toast from "../../../components/Toast";
 
 export default function SignUp() {
   const router = useRouter();
@@ -126,29 +128,43 @@ export default function SignUp() {
 
       try {
         // Simulate a delay
-        // const api = await initializeApi();
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Attempt to register
         const response = await register(data);
-        console.log("Registration successful:", response);
-        Alert.alert("Success", response.message || "Registration successful", [
-          {
-            text: "OK",
-            onPress: () => {
-              navigation.goBack();
-            },
-          },
-        ]);
+        if (response.success) {
+          Alert.alert(
+            "Success",
+            response.message || "Registration successful",
+            [
+              {
+                text: "OK",
+                onPress: () => {
+                  navigation.goBack();
+                },
+              },
+            ]
+          );
+        } else {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            username: response.message,
+          }));
+        }
       } catch (error) {
-        console.error("Registration failed:", error);
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          global: "Registration failed. Please try again.",
-        }));
+        if (error.response && error.response.data) {
+          console.log(error.response.data.message);
+        } else {
+          console.log(
+            "An unexpected error occurred while creating the service type."
+          );
+        }
+        // // console.error("Registration failed:", error);
+        // setErrors((prevErrors) => ({
+        //   ...prevErrors,
+        //   global: "Registration failed. Please try again.",
+        // }));
         setLoading(false);
       } finally {
-        // Set loading state to false regardless of success or failure
         setLoading(false);
       }
     }
@@ -595,66 +611,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-{
-  /* Signup Button */
-}
-{
-  /* <TouchableOpacity
-            onPress={handleSignup}
-            disabled={loading} // Disable button while loading
-            style={{
-              backgroundColor: COLORS.secondary,
-              borderRadius: 10,
-              marginTop: 10,
-              padding: 10,
-              opacity: loading ? 0.7 : 1, // Add some visual feedback when loading
-              alignItems: "center", // Center content horizontally
-              justifyContent: "center", // Center content vertically
-              height: 50, // Fixed height to prevent size change
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              {loading ? (
-                <ActivityIndicator size="small" color={COLORS.white} />
-              ) : (
-                <Text
-                  style={{
-                    color: COLORS.white,
-                    fontSize: 15,
-                    fontFamily: fonts.Bold,
-                    textAlign: "center",
-                  }}
-                >
-                  Register
-                </Text>
-              )}
-            </View>
-          </TouchableOpacity> */
-}
-
-// const handleSignup = async () => {
-//   const newErrors = validateFields();
-//   setErrors(newErrors);
-
-//   if (Object.keys(newErrors).length === 0) {
-//     const data = {
-//       c_number: phoneNumber,
-//       c_username: username,
-//       c_firstname: firstname,
-//       c_middlename: middlename,
-//       c_lastname: lastname,
-//       c_password: password,
-//       isAgreement: isChecked,
-//     };
-
-//     setTimeout(async () => {
-//       try {
-//         const response = await register(data);
-//         console.log("Registration successful:", response);
-//       } catch (error) {
-//         console.error("Registration failed:", error);
-//       }
-//     }, 500);
-//   }
-// };

@@ -25,9 +25,27 @@ export const register = async (data) => {
     const response = await api.post("/register", data); // Corrected parameter name to 'data'
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    throw error;
   }
 };
+
+export const login = async (data) => {
+  try {
+    const response = await api.post("/login", data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// export const login = async (data) => {
+//   try {
+//     const response = await api.post("/login", data);
+//     return response.data;
+//   } catch (error) {
+//     throw error.response ? error.response.data : new Error("Network Error");
+//   }
+// };
 
 // import axios from "axios";
 
