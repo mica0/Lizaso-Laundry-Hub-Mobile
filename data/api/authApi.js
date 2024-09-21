@@ -7,19 +7,6 @@ const api = axios.create({
   timeout: 5000,
 });
 
-// Test if the base URL is working
-const testConnection = async () => {
-  try {
-    const response = await api.get("/"); // Assuming you have a root endpoint or a health check endpoint
-    console.log("Base URL is working. Response:", response.data);
-  } catch (error) {
-    console.error("Error connecting to the base URL:", error.message);
-  }
-};
-
-// Call the test function
-testConnection();
-
 export const register = async (data) => {
   try {
     const response = await api.post("/register", data); // Corrected parameter name to 'data'
@@ -37,6 +24,19 @@ export const login = async (data) => {
     throw error;
   }
 };
+
+// Test if the base URL is working
+// const testConnection = async () => {
+//   try {
+//     const response = await api.get("/"); // Assuming you have a root endpoint or a health check endpoint
+//     console.log("Base URL is working. Response:", response.data);
+//   } catch (error) {
+//     console.error("Error connecting to the base URL:", error.message);
+//   }
+// };
+
+// // Call the test function
+// testConnection();
 
 // export const login = async (data) => {
 //   try {

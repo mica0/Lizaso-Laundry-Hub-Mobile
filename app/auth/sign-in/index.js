@@ -72,32 +72,32 @@ export default function SignIn() {
         password: password,
       };
 
-      setLoading(true);
+      router.push("/(customer)/home");
 
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+      // setLoading(true);
 
-        const response = await login(data);
-        if (response.success) {
-          router.push("/(staff)/home");
-        } else {
-          setErrors((prevErrors) => ({
-            ...prevErrors,
-            username: response.message,
-          }));
-        }
-      } catch (error) {
-        if (error.response && error.response.data) {
-          console.log(error.response.data.message);
-        } else {
-          console.log(
-            "An unexpected error occurred while creating the service type."
-          );
-        }
-        setLoading(false);
-      } finally {
-        setLoading(false);
-      }
+      // try {
+      //   await new Promise((resolve) => setTimeout(resolve, 500));
+
+      //   const response = await login(data);
+      //   if (response.success) {
+      //     router.push("/(staff)/home");
+      //   } else {
+      //     setErrors((prevErrors) => ({
+      //       ...prevErrors,
+      //       username: response.message,
+      //     }));
+      //   }
+      // } catch (error) {
+      //   if (error.response && error.response.data) {
+      //     console.log(error.response.data.message);
+      //   } else {
+      //     console.log("An unexpected error occurred.");
+      //   }
+      //   setLoading(false);
+      // } finally {
+      //   setLoading(false);
+      // }
     }
   };
 
