@@ -6,8 +6,6 @@
 // const tintColorLight = '#0a7ea4';
 // const tintColorDark = '#fff';
 
- 
-
 // export const primaryColors = {
 //   light: {
 //     text: '#11181C',
@@ -31,7 +29,6 @@
 //     grey: '#737373',
 //   }
 // };
-
 
 const COLORS = {
   // Basic colors
