@@ -13,21 +13,21 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="home"
+        name="pickup"
         options={{
-          tabBarLabel: "Home",
+          tabBarLabel: "Pickup",
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="delivery"
         options={{
-          tabBarLabel: "Explore",
+          tabBarLabel: "Delivery",
         }}
       />
       <Tabs.Screen
-        name="payment"
+        name="history"
         options={{
-          tabBarLabel: "Payment",
+          tabBarLabel: "History",
         }}
       />
       <Tabs.Screen
@@ -36,6 +36,12 @@ export default function TabLayout() {
           tabBarLabel: "Profile",
         }}
       />
+      {/* <Tabs.Screen
+        name="delivery"
+        options={{
+          tabBarLabel: "Delivery",
+        }}
+      /> */}
     </Tabs>
   );
 }

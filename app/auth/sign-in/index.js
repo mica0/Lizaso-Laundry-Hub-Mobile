@@ -72,7 +72,8 @@ export default function SignIn() {
         password: password,
       };
 
-      router.push("/(customer)/home");
+      // router.push("/(customer)/home");
+      router.push("/(staff)/pickup");
 
       // setLoading(true);
 

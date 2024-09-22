@@ -4,7 +4,7 @@ import React from "react";
 import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
 
-export default function Explore() {
+export default function History() {
   return (
     <SafeAreaView style={{ flex: 1, padding: 16, backgroundColor: "#f5f5f5" }}>
       <Text
