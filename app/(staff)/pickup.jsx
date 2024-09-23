@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
+import { FlashList } from "@shopify/flash-list";
 
 const mockServices = [
   {
@@ -41,6 +36,15 @@ const mockServices = [
   },
   {
     id: "4",
+    name: "Laundry",
+    location: "321 River St, Uptown",
+    customerName: "Emily Brown",
+    requestDate: "2024-09-04T11:45:00Z",
+    distance: "5 km",
+    status: "Pending Pickup",
+  },
+  {
+    id: "5",
     name: "Laundry",
     location: "321 River St, Uptown",
     customerName: "Emily Brown",
@@ -183,14 +187,17 @@ export default function Pickup() {
                 filter === "Cancel" && styles.activeTabText,
               ]}
             >
-              Canceled
+              Cancel
             </Text>
           </TouchableOpacity>
         </View>
-        <FlatList
+        <FlashList
           data={sortedServices}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 60 }}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={100}
         />
       </View>
     </SafeAreaView>
@@ -298,6 +305,7 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
+    height: 40,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 5,
