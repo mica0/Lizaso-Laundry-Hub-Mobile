@@ -1,21 +1,61 @@
 import { Text } from "react-native";
 import { Stack } from "expo-router";
 import useFonts from "../hooks/useFonts";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { PortalProvider } from "@gorhom/portal";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export default function RootLayout() {
   const fontsLoaded = useFonts();
   if (!fontsLoaded) {
     return <Text>Loading...</Text>;
   }
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="(tabs)" />
-      {/* <Stack.Screen name="auth/sign-in" />
-      <Stack.Screen name="auth/sign-up" /> */}
-    </Stack>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <PortalProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+        </Stack>
+      </PortalProvider>
+    </GestureHandlerRootView>
   );
 }
+
+// import { Text } from "react-native";
+// import { Stack } from "expo-router";
+// import useFonts from "../hooks/useFonts";
+
+// export default function RootLayout() {
+//   const fontsLoaded = useFonts();
+//   if (!fontsLoaded) {
+//     return <Text>Loading...</Text>;
+//   }
+//   return (
+//     <Stack screenOptions={{ headerShown: false }}>
+//       <Stack.Screen name="index" />
+//     </Stack>
+//   );
+// }
+
+// import { Text } from "react-native";
+// import { Stack } from "expo-router";
+// import useFonts from "../hooks/useFonts";
+
+// export default function RootLayout() {
+//   const fontsLoaded = useFonts();
+//   if (!fontsLoaded) {
+//     return <Text>Loading...</Text>;
+//   }
+//   return (
+//     <Stack screenOptions={{ headerShown: false }}>
+//       <Stack.Screen name="index" />
+//       <Stack.Screen name="(tabs)" />
+//       {/* <Stack.Screen name="auth/sign-in" />
+//       <Stack.Screen name="auth/sign-up" /> */}
+//     </Stack>
+//   );
+// }
 
 // import React from 'react';
 // import { Text, View, StyleSheet } from 'react-native';

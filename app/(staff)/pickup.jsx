@@ -18,9 +18,12 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+} from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
+import { Portal } from "@gorhom/portal";
 
 const mockServices = [
   {
@@ -126,6 +129,10 @@ export default function Pickup() {
     bottomSheetRef.current?.expand();
   };
 
+  const handleCloseSheet = () => {
+    bottomSheetRef.current?.close();
+  };
+
   // Filter services based on the selected tab
   const filteredServices = services.filter((service) => {
     if (filter === "All") {
@@ -183,7 +190,7 @@ export default function Pickup() {
       statusText = "Pending";
     } else if (item.status === "Ongoing Pickup") {
       backgroundColor = COLORS.success;
-      // iconComponent = <AnimatedIcon />; // comment for now
+      iconComponent = <AnimatedIcon />; // comment for now
       statusText = "Ongoing";
     }
 
@@ -267,85 +274,80 @@ export default function Pickup() {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView style={styles.container}>
-        {/* Upper Design */}
-        <View style={{ marginBottom: 1, alignItems: "center" }}>
-          <Text
-            style={{ fontSize: 24, fontWeight: "bold", color: COLORS.white }}
-          >
-            Pickup Orders
+    <SafeAreaView style={styles.container}>
+      {/* Upper Design */}
+      <View style={{ marginBottom: 1, alignItems: "center" }}>
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: COLORS.white }}>
+          Pickup Orders
+        </Text>
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: "#FF6F61", // Example color
+            justifyContent: "center",
+            alignItems: "center",
+            marginVertical: 8,
+          }}
+        >
+          <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
+            {pendingOrdersCount}
           </Text>
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: "#FF6F61", // Example color
-              justifyContent: "center",
-              alignItems: "center",
-              marginVertical: 8,
-            }}
-          >
-            <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
-              {pendingOrdersCount}
-            </Text>
-          </View>
-          <Text style={{ fontSize: 16, color: "white" }}>Pending</Text>
         </View>
+        <Text style={{ fontSize: 16, color: "white" }}>Pending</Text>
+      </View>
 
-        {/* Bottom Design */}
-        <View style={styles.listContainer}>
-          <View style={styles.tabContainer}>
-            <TouchableOpacity
-              style={[styles.tab, filter === "All" && styles.activeTab]}
-              onPress={() => setFilter("All")}
+      {/* Bottom Design */}
+      <View style={styles.listContainer}>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, filter === "All" && styles.activeTab]}
+            onPress={() => setFilter("All")}
+          >
+            <Text
+              style={[styles.tabText, filter === "All" && styles.activeTabText]}
             >
-              <Text
-                style={[
-                  styles.tabText,
-                  filter === "All" && styles.activeTabText,
-                ]}
-              >
-                All
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, filter === "Nearest" && styles.activeTab]}
-              onPress={() => setFilter("Nearest")}
+              All
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, filter === "Nearest" && styles.activeTab]}
+            onPress={() => setFilter("Nearest")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                filter === "Nearest" && styles.activeTabText,
+              ]}
             >
-              <Text
-                style={[
-                  styles.tabText,
-                  filter === "Nearest" && styles.activeTabText,
-                ]}
-              >
-                Nearest
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, filter === "Cancel" && styles.activeTab]}
-              onPress={() => setFilter("Cancel")}
+              Nearest
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, filter === "Cancel" && styles.activeTab]}
+            onPress={() => setFilter("Cancel")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                filter === "Cancel" && styles.activeTabText,
+              ]}
             >
-              <Text
-                style={[
-                  styles.tabText,
-                  filter === "Cancel" && styles.activeTabText,
-                ]}
-              >
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <FlashList
-            data={sortedServices}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={{ paddingBottom: 60 }}
-            showsVerticalScrollIndicator={false}
-            estimatedItemSize={100}
-          />
+              Cancel
+            </Text>
+          </TouchableOpacity>
         </View>
+        <FlashList
+          data={sortedServices}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 60 }}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={100}
+        />
+      </View>
+      <Portal>
         <BottomSheet
           ref={bottomSheetRef}
           index={-1}
@@ -377,10 +379,49 @@ export default function Pickup() {
                 </Text>
               </>
             )}
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={handleCloseSheet}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
           </View>
         </BottomSheet>
-      </SafeAreaView>
-    </GestureHandlerRootView>
+        {/* <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          backgroundStyle={{ backgroundColor: COLORS.white }}
+          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
+          backdropComponent={renderBackdrop}
+        >
+          <View style={styles.contentContainer}>
+            {selectedService && (
+              <>
+                <Text style={styles.modalTitle}>{selectedService.name}</Text>
+                <Text style={styles.modalText}>
+                  Customer: {selectedService.customerName}
+                </Text>
+                <Text style={styles.modalText}>
+                  Location: {selectedService.location}
+                </Text>
+                <Text style={styles.modalText}>
+                  Request Date:{" "}
+                  {new Date(selectedService.requestDate).toLocaleString()}
+                </Text>
+                <Text style={styles.modalText}>
+                  Distance: {selectedService.distance}
+                </Text>
+                <Text style={styles.modalText}>
+                  Status: {selectedService.status}
+                </Text>
+              </>
+            )}
+          </View>
+        </BottomSheet> */}
+      </Portal>
+    </SafeAreaView>
   );
 }
 
@@ -393,6 +434,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   modalText: {
+    fontSize: 16,
+  },
+  closeButton: {
+    marginTop: 100,
+    paddingVertical: 10,
+    backgroundColor: COLORS.primary,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: COLORS.white,
     fontSize: 16,
   },
   container: {

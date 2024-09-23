@@ -44,6 +44,7 @@
 
 import { View } from "react-native";
 import Onboarding from "../components/Onboarding";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export default function Index() {
   return (

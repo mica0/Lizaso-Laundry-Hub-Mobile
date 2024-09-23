@@ -10,6 +10,12 @@ export default function TabLayout() {
         tabBar={(props) => <TabBar {...props} />}
         screenOptions={{
           headerShown: false,
+          tabBarStyle: {
+            position: "absolute", // Position it absolutely
+            bottom: 0, // Keep it at the bottom
+            zIndex: 1, // Lower z-index for the tab bar
+            width: "100%", // Full width
+          },
         }}
       >
         <Tabs.Screen
@@ -46,6 +52,55 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+// import { View, StyleSheet } from "react-native";
+// import { Tabs } from "expo-router";
+// import React from "react";
+// import TabBar from "../../components/TabBar";
+
+// export default function TabLayout() {
+//   return (
+//     <View style={styles.container}>
+//       <Tabs
+//         tabBar={(props) => <TabBar {...props} />}
+//         screenOptions={{
+//           headerShown: false,
+//         }}
+//       >
+//         <Tabs.Screen
+//           name="pickup"
+//           options={{
+//             tabBarLabel: "Pickup",
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="delivery"
+//           options={{
+//             tabBarLabel: "Delivery",
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="history"
+//           options={{
+//             tabBarLabel: "History",
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="profile"
+//           options={{
+//             tabBarLabel: "Profile",
+//           }}
+//         />
+//       </Tabs>
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//   },
+// });
 
 // import { View, Text } from "react-native";
 // import { Tabs } from "expo-router";

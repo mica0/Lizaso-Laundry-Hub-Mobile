@@ -19,7 +19,8 @@ lizaso-laundry-hub/
 ├── assets/
 ├── components/
 │   ├── Onboarding.jsx
-│   └── 
+│   ├── TabBar.jsx
+│   └── TabBarButton.jsx
 ├── constants/
 ├── data/
 │   └──api
