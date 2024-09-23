@@ -183,11 +183,10 @@ export default function Pickup() {
                 filter === "Cancel" && styles.activeTabText,
               ]}
             >
-              Cancel
+              Canceled
             </Text>
           </TouchableOpacity>
         </View>
-
         <FlatList
           data={sortedServices}
           renderItem={renderItem}
@@ -213,6 +212,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
     padding: 20,
+    marginTop: 50,
   },
   title: {
     fontSize: 32,
@@ -291,34 +291,35 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 10,
     backgroundColor: COLORS.lightGray,
-    borderRadius: 8,
-    marginBottom: 10,
-    gap: 10,
+    borderRadius: 10,
+    marginBottom: 12,
+    gap: 12,
+    alignItems: "center",
   },
   tab: {
-    paddingTop: 5,
-    paddingBottom: 5,
-    paddingStart: 10,
-    paddingEnd: 10,
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: COLORS.secondary, // Border color for the tab
-    backgroundColor: "transparent", // Make background transparent
+    borderColor: COLORS.secondary,
+    backgroundColor: "transparent",
+    justifyContent: "center",
+    alignItems: "center",
   },
-
   activeTab: {
-    backgroundColor: COLORS.secondary, // Background color for the active tab
-    borderColor: COLORS.secondary, // Keep border color same as background
+    backgroundColor: COLORS.secondary,
+    borderColor: COLORS.secondary,
   },
 
   tabText: {
     fontSize: 15,
-    color: COLORS.secondary, // Text color for the tab
+    color: COLORS.secondary,
     fontFamily: fonts.SemiBold,
   },
 
   activeTabText: {
-    color: COLORS.white, // Text color for active tab
+    color: COLORS.white,
   },
   button: {
     width: 40,
