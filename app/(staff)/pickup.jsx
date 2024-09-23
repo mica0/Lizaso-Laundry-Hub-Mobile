@@ -339,7 +339,7 @@ export default function Pickup() {
           />
         </View>
         {/* Modal for displaying selected service details */}
-        <Modal
+        {/* <Modal
           animationType="slide"
           transparent={true}
           visible={modalVisible}
@@ -367,7 +367,7 @@ export default function Pickup() {
               )}
             </View>
           </View>
-        </Modal>
+        </Modal> */}
       </SafeAreaView>
     </LinearGradient>
   );
