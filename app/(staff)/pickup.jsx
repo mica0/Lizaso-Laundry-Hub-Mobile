@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Pressable,
-  Modal,
-} from "react-native";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../constants/fonts";
@@ -19,6 +18,8 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 
 const mockServices = [
@@ -101,8 +102,20 @@ const AnimatedIcon = () => {
 export default function Pickup() {
   const [services, setServices] = useState([]);
   const [filter, setFilter] = useState("All");
-  const [modalVisible, setModalVisible] = useState(false);
+
+  const bottomSheetRef = useRef(null);
+  const snapPoints = useMemo(() => ["25%", "50%", "70%"], []);
   const [selectedService, setSelectedService] = useState(null);
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+        {...props}
+      />
+    ),
+    []
+  );
 
   useEffect(() => {
     setServices(mockServices);
@@ -110,12 +123,7 @@ export default function Pickup() {
 
   const openModal = (service) => {
     setSelectedService(service);
-    setModalVisible(true);
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-    setSelectedService(null);
+    bottomSheetRef.current?.expand();
   };
 
   // Filter services based on the selected tab
@@ -175,7 +183,7 @@ export default function Pickup() {
       statusText = "Pending";
     } else if (item.status === "Ongoing Pickup") {
       backgroundColor = COLORS.success;
-      iconComponent = <AnimatedIcon />;
+      // iconComponent = <AnimatedIcon />; // comment for now
       statusText = "Ongoing";
     }
 
@@ -259,15 +267,13 @@ export default function Pickup() {
   };
 
   return (
-    <LinearGradient
-      colors={["#5787C8", "#71C7DA"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      style={{ flex: 1 }}
-    >
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
-        <View style={{ marginBottom: 16, alignItems: "center" }}>
-          <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+        {/* Upper Design */}
+        <View style={{ marginBottom: 1, alignItems: "center" }}>
+          <Text
+            style={{ fontSize: 24, fontWeight: "bold", color: COLORS.white }}
+          >
             Pickup Orders
           </Text>
           <View
@@ -287,6 +293,8 @@ export default function Pickup() {
           </View>
           <Text style={{ fontSize: 16, color: "white" }}>Pending</Text>
         </View>
+
+        {/* Bottom Design */}
         <View style={styles.listContainer}>
           <View style={styles.tabContainer}>
             <TouchableOpacity
@@ -338,44 +346,58 @@ export default function Pickup() {
             estimatedItemSize={100}
           />
         </View>
-        {/* Modal for displaying selected service details */}
-        {/* <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={closeModal}
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          backgroundStyle={{ backgroundColor: COLORS.white }}
+          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
+          backdropComponent={renderBackdrop}
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              {selectedService && (
-                <>
-                  <Text style={styles.modalTitle}>{selectedService.name}</Text>
-                  <Text style={styles.modalText}>
-                    Customer: {selectedService.customerName}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Location: {selectedService.location}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Request Date:{" "}
-                    {new Date(selectedService.requestDate).toLocaleString()}
-                  </Text>
-                  <Pressable style={styles.closeButton} onPress={closeModal}>
-                    <Text style={styles.closeButtonText}>Close</Text>
-                  </Pressable>
-                </>
-              )}
-            </View>
+          <View style={styles.contentContainer}>
+            {selectedService && (
+              <>
+                <Text style={styles.modalTitle}>{selectedService.name}</Text>
+                <Text style={styles.modalText}>
+                  Customer: {selectedService.customerName}
+                </Text>
+                <Text style={styles.modalText}>
+                  Location: {selectedService.location}
+                </Text>
+                <Text style={styles.modalText}>
+                  Request Date:{" "}
+                  {new Date(selectedService.requestDate).toLocaleString()}
+                </Text>
+                <Text style={styles.modalText}>
+                  Distance: {selectedService.distance}
+                </Text>
+                <Text style={styles.modalText}>
+                  Status: {selectedService.status}
+                </Text>
+              </>
+            )}
           </View>
-        </Modal> */}
+        </BottomSheet>
       </SafeAreaView>
-    </LinearGradient>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  contentContainer: {
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  modalText: {
+    fontSize: 16,
+  },
   container: {
     flex: 1,
+    backgroundColor: COLORS.secondary,
   },
   firstContainer: {
     padding: 16,
@@ -510,3 +532,90 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.pending,
   },
 });
+
+{
+  /* <LinearGradient
+colors={["#5787C8", "#71C7DA"]}
+start={{ x: 0, y: 0 }}
+end={{ x: 1, y: 0 }}
+style={{ flex: 1 }}
+>
+<SafeAreaView style={styles.container}>
+  <View style={{ marginBottom: 1, alignItems: "center" }}>
+    <Text
+      style={{ fontSize: 24, fontWeight: "bold", color: COLORS.white }}
+    >
+      Pickup Orders
+    </Text>
+    <View
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: "#FF6F61", // Example color
+        justifyContent: "center",
+        alignItems: "center",
+        marginVertical: 8,
+      }}
+    >
+      <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
+        {pendingOrdersCount}
+      </Text>
+    </View>
+    <Text style={{ fontSize: 16, color: "white" }}>Pending</Text>
+  </View>
+
+  <View style={styles.listContainer}>
+    <View style={styles.tabContainer}>
+      <TouchableOpacity
+        style={[styles.tab, filter === "All" && styles.activeTab]}
+        onPress={() => setFilter("All")}
+      >
+        <Text
+          style={[
+            styles.tabText,
+            filter === "All" && styles.activeTabText,
+          ]}
+        >
+          All
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.tab, filter === "Nearest" && styles.activeTab]}
+        onPress={() => setFilter("Nearest")}
+      >
+        <Text
+          style={[
+            styles.tabText,
+            filter === "Nearest" && styles.activeTabText,
+          ]}
+        >
+          Nearest
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.tab, filter === "Cancel" && styles.activeTab]}
+        onPress={() => setFilter("Cancel")}
+      >
+        <Text
+          style={[
+            styles.tabText,
+            filter === "Cancel" && styles.activeTabText,
+          ]}
+        >
+          Cancel
+        </Text>
+      </TouchableOpacity>
+    </View>
+    <FlashList
+      data={sortedServices}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={{ paddingBottom: 60 }}
+      showsVerticalScrollIndicator={false}
+      estimatedItemSize={100}
+    />
+  </View>
+</SafeAreaView>
+</LinearGradient> */
+}

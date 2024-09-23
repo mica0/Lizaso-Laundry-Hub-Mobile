@@ -1,50 +1,51 @@
-import { View, Text } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Tabs } from "expo-router";
 import React from "react";
 import TabBar from "../../components/TabBar";
 
 export default function TabLayout() {
   return (
-    <Tabs
-      tabBar={(props) => <TabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-        // tabBarActiveTintColor: Colors.PRIMARY,
-      }}
-    >
-      <Tabs.Screen
-        name="pickup"
-        options={{
-          tabBarLabel: "Pickup",
+    <View style={styles.container}>
+      <Tabs
+        tabBar={(props) => <TabBar {...props} />}
+        screenOptions={{
+          headerShown: false,
         }}
-      />
-      <Tabs.Screen
-        name="delivery"
-        options={{
-          tabBarLabel: "Delivery",
-        }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{
-          tabBarLabel: "History",
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          tabBarLabel: "Profile",
-        }}
-      />
-      {/* <Tabs.Screen
-        name="delivery"
-        options={{
-          tabBarLabel: "Delivery",
-        }}
-      /> */}
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="pickup"
+          options={{
+            tabBarLabel: "Pickup",
+          }}
+        />
+        <Tabs.Screen
+          name="delivery"
+          options={{
+            tabBarLabel: "Delivery",
+          }}
+        />
+        <Tabs.Screen
+          name="history"
+          options={{
+            tabBarLabel: "History",
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            tabBarLabel: "Profile",
+          }}
+        />
+      </Tabs>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 // import { View, Text } from "react-native";
 // import { Tabs } from "expo-router";
