@@ -238,7 +238,7 @@ export default function Pickup() {
 
   return (
     <LinearGradient
-      colors={["#5787C8", "#8FAFDA"]}
+      colors={["#5787C8", "#71C7DA"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
       style={{ flex: 1 }}
