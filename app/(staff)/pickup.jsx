@@ -11,6 +11,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
 import { FlashList } from "@shopify/flash-list";
+import Animated, {
+  Easing,
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 
 const mockServices = [
   {
@@ -59,6 +66,32 @@ const mockServices = [
     status: "Ongoing Pickup",
   },
 ];
+
+const AnimatedIcon = () => {
+  const rotation = useSharedValue(0);
+
+  // Define the animated style
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${rotation.value}deg` }],
+    };
+  });
+
+  // Start the rotation animation
+  React.useEffect(() => {
+    rotation.value = withRepeat(
+      withTiming(360, { duration: 1000, easing: Easing.linear }),
+      -1,
+      false
+    );
+  }, [rotation]);
+
+  return (
+    <Animated.View style={animatedStyle}>
+      <Ionicons name="hourglass-outline" size={24} color={COLORS.white} />
+    </Animated.View>
+  );
+};
 
 export default function Pickup() {
   const [services, setServices] = useState([]);
@@ -114,16 +147,19 @@ export default function Pickup() {
     let iconName;
     let backgroundColor;
     let iconComponent;
+    let statusText;
 
     if (item.status === "Pending Pickup") {
-      iconName = "hourglass-outline";
-      backgroundColor = COLORS.warning;
+      iconName = "time-outline";
+      backgroundColor = COLORS.secondary;
       iconComponent = (
-        <Ionicons name={iconName} size={24} color={COLORS.black} />
+        <Ionicons name={iconName} size={24} color={COLORS.white} />
       );
+      statusText = "Pending";
     } else if (item.status === "Ongoing Pickup") {
       backgroundColor = COLORS.success;
-      iconComponent = <ActivityIndicator size="small" color={COLORS.white} />;
+      iconComponent = <AnimatedIcon />;
+      statusText = "Ongoing";
     }
 
     return (
@@ -143,7 +179,7 @@ export default function Pickup() {
               <Text style={styles.locationText}>{item.location}</Text>
             </View>
             <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+              style={{ flexDirection: "row", alignItems: "flex-start", gap: 2 }}
             >
               <TouchableOpacity style={[styles.button, styles.messageButton]}>
                 <Ionicons
@@ -152,8 +188,19 @@ export default function Pickup() {
                   color={COLORS.danger}
                 />
               </TouchableOpacity>
-              <View style={[styles.button, { backgroundColor }]}>
-                {iconComponent}
+              <View style={{ alignItems: "center" }}>
+                <View style={[styles.button, { backgroundColor }]}>
+                  {iconComponent}
+                </View>
+                <Text
+                  style={{
+                    fontFamily: fonts.Regular,
+                    fontSize: 12,
+                    color: COLORS.primary,
+                  }}
+                >
+                  {statusText}
+                </Text>
               </View>
             </View>
           </View>
@@ -290,9 +337,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   customerText: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: fonts.Bold,
-    color: COLORS.black,
+    color: COLORS.primary,
     marginBottom: 2,
   },
   itemText: {
