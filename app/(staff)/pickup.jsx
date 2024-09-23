@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
 
@@ -59,11 +60,27 @@ export default function Pickup() {
         <View style={styles.rowBetween}>
           <View style={styles.requestStatusContainer}>
             <Text style={styles.labelText}>Requested:</Text>
-            <Text style={styles.dateText}>{item.requestDate}</Text>
+            <View style={styles.dateContainer}>
+              <Ionicons
+                name="calendar-outline"
+                size={18}
+                color={COLORS.secondary}
+                style={{ paddingRight: 5 }}
+              />
+              <Text style={styles.dateText}>{item.requestDate}</Text>
+            </View>
           </View>
           <View style={styles.requestStatusContainer}>
             <Text style={styles.labelText}>Status:</Text>
-            <Text style={styles.statusText}>{item.status}</Text>
+            <View style={styles.statusContainer}>
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={18}
+                color={COLORS.success}
+                style={{ paddingRight: 2 }}
+              />
+              <Text style={styles.statusText}>{item.status}</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -152,8 +169,14 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   requestStatusContainer: {
-    flexDirection: "column", // Stack label and value vertically
-    alignItems: "flex-start", // Align to the right
+    flexDirection: "column", // Stack label above the date/status
+    alignItems: "flex-start", // Align items to the left
+  },
+  dateContainer: {
+    flexDirection: "row",
+  },
+  statusContainer: {
+    flexDirection: "row",
   },
   labelText: {
     fontSize: 12,
