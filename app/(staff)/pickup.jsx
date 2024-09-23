@@ -8,17 +8,33 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fonts } from "../../constants/fonts";
-import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 
 const mockServices = [
-  { id: "1", name: "Washing", location: "123 Main St, City Center" },
-  { id: "2", name: "Dry Cleaning", location: "456 Park Ave, Downtown" },
-  { id: "3", name: "Ironing", location: "789 Elm St, Suburbs" },
-  { id: "4", name: "Fold Laundry", location: "321 Oak St, Midtown" },
-  { id: "5", name: "Pickup & Delivery", location: "654 Maple Rd, Uptown" },
-  { id: "6", name: "Fold Laundry", location: "321 Oak St, Midtown" },
-  { id: "7", name: "Pickup & Delivery", location: "654 Maple Rd, Uptown" },
+  {
+    id: "1",
+    name: "Washing",
+    location: "123 Main St, City Center",
+    customerName: "John Doe",
+    requestDate: "2024-09-01",
+    status: "Pending",
+  },
+  {
+    id: "2",
+    name: "Dry Cleaning",
+    location: "456 Park Ave, Downtown",
+    customerName: "Jane Smith",
+    requestDate: "2024-09-02",
+    status: "Completed",
+  },
+  {
+    id: "3",
+    name: "Ironing",
+    location: "789 Elm St, Suburbs",
+    customerName: "Alex Johnson",
+    requestDate: "2024-09-03",
+    status: "In Progress",
+  },
 ];
 
 export default function Pickup() {
@@ -30,12 +46,25 @@ export default function Pickup() {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.itemContainer}>
-      <View style={styles.row}>
-        {/* Service Icon */}
-        <Ionicons name="cart-outline" size={24} color="#4690FF" />
-        <View style={styles.itemDetails}>
-          <Text style={styles.itemText}>{item.name}</Text>
-          <Text style={styles.locationText}>{item.location}</Text>
+      <View style={styles.itemDetails}>
+        {/* Customer Name */}
+        <Text style={styles.customerText}>{item.customerName}</Text>
+        {/* Service Name */}
+        <Text style={styles.itemText}>{item.name}</Text>
+        {/* Location */}
+        <Text style={styles.locationText}>{item.location}</Text>
+        {/* Divider */}
+        <View style={styles.divider} />
+        {/* Date and Status Row */}
+        <View style={styles.rowBetween}>
+          <View style={styles.requestStatusContainer}>
+            <Text style={styles.labelText}>Requested:</Text>
+            <Text style={styles.dateText}>{item.requestDate}</Text>
+          </View>
+          <View style={styles.requestStatusContainer}>
+            <Text style={styles.labelText}>Status:</Text>
+            <Text style={styles.statusText}>{item.status}</Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -43,12 +72,17 @@ export default function Pickup() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Pickup Services</Text>
-      <FlatList
-        data={services}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
+      <View style={styles.firstContainer}>
+        <Text style={styles.title}>Pickup Orders</Text>
+      </View>
+
+      <View style={styles.listContainer}>
+        <FlatList
+          data={services}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -56,8 +90,18 @@ export default function Pickup() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f5f5f5",
+  },
+  firstContainer: {
     padding: 16,
     backgroundColor: "#f5f5f5",
+  },
+  listContainer: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    padding: 20,
   },
   title: {
     fontSize: 32,
@@ -66,126 +110,64 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   itemContainer: {
-    padding: 16,
-    backgroundColor: "#fff",
+    padding: 18,
+    backgroundColor: COLORS.white,
     marginBottom: 10,
     borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    width: "100%", // Ensure the item container takes full width
   },
   itemDetails: {
-    marginLeft: 12,
     flexDirection: "column",
+    width: "100%", // Ensure full width for the item details
+  },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between", // Align left and right
+    marginTop: 8, // Space between the divider and the date/status row
+  },
+  customerText: {
+    fontSize: 18,
+    fontFamily: fonts.Bold,
+    color: COLORS.black,
+    marginBottom: 2,
   },
   itemText: {
-    fontSize: 18,
-    fontFamily: fonts.SemiBold,
-    color: "#333",
+    fontSize: 16,
+    fontFamily: fonts.Medium,
+    color: COLORS.primary,
+    marginBottom: 2,
   },
   locationText: {
-    fontSize: 14,
+    fontSize: 16,
+    fontFamily: fonts.SemiBold,
+    color: COLORS.secondary,
+    marginBottom: 8,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#ddd",
+    marginBottom: 5,
+    width: "100%",
+  },
+  requestStatusContainer: {
+    flexDirection: "column", // Stack label and value vertically
+    alignItems: "flex-start", // Align to the right
+  },
+  labelText: {
+    fontSize: 12,
+    fontFamily: fonts.SemiBold,
+    color: COLORS.primary, // Lighter color for the labels
+  },
+  dateText: {
+    fontSize: 12,
     fontFamily: fonts.Regular,
-    color: "#777",
-    marginTop: 4,
+    color: COLORS.black,
+  },
+  statusText: {
+    fontSize: 12,
+    fontFamily: fonts.Regular,
+    color: COLORS.primary, // Assuming primary color is set
   },
 });
-
-// import React, { useState, useEffect } from "react";
-// import {
-//   View,
-//   Text,
-//   FlatList,
-//   TouchableOpacity,
-//   StyleSheet,
-// } from "react-native";
-// import { SafeAreaView } from "react-native-safe-area-context";
-// import Popup from "../../components/Popup"; // Ensure the path is correct
-// import { fonts } from "../../constants/fonts";
-
-// const mockServices = [
-//   { id: "1", name: "Washing" },
-//   { id: "2", name: "Dry Cleaning" },
-//   { id: "3", name: "Ironing" },
-//   { id: "4", name: "Fold Laundry" },
-//   { id: "5", name: "Pickup & Delivery" },
-// ];
-
-// export default function Pickup() {
-//   const [services, setServices] = useState([]);
-//   const [selectedService, setSelectedService] = useState(null);
-//   const [popupVisible, setPopupVisible] = useState(false);
-
-//   useEffect(() => {
-//     setServices(mockServices);
-//   }, []);
-
-//   const handlePress = (service) => {
-//     setSelectedService(service);
-//     setPopupVisible(true);
-//   };
-
-//   const handleClose = () => {
-//     setPopupVisible(false);
-//     setSelectedService(null);
-//   };
-
-//   const renderItem = ({ item }) => (
-//     <TouchableOpacity
-//       onPress={() => handlePress(item.name)}
-//       style={styles.itemContainer}
-//     >
-//       <Text style={styles.itemText}>{item.name}</Text>
-//     </TouchableOpacity>
-//   );
-
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       <Text style={styles.title}>Laundry Services</Text>
-//       <FlatList
-//         data={services}
-//         renderItem={renderItem}
-//         keyExtractor={(item) => item.id}
-//       />
-//       <Popup
-//         visible={popupVisible}
-//         onClose={handleClose}
-//         service={selectedService}
-//       />
-//     </SafeAreaView>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 16,
-//     backgroundColor: "#f5f5f5",
-//   },
-//   title: {
-//     fontSize: 40,
-//     fontFamily: fonts.Regular,
-//     marginBottom: 16,
-//   },
-//   itemContainer: {
-//     padding: 16,
-//     backgroundColor: "#fff",
-//     marginBottom: 8,
-//     borderRadius: 8,
-//     shadowColor: "#000",
-//     shadowOffset: { width: 0, height: 2 },
-//     shadowOpacity: 0.1,
-//     shadowRadius: 4,
-//     elevation: 2,
-//   },
-//   itemText: {
-//     fontSize: 18,
-//     fontFamily: fonts.Regular,
-//   },
-// });
