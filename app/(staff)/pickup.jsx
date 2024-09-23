@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Pressable,
+  Modal,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../constants/fonts";
@@ -94,10 +101,22 @@ const AnimatedIcon = () => {
 export default function Pickup() {
   const [services, setServices] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
 
   useEffect(() => {
     setServices(mockServices);
   }, []);
+
+  const openModal = (service) => {
+    setSelectedService(service);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedService(null);
+  };
 
   // Filter services based on the selected tab
   const filteredServices = services.filter((service) => {
@@ -161,7 +180,10 @@ export default function Pickup() {
     }
 
     return (
-      <TouchableOpacity style={styles.itemContainer}>
+      <TouchableOpacity
+        style={styles.itemContainer}
+        onPress={() => openModal(item)}
+      >
         <View style={styles.itemDetails}>
           <View
             style={{
@@ -316,6 +338,36 @@ export default function Pickup() {
             estimatedItemSize={100}
           />
         </View>
+        {/* Modal for displaying selected service details */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              {selectedService && (
+                <>
+                  <Text style={styles.modalTitle}>{selectedService.name}</Text>
+                  <Text style={styles.modalText}>
+                    Customer: {selectedService.customerName}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Location: {selectedService.location}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Request Date:{" "}
+                    {new Date(selectedService.requestDate).toLocaleString()}
+                  </Text>
+                  <Pressable style={styles.closeButton} onPress={closeModal}>
+                    <Text style={styles.closeButtonText}>Close</Text>
+                  </Pressable>
+                </>
+              )}
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </LinearGradient>
   );
