@@ -12,6 +12,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 
 const mockServices = [
   {
@@ -60,6 +61,9 @@ const mockServices = [
     status: "Ongoing Pickup",
   },
 ];
+const pendingOrdersCount = mockServices.filter(
+  (service) => service.status === "Pending Pickup"
+).length;
 
 const AnimatedIcon = () => {
   const rotation = useSharedValue(0);
@@ -233,70 +237,96 @@ export default function Pickup() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.firstContainer}>
-        <Text style={styles.title}>Pickup Orders</Text>
-      </View>
-      <View style={styles.listContainer}>
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, filter === "All" && styles.activeTab]}
-            onPress={() => setFilter("All")}
+    <LinearGradient
+      colors={["#5787C8", "#8FAFDA"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={styles.container}>
+        <View style={{ marginBottom: 16, alignItems: "center" }}>
+          <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+            Pickup Orders
+          </Text>
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: "#FF6F61", // Example color
+              justifyContent: "center",
+              alignItems: "center",
+              marginVertical: 8,
+            }}
           >
-            <Text
-              style={[styles.tabText, filter === "All" && styles.activeTabText]}
-            >
-              All
+            <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
+              {pendingOrdersCount}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, filter === "Nearest" && styles.activeTab]}
-            onPress={() => setFilter("Nearest")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                filter === "Nearest" && styles.activeTabText,
-              ]}
-            >
-              Nearest
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, filter === "Cancel" && styles.activeTab]}
-            onPress={() => setFilter("Cancel")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                filter === "Cancel" && styles.activeTabText,
-              ]}
-            >
-              Cancel
-            </Text>
-          </TouchableOpacity>
+          </View>
+          <Text style={{ fontSize: 16, color: "white" }}>Pending</Text>
         </View>
-        <FlashList
-          data={sortedServices}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 60 }}
-          showsVerticalScrollIndicator={false}
-          estimatedItemSize={100}
-        />
-      </View>
-    </SafeAreaView>
+        <View style={styles.listContainer}>
+          <View style={styles.tabContainer}>
+            <TouchableOpacity
+              style={[styles.tab, filter === "All" && styles.activeTab]}
+              onPress={() => setFilter("All")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  filter === "All" && styles.activeTabText,
+                ]}
+              >
+                All
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, filter === "Nearest" && styles.activeTab]}
+              onPress={() => setFilter("Nearest")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  filter === "Nearest" && styles.activeTabText,
+                ]}
+              >
+                Nearest
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, filter === "Cancel" && styles.activeTab]}
+              onPress={() => setFilter("Cancel")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  filter === "Cancel" && styles.activeTabText,
+                ]}
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <FlashList
+            data={sortedServices}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingBottom: 60 }}
+            showsVerticalScrollIndicator={false}
+            estimatedItemSize={100}
+          />
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
   },
   firstContainer: {
     padding: 16,
-    backgroundColor: "#f5f5f5",
   },
   listContainer: {
     flex: 1,
