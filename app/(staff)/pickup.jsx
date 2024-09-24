@@ -320,11 +320,14 @@ export default function Pickup() {
 
       {/* Bottom Design */}
       <View style={styles.listContainer}>
-        <View style={{ marginBottom: 1, alignItems: "center" }}>
-          <Text style={{ fontSize: 24, fontWeight: "bold", color: COLORS.pri }}>
+        <View style={{ marginBottom: 20, alignItems: "center" }}>
+          <Text
+            style={{ fontSize: 24, fontWeight: "bold", color: COLORS.primary }}
+          >
             Pickup Orders
           </Text>
         </View>
+        <View style={styles.divider} />
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tab, filter === "All" && styles.activeTab]}
@@ -450,7 +453,7 @@ export default function Pickup() {
                   Location: {selectedService.location}
                 </Text>
                 <Text style={styles.modalText}>
-                  Request Date:{" "}
+                  Request Date:
                   {new Date(selectedService.requestDate).toLocaleString()}
                 </Text>
                 <Text style={styles.modalText}>
