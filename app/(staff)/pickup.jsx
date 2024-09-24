@@ -8,6 +8,7 @@ import React, {
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
 import { FlashList } from "@shopify/flash-list";
@@ -190,8 +191,19 @@ export default function Pickup() {
       statusText = "Pending";
     } else if (item.status === "Ongoing Pickup") {
       backgroundColor = COLORS.success;
-      iconComponent = <AnimatedIcon />; // comment for now
+      // iconComponent = <AnimatedIcon />; // comment for now
       statusText = "Ongoing";
+    } else if (item.status === "Cancel") {
+      iconName = "book-cancel-outline";
+      iconComponent = (
+        <MaterialCommunityIcons
+          name={iconName}
+          size={24}
+          color={COLORS.white}
+        />
+      );
+      backgroundColor = COLORS.error;
+      statusText = "Cancel";
     }
 
     return (
@@ -382,10 +394,18 @@ export default function Pickup() {
 
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
               <TouchableOpacity
-                style={styles.closeButton}
+                style={styles.finishButton}
                 onPress={handleCloseSheet}
               >
-                <Text style={styles.closeButtonText}>Close</Text>
+                <Text
+                  style={{
+                    fontFamily: fonts.SemiBold,
+                    fontSize: 16,
+                    color: COLORS.white,
+                  }}
+                >
+                  Finish Pickup
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -406,16 +426,11 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 16,
   },
-  closeButton: {
-    marginTop: 100,
-    paddingVertical: 10,
-    backgroundColor: COLORS.primary,
-    borderRadius: 5,
+  finishButton: {
+    padding: 10,
+    backgroundColor: COLORS.secondary,
+    borderRadius: 10,
     alignItems: "center",
-  },
-  closeButtonText: {
-    color: COLORS.white,
-    fontSize: 16,
   },
   container: {
     flex: 1,
