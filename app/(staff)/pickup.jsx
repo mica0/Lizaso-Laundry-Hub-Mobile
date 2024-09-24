@@ -379,47 +379,17 @@ export default function Pickup() {
                 </Text>
               </>
             )}
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={handleCloseSheet}
-            >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
+
+            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={handleCloseSheet}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </BottomSheet>
-        {/* <BottomSheet
-          ref={bottomSheetRef}
-          index={-1}
-          snapPoints={snapPoints}
-          enablePanDownToClose={true}
-          backgroundStyle={{ backgroundColor: COLORS.white }}
-          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
-          backdropComponent={renderBackdrop}
-        >
-          <View style={styles.contentContainer}>
-            {selectedService && (
-              <>
-                <Text style={styles.modalTitle}>{selectedService.name}</Text>
-                <Text style={styles.modalText}>
-                  Customer: {selectedService.customerName}
-                </Text>
-                <Text style={styles.modalText}>
-                  Location: {selectedService.location}
-                </Text>
-                <Text style={styles.modalText}>
-                  Request Date:{" "}
-                  {new Date(selectedService.requestDate).toLocaleString()}
-                </Text>
-                <Text style={styles.modalText}>
-                  Distance: {selectedService.distance}
-                </Text>
-                <Text style={styles.modalText}>
-                  Status: {selectedService.status}
-                </Text>
-              </>
-            )}
-          </View>
-        </BottomSheet> */}
       </Portal>
     </SafeAreaView>
   );
@@ -427,11 +397,11 @@ export default function Pickup() {
 
 const styles = StyleSheet.create({
   contentContainer: {
+    flex: 1,
     padding: 20,
   },
   modalTitle: {
     fontSize: 24,
-    fontWeight: "bold",
   },
   modalText: {
     fontSize: 16,
@@ -584,6 +554,42 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.pending,
   },
 });
+
+{
+  /* <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          backgroundStyle={{ backgroundColor: COLORS.white }}
+          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
+          backdropComponent={renderBackdrop}
+        >
+          <View style={styles.contentContainer}>
+            {selectedService && (
+              <>
+                <Text style={styles.modalTitle}>{selectedService.name}</Text>
+                <Text style={styles.modalText}>
+                  Customer: {selectedService.customerName}
+                </Text>
+                <Text style={styles.modalText}>
+                  Location: {selectedService.location}
+                </Text>
+                <Text style={styles.modalText}>
+                  Request Date:{" "}
+                  {new Date(selectedService.requestDate).toLocaleString()}
+                </Text>
+                <Text style={styles.modalText}>
+                  Distance: {selectedService.distance}
+                </Text>
+                <Text style={styles.modalText}>
+                  Status: {selectedService.status}
+                </Text>
+              </>
+            )}
+          </View>
+        </BottomSheet> */
+}
 
 {
   /* <LinearGradient
