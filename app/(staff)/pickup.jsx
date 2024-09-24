@@ -5,13 +5,17 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
 import { FlashList } from "@shopify/flash-list";
+import { Portal } from "@gorhom/portal";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+import { LinearGradient } from "expo-linear-gradient";
+import nodata from "../../assets/images/no_data.png";
 import Animated, {
   Easing,
   useSharedValue,
@@ -19,12 +23,6 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetModal,
-} from "@gorhom/bottom-sheet";
-import { LinearGradient } from "expo-linear-gradient";
-import { Portal } from "@gorhom/portal";
 
 const mockServices = [
   {

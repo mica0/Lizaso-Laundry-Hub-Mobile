@@ -1,10 +1,10 @@
 import { View, Text } from "react-native";
 import React from "react";
 
-export default function CompleteDetails() {
+export default function Message() {
   return (
     <View>
-      <Text>index</Text>
+      <Text>message</Text>
     </View>
   );
 }
