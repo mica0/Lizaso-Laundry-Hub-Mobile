@@ -108,7 +108,8 @@ export default function Pickup() {
   const [filter, setFilter] = useState("All");
 
   const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ["25%", "50%", "70%"], []);
+  const bottomPendingSheet = useRef(null);
+  const snapPoints = useMemo(() => ["50%"], []);
   const [selectedService, setSelectedService] = useState(null);
   const renderBackdrop = useCallback(
     (props) => (
@@ -125,7 +126,16 @@ export default function Pickup() {
     setServices(mockServices);
   }, []);
 
-  const openModal = (service) => {
+  const openPendingModal = (service) => {
+    setSelectedService(service);
+    bottomPendingSheet.current?.expand();
+  };
+
+  const closePendingModal = () => {
+    bottomPendingSheet.current?.close();
+  };
+
+  const openOngoingModal = (service) => {
     setSelectedService(service);
     bottomSheetRef.current?.expand();
   };
@@ -209,7 +219,19 @@ export default function Pickup() {
     return (
       <TouchableOpacity
         style={styles.itemContainer}
-        onPress={() => openModal(item)}
+        onPress={() => {
+          if (item.status === "Pending Pickup") {
+            openPendingModal(item);
+          } else if (item.status === "Ongoing Pickup") {
+            openOngoingModal(item);
+          } else {
+          }
+        }}
+        activeOpacity={
+          item.status === "Pending Pickup" || item.status === "Ongoing Pickup"
+            ? 0.2
+            : 1
+        }
       >
         <View style={styles.itemDetails}>
           <View
@@ -228,13 +250,15 @@ export default function Pickup() {
             <View
               style={{ flexDirection: "row", alignItems: "flex-start", gap: 2 }}
             >
-              <TouchableOpacity style={[styles.button, styles.messageButton]}>
-                <Ionicons
-                  name="chatbubble-outline"
-                  size={24}
-                  color={COLORS.danger}
-                />
-              </TouchableOpacity>
+              {item.status !== "Cancel" && (
+                <TouchableOpacity style={[styles.button, styles.messageButton]}>
+                  <Ionicons
+                    name="chatbubble-outline"
+                    size={24}
+                    color={COLORS.danger}
+                  />
+                </TouchableOpacity>
+              )}
               <View style={{ alignItems: "center" }}>
                 <View style={[styles.button, { backgroundColor }]}>
                   {iconComponent}
@@ -359,6 +383,60 @@ export default function Pickup() {
           estimatedItemSize={100}
         />
       </View>
+      {/* For Pending */}
+      <Portal>
+        <BottomSheet
+          ref={bottomPendingSheet}
+          index={-1}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          backgroundStyle={{ backgroundColor: COLORS.white }}
+          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
+          backdropComponent={renderBackdrop}
+        >
+          <View style={styles.contentContainer}>
+            {selectedService && (
+              <>
+                <Text style={styles.modalTitle}>{selectedService.name}</Text>
+                <Text style={styles.modalText}>
+                  Customer: {selectedService.customerName}
+                </Text>
+                <Text style={styles.modalText}>
+                  Location: {selectedService.location}
+                </Text>
+                <Text style={styles.modalText}>
+                  Request Date:{" "}
+                  {new Date(selectedService.requestDate).toLocaleString()}
+                </Text>
+                <Text style={styles.modalText}>
+                  Distance: {selectedService.distance}
+                </Text>
+                <Text style={styles.modalText}>
+                  Status: {selectedService.status}
+                </Text>
+              </>
+            )}
+
+            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+              <TouchableOpacity
+                style={styles.finishButton}
+                onPress={closePendingModal}
+              >
+                <Text
+                  style={{
+                    fontFamily: fonts.SemiBold,
+                    fontSize: 16,
+                    color: COLORS.white,
+                  }}
+                >
+                  Get the laundry
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </BottomSheet>
+      </Portal>
+      {/* For Ongoing */}
       <Portal>
         <BottomSheet
           ref={bottomSheetRef}
