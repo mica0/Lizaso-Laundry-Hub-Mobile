@@ -129,16 +129,18 @@ export default function Pickup() {
     bottomPendingSheet.current?.expand();
   };
 
-  const closePendingModal = () => {
-    bottomPendingSheet.current?.close();
-  };
-
   const openOngoingModal = (service) => {
     setSelectedService(service);
     bottomSheetRef.current?.expand();
   };
 
-  const handleCloseSheet = () => {
+  const handleGetLaundry = async (id) => {
+    console.log(id);
+    bottomPendingSheet.current?.close();
+  };
+
+  const handleFinishPickup = async (id) => {
+    console.log(id);
     bottomSheetRef.current?.close();
   };
 
@@ -418,7 +420,7 @@ export default function Pickup() {
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
               <TouchableOpacity
                 style={styles.finishButton}
-                onPress={closePendingModal}
+                onPress={() => handleGetLaundry(selectedService.id)}
               >
                 <Text
                   style={{
@@ -441,7 +443,10 @@ export default function Pickup() {
           index={-1}
           snapPoints={snapPoints}
           enablePanDownToClose={true}
-          backgroundStyle={{ backgroundColor: COLORS.white }}
+          backgroundStyle={{
+            backgroundColor: COLORS.white,
+            borderRadius: 20,
+          }}
           handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
           backdropComponent={renderBackdrop}
         >
@@ -471,7 +476,7 @@ export default function Pickup() {
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
               <TouchableOpacity
                 style={styles.finishButton}
-                onPress={handleCloseSheet}
+                onPress={() => handleFinishPickup(selectedService.id)}
               >
                 <Text
                   style={{
