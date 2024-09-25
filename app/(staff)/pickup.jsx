@@ -35,6 +35,7 @@ const mockServices = [
     requestDate: "2024-09-01T10:00:00Z",
     distance: "7 km",
     status: "Pending Pickup",
+    messageCount: 1,
   },
   {
     id: "2",
@@ -44,6 +45,7 @@ const mockServices = [
     requestDate: "2024-09-02T09:30:00Z",
     distance: "1 km",
     status: "Cancel",
+    messageCount: 0,
   },
   {
     id: "3",
@@ -53,6 +55,7 @@ const mockServices = [
     requestDate: "2024-09-03T08:15:00Z",
     distance: "3 km",
     status: "Pending Pickup",
+    messageCount: 10,
   },
   {
     id: "4",
@@ -62,6 +65,7 @@ const mockServices = [
     requestDate: "2024-09-04T12:45:00Z",
     distance: "5 km",
     status: "Ongoing Pickup",
+    messageCount: 50,
   },
   {
     id: "5",
@@ -71,6 +75,7 @@ const mockServices = [
     requestDate: "2024-09-04T11:45:00Z",
     distance: "5 km",
     status: "Ongoing Pickup",
+    messageCount: 80,
   },
 ];
 const pendingOrdersCount = mockServices.filter(
@@ -105,8 +110,8 @@ const AnimatedIcon = () => {
 
 export default function Pickup() {
   const [services, setServices] = useState([]);
+  const [badgeCount, setBadgeCount] = useState(1);
   const [filter, setFilter] = useState("All");
-
   const bottomSheetRef = useRef(null);
   const bottomPendingSheet = useRef(null);
   const snapPoints = useMemo(() => ["50%"], []);
@@ -149,6 +154,11 @@ export default function Pickup() {
   const handleGetLaundry = async (id) => {
     console.log(id);
     bottomPendingSheet.current?.close();
+  };
+
+  const handleGoToMessage = async (id, name) => {
+    console.log("Message ID Customer: " + id);
+    console.log("Message Customer Name: " + name);
   };
 
   // Filter services based on the selected tab
@@ -257,14 +267,33 @@ export default function Pickup() {
             <View
               style={{ flexDirection: "row", alignItems: "flex-start", gap: 2 }}
             >
-              {item.status !== "Cancel" && (
-                <TouchableOpacity style={[styles.button, styles.messageButton]}>
-                  <Ionicons
-                    name="chatbubble-outline"
-                    size={24}
-                    color={COLORS.danger}
-                  />
-                </TouchableOpacity>
+              {item.status !== "Cancel" && item.status !== "Pending Pickup" && (
+                <View style={{ position: "relative" }}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleGoToMessage(item.id, item.customerName)
+                    }
+                    style={[styles.button, styles.messageButton]}
+                  >
+                    <Ionicons
+                      name="chatbubble-ellipses"
+                      size={24}
+                      color={COLORS.primary}
+                    />
+                    {item.messageCount > 0 && (
+                      <View style={styles.badge}>
+                        <Text
+                          style={[
+                            styles.badgeText,
+                            { fontSize: item.messageCount > 99 ? 10 : 12 },
+                          ]}
+                        >
+                          {item.messageCount > 99 ? "99+" : item.messageCount}
+                        </Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                </View>
               )}
               <View style={{ alignItems: "center" }}>
                 <View style={[styles.button, { backgroundColor }]}>
@@ -981,11 +1010,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 5,
   },
+
   messageButton: {
-    backgroundColor: COLORS.lightGray,
+    // backgroundColor: COLORS.lightGray,
+    borderWidth: 1, // Add border width
+    borderColor: COLORS.primary, // Set border color
+    padding: 5, // Adjust this value as needed
   },
-  acceptButton: {
-    backgroundColor: COLORS.pending,
+  badge: {
+    position: "absolute",
+    right: -5, // Adjust this value as needed
+    top: -5, // Adjust this value as needed
+    backgroundColor: COLORS.message,
+    borderRadius: 10, // Circular badge
+    width: 20, // Width of the badge
+    height: 20, // Height of the badge
+    justifyContent: "center", // Center text vertically
+    alignItems: "center", // Center text horizontally
+  },
+  badgeText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });
 
