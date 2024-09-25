@@ -425,20 +425,47 @@ export default function Pickup() {
             )}
 
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
-              <TouchableOpacity
-                style={styles.finishButton}
-                onPress={() => handleGetLaundry(selectedService.id)}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  marginBottom: 10,
+                  gap: 10,
+                }}
               >
-                <Text
+                <TouchableOpacity
                   style={{
-                    fontFamily: fonts.SemiBold,
-                    fontSize: 16,
-                    color: COLORS.white,
+                    padding: 10,
+                    backgroundColor: COLORS.light,
+                    borderRadius: 10,
+                    alignItems: "center",
                   }}
                 >
-                  Get the laundry
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontFamily: fonts.SemiBold,
+                      fontSize: 16,
+                      color: COLORS.black,
+                    }}
+                  >
+                    Cancel request
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.finishButton}
+                  onPress={() => handleGetLaundry(selectedService.id)}
+                >
+                  <Text
+                    style={{
+                      fontFamily: fonts.SemiBold,
+                      fontSize: 16,
+                      color: COLORS.white,
+                    }}
+                  >
+                    Get the laundry
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </BottomSheet>
@@ -458,9 +485,7 @@ export default function Pickup() {
           backdropComponent={renderBackdrop}
         >
           <View style={styles.headerContainer}>
-            {/* Title aligned to the left */}
             <Text style={styles.headerTitle}>Ongoing Pickup</Text>
-
             <TouchableOpacity
               onPress={closeOngoingModal}
               style={styles.closeButton}
@@ -470,45 +495,97 @@ export default function Pickup() {
           </View>
 
           <View style={styles.divider} />
+          <View style={{ marginStart: 20, marginTop: 20 }}>
+            <Text style={{ fontFamily: fonts.SemiBold, fontSize: 16 }}>
+              Customer Details
+            </Text>
+          </View>
 
           <View style={styles.contentContainer}>
-            {selectedService && (
-              <>
-                <Text style={styles.modalTitle}>{selectedService.name}</Text>
-                <Text style={styles.modalText}>
-                  Customer: {selectedService.customerName}
-                </Text>
-                <Text style={styles.modalText}>
-                  Location: {selectedService.location}
-                </Text>
-                <Text style={styles.modalText}>
-                  Request Date:
-                  {new Date(selectedService.requestDate).toLocaleString()}
-                </Text>
-                <Text style={styles.modalText}>
-                  Distance: {selectedService.distance}
-                </Text>
-                <Text style={styles.modalText}>
-                  Status: {selectedService.status}
-                </Text>
-              </>
-            )}
-
+            {/* Outlined Box */}
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: COLORS.divider,
+                borderRadius: 10,
+                alignItems: "flex-start",
+                paddingTop: 20,
+                paddingBottom: 20,
+              }}
+            >
+              <View style={{ paddingStart: 10 }}>
+                {selectedService && (
+                  <>
+                    {/* <Text style={styles.modalTitle}>
+                      {selectedService.name}
+                    </Text> */}
+                    <Text style={styles.modalText}>
+                      Customer: {selectedService.customerName}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Location: {selectedService.location}
+                    </Text>
+                  </>
+                )}
+              </View>
+              <View style={styles.divider} />
+              <View style={{ paddingStart: 10 }}>
+                {selectedService && (
+                  <>
+                    <Text style={styles.modalText}>
+                      Request Date:
+                      {new Date(selectedService.requestDate).toLocaleString()}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Distance: {selectedService.distance}
+                    </Text>
+                  </>
+                )}
+              </View>
+            </View>
+            {/* Bottom Button */}
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
-              <TouchableOpacity
-                style={styles.finishButton}
-                onPress={() => handleFinishPickup(selectedService.id)}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  marginBottom: 10,
+                  gap: 10,
+                }}
               >
-                <Text
+                <TouchableOpacity
                   style={{
-                    fontFamily: fonts.SemiBold,
-                    fontSize: 16,
-                    color: COLORS.white,
+                    padding: 10,
+                    backgroundColor: COLORS.light,
+                    borderRadius: 10,
+                    alignItems: "center",
                   }}
                 >
-                  Finish Pickup
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontFamily: fonts.SemiBold,
+                      fontSize: 16,
+                      color: COLORS.black,
+                    }}
+                  >
+                    Return to pending
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.finishButton}
+                  onPress={() => handleFinishPickup(selectedService.id)}
+                >
+                  <Text
+                    style={{
+                      fontFamily: fonts.SemiBold,
+                      fontSize: 16,
+                      color: COLORS.white,
+                    }}
+                  >
+                    Finish Pickup
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </BottomSheet>
@@ -538,7 +615,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   contentContainer: {
     flex: 1,
     padding: 20,
@@ -554,6 +630,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.secondary,
     borderRadius: 10,
     alignItems: "center",
+    width: "55%",
   },
   container: {
     flex: 1,
