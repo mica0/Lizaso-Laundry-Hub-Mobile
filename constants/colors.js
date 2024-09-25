@@ -5,6 +5,11 @@ const COLORS = {
   light: "#F5F5F5",
   divider: "#ddd",
 
+  // Text Colors
+  text1: "#161616",
+  text2: "#2C2C2C",
+  text3: "#393939",
+
   // Primary and Secondary colors
   primary: "#595959",
   secondary: "#5787C8",

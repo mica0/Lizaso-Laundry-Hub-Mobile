@@ -33,5 +33,5 @@ npx expo install @gorhom/bottom-sheet react-native-reanimated react-native-gestu
 npx expo install react-native-gesture-handler
 npm install -g yarn
 npm install @gorhom/portal
-
+npm install --save luxon
 

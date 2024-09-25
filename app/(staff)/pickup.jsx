@@ -24,6 +24,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { timeAgo } from "../../constants/datetime";
 
 const mockServices = [
   {
@@ -65,7 +66,7 @@ const mockServices = [
   {
     id: "5",
     name: "Laundry",
-    location: "321 River St, Uptown",
+    location: "321 River St, Uptowns",
     customerName: "Emily Brown",
     requestDate: "2024-09-04T11:45:00Z",
     distance: "5 km",
@@ -424,7 +425,7 @@ export default function Pickup() {
                 paddingHorizontal: 20,
               }}
             >
-              {selectedService.name}
+              {selectedService?.name || "No Service Selected"}
             </Text>
           </View>
           <View style={styles.contentContainer}>
@@ -569,7 +570,13 @@ export default function Pickup() {
               marginTop: 20,
             }}
           >
-            <Text style={{ fontFamily: fonts.SemiBold, fontSize: 16 }}>
+            <Text
+              style={{
+                fontFamily: fonts.SemiBold,
+                fontSize: 16,
+                color: COLORS.text3,
+              }}
+            >
               Customer Details
             </Text>
             <Text
@@ -581,20 +588,136 @@ export default function Pickup() {
                 borderRadius: 15,
                 paddingHorizontal: 20,
                 paddingVertical: 2,
-                maxWidth: "50%", // Limit the width to prevent overflow
-                overflow: "hidden", // Ensures no overflow
-                textOverflow: "ellipsis", // Adds ellipsis if the text overflows
-                whiteSpace: "nowrap", // Prevents wrapping
+                maxWidth: "50%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
               }}
-              numberOfLines={1} // Ensures the text is truncated if too long
-              ellipsizeMode="tail" // Adds ellipsis at the end if truncated
+              numberOfLines={1}
+              ellipsizeMode="tail"
             >
-              {selectedService.name}
+              {selectedService?.name || "No Service Selected"}
             </Text>
           </View>
 
           <View style={styles.contentContainer}>
             <View
+              style={{
+                borderWidth: 1,
+                borderColor: COLORS.divider,
+                borderRadius: 10,
+                paddingTop: 10,
+              }}
+            >
+              <View>
+                {selectedService && (
+                  <>
+                    <View style={{ paddingStart: 20, marginBottom: 10 }}>
+                      <View style={{ flexDirection: "row", gap: 5 }}>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Bold,
+                            fontSize: 14,
+                            color: COLORS.text3,
+                          }}
+                        >
+                          Customer:
+                        </Text>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Medium,
+                            fontSize: 14,
+                            color: COLORS.primary,
+                          }}
+                        >
+                          {selectedService.customerName}
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: "row", gap: 5 }}>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Bold,
+                            fontSize: 14,
+                            color: COLORS.text3,
+                          }}
+                        >
+                          Location:
+                        </Text>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Medium,
+                            fontSize: 14,
+                            color: COLORS.secondary,
+                            flexShrink: 1, // Allow the text to shrink
+                            flexWrap: "wrap", // Allow text to wrap to the next line
+                            maxWidth: "80%", // Adjust this percentage as needed to prevent overflow
+                          }}
+                        >
+                          {selectedService.location}
+                        </Text>
+                      </View>
+
+                      {/* <Text style={styles.modalText}>
+                        Request Date:{" "}
+                        {new Date(selectedService.requestDate).toLocaleString()}
+                      </Text>
+                      <Text style={styles.modalText}>
+                        Distance: {selectedService.distance}
+                      </Text>
+                      <Text style={styles.modalText}>
+                        Status: {selectedService.status}
+                      </Text> */}
+                    </View>
+                    {/* Divider */}
+                    <View
+                      style={{
+                        height: 1,
+                        backgroundColor: "#ddd",
+                        width: "100%",
+                      }}
+                    />
+                    <View
+                      style={{
+                        backgroundColor: COLORS.secondary,
+                        borderRadius: 20,
+                        marginTop: 10,
+                        alignSelf: "center", // Center the view in its parent
+                        justifyContent: "center", // Center content vertically
+                        alignItems: "center", // Center content horizontally
+                        paddingHorizontal: "auto",
+                        paddingVertical: 5,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: fonts.Medium,
+                          color: COLORS.white,
+                          fontSize: 12, // Set a specific font size for better readability
+                        }}
+                      >
+                        {timeAgo(selectedService.requestDate)}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        alignSelf: "center",
+                        marginBottom: 5,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: fonts.Medium,
+                          color: COLORS.primary, // Change the color as needed
+                          fontSize: 10, // Set a specific font size for better readability
+                        }}
+                      >
+                        Waiting for Pickup
+                      </Text>
+                    </View>
+                  </>
+                )}
+              </View>
+              {/* <View
               style={{
                 borderWidth: 1,
                 borderColor: COLORS.divider,
@@ -631,10 +754,7 @@ export default function Pickup() {
                     <Text style={styles.modalText}>
                       Location: {selectedService.location}
                     </Text>
-                    <Text style={styles.modalText}>
-                      Request Date:{" "}
-                      {new Date(selectedService.requestDate).toLocaleString()}
-                    </Text>
+
                     <Text style={styles.modalText}>
                       Distance: {selectedService.distance}
                     </Text>
@@ -643,7 +763,7 @@ export default function Pickup() {
                     </Text>
                   </>
                 )}
-              </View>
+              </View> */}
             </View>
             {/* Bottom Button */}
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
