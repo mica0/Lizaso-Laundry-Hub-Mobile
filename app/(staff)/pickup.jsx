@@ -401,28 +401,93 @@ export default function Pickup() {
             </TouchableOpacity>
           </View>
           <View style={styles.divider} />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignContent: "center",
+              marginStart: 20,
+              marginEnd: 20,
+              marginTop: 20,
+            }}
+          >
+            <Text style={{ fontFamily: fonts.SemiBold, fontSize: 16 }}>
+              Customer Details
+            </Text>
+            <Text
+              style={{
+                fontFamily: fonts.SemiBold,
+                fontSize: 15,
+                color: "white",
+                backgroundColor: COLORS.success,
+                borderRadius: 15,
+                paddingHorizontal: 20,
+              }}
+            >
+              {selectedService.name}
+            </Text>
+          </View>
           <View style={styles.contentContainer}>
-            {selectedService && (
-              <>
-                <Text style={styles.modalTitle}>{selectedService.name}</Text>
-                <Text style={styles.modalText}>
-                  Customer: {selectedService.customerName}
-                </Text>
-                <Text style={styles.modalText}>
-                  Location: {selectedService.location}
-                </Text>
-                <Text style={styles.modalText}>
-                  Request Date:{" "}
-                  {new Date(selectedService.requestDate).toLocaleString()}
-                </Text>
-                <Text style={styles.modalText}>
-                  Distance: {selectedService.distance}
-                </Text>
-                <Text style={styles.modalText}>
-                  Status: {selectedService.status}
-                </Text>
-              </>
-            )}
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: COLORS.divider,
+                borderRadius: 10,
+                alignItems: "flex-start",
+                paddingTop: 10,
+                paddingBottom: 20,
+              }}
+            >
+              <View style={{ paddingStart: 20 }}>
+                {selectedService && (
+                  <>
+                    <Text
+                      style={{
+                        fontFamily: fonts.SemiBold,
+                        fontSize: 20,
+                        color: COLORS.primary,
+                      }}
+                    >
+                      {selectedService.name}
+                    </Text>
+                    <View style={{ flexDirection: "row", gap: 10 }}>
+                      <Text
+                        style={{
+                          fontFamily: fonts.SemiBold, // Semi-bold for "Customer:"
+                          fontSize: 16,
+                          color: COLORS.black,
+                        }}
+                      >
+                        Customer:
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: fonts.Medium,
+                          fontSize: 16,
+                          color: COLORS.black,
+                        }}
+                      >
+                        {selectedService.customerName}
+                      </Text>
+                    </View>
+
+                    <Text style={styles.modalText}>
+                      Location: {selectedService.location}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Request Date:{" "}
+                      {new Date(selectedService.requestDate).toLocaleString()}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Distance: {selectedService.distance}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Status: {selectedService.status}
+                    </Text>
+                  </>
+                )}
+              </View>
+            </View>
 
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
               <View
@@ -493,51 +558,88 @@ export default function Pickup() {
               <MaterialIcons name="close" size={24} color={COLORS.secondary} />
             </TouchableOpacity>
           </View>
-
           <View style={styles.divider} />
-          <View style={{ marginStart: 20, marginTop: 20 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center", // Center text vertically
+              marginStart: 20,
+              marginEnd: 20,
+              marginTop: 20,
+            }}
+          >
             <Text style={{ fontFamily: fonts.SemiBold, fontSize: 16 }}>
               Customer Details
+            </Text>
+            <Text
+              style={{
+                fontFamily: fonts.SemiBold,
+                fontSize: 15,
+                color: "white",
+                backgroundColor: COLORS.success,
+                borderRadius: 15,
+                paddingHorizontal: 20,
+                paddingVertical: 2,
+                maxWidth: "50%", // Limit the width to prevent overflow
+                overflow: "hidden", // Ensures no overflow
+                textOverflow: "ellipsis", // Adds ellipsis if the text overflows
+                whiteSpace: "nowrap", // Prevents wrapping
+              }}
+              numberOfLines={1} // Ensures the text is truncated if too long
+              ellipsizeMode="tail" // Adds ellipsis at the end if truncated
+            >
+              {selectedService.name}
             </Text>
           </View>
 
           <View style={styles.contentContainer}>
-            {/* Outlined Box */}
             <View
               style={{
                 borderWidth: 1,
                 borderColor: COLORS.divider,
                 borderRadius: 10,
                 alignItems: "flex-start",
-                paddingTop: 20,
+                paddingTop: 10,
                 paddingBottom: 20,
               }}
             >
-              <View style={{ paddingStart: 10 }}>
+              <View style={{ paddingStart: 20 }}>
                 {selectedService && (
                   <>
-                    {/* <Text style={styles.modalTitle}>
-                      {selectedService.name}
-                    </Text> */}
-                    <Text style={styles.modalText}>
-                      Customer: {selectedService.customerName}
-                    </Text>
+                    <View style={{ flexDirection: "row", gap: 10 }}>
+                      <Text
+                        style={{
+                          fontFamily: fonts.Medium, // Semi-bold for "Customer:"
+                          fontSize: 16,
+                          color: COLORS.black,
+                        }}
+                      >
+                        Customer:
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: fonts.Regular,
+                          fontSize: 16,
+                          color: COLORS.black,
+                        }}
+                      >
+                        {selectedService.customerName}
+                      </Text>
+                    </View>
+
                     <Text style={styles.modalText}>
                       Location: {selectedService.location}
                     </Text>
-                  </>
-                )}
-              </View>
-              <View style={styles.divider} />
-              <View style={{ paddingStart: 10 }}>
-                {selectedService && (
-                  <>
                     <Text style={styles.modalText}>
-                      Request Date:
+                      Request Date:{" "}
                       {new Date(selectedService.requestDate).toLocaleString()}
                     </Text>
                     <Text style={styles.modalText}>
                       Distance: {selectedService.distance}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Status: {selectedService.status}
                     </Text>
                   </>
                 )}
@@ -621,9 +723,6 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 24,
-  },
-  modalText: {
-    fontSize: 16,
   },
   finishButton: {
     padding: 10,
@@ -769,6 +868,55 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.pending,
   },
 });
+
+{
+  /* <View
+              style={{
+                borderWidth: 1,
+                borderColor: COLORS.divider,
+                borderRadius: 10,
+                alignItems: "flex-start",
+                paddingTop: 10,
+                paddingBottom: 20,
+              }}
+            >
+              <View style={{ paddingStart: 10 }}>
+                {selectedService && (
+                  <>
+                    <Text style={styles.modalTitle}>
+                      {selectedService.name}
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: fonts.SemiBold,
+                        fontSize: 16,
+                        color: COLORS.primary,
+                      }}
+                    >
+                      {selectedService.customerName}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      {selectedService.location}
+                    </Text>
+                  </>
+                )}
+              </View>
+              <View style={styles.divider} />
+              <View style={{ paddingStart: 10, flexDirection: "row", gap: 10 }}>
+                {selectedService && (
+                  <>
+                    <Text style={styles.modalText}>
+                      Request Date:
+                      {new Date(selectedService.requestDate).toLocaleString()}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Distance: {selectedService.distance}
+                    </Text>
+                  </>
+                )}
+              </View>
+            </View> */
+}
 
 // import React, {
 //   useState,
