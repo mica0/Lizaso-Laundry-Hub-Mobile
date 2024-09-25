@@ -2,6 +2,7 @@ const COLORS = {
   // Basic colors
   white: "#FFFFFF",
   black: "#222222",
+  light: "#F5F5F5",
 
   // Primary and Secondary colors
   primary: "#595959",

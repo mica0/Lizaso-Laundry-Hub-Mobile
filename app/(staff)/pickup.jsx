@@ -8,6 +8,7 @@ import React, {
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
@@ -134,14 +135,19 @@ export default function Pickup() {
     bottomSheetRef.current?.expand();
   };
 
-  const handleGetLaundry = async (id) => {
-    console.log(id);
-    bottomPendingSheet.current?.close();
+  const closeOngoingModal = (service) => {
+    setSelectedService(service);
+    bottomSheetRef.current?.close();
   };
 
   const handleFinishPickup = async (id) => {
     console.log(id);
     bottomSheetRef.current?.close();
+  };
+
+  const handleGetLaundry = async (id) => {
+    console.log(id);
+    bottomPendingSheet.current?.close();
   };
 
   // Filter services based on the selected tab
@@ -386,6 +392,15 @@ export default function Pickup() {
           handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
           backdropComponent={renderBackdrop}
         >
+          <View style={styles.headerContainer}>
+            {/* Title aligned to the left */}
+            <Text style={styles.headerTitle}>Pending Pickup</Text>
+
+            <TouchableOpacity style={styles.closeButton}>
+              <MaterialIcons name="close" size={24} color={COLORS.secondary} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.divider} />
           <View style={styles.contentContainer}>
             {selectedService && (
               <>
@@ -442,6 +457,20 @@ export default function Pickup() {
           handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
           backdropComponent={renderBackdrop}
         >
+          <View style={styles.headerContainer}>
+            {/* Title aligned to the left */}
+            <Text style={styles.headerTitle}>Ongoing Pickup</Text>
+
+            <TouchableOpacity
+              onPress={closeOngoingModal}
+              style={styles.closeButton}
+            >
+              <MaterialIcons name="close" size={24} color={COLORS.secondary} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.divider} />
+
           <View style={styles.contentContainer}>
             {selectedService && (
               <>
@@ -489,6 +518,27 @@ export default function Pickup() {
 }
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  headerTitle: {
+    fontFamily: fonts.SemiBold,
+    fontSize: 18,
+    color: COLORS.primary,
+  },
+  closeButton: {
+    backgroundColor: COLORS.light,
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   contentContainer: {
     flex: 1,
     padding: 20,
