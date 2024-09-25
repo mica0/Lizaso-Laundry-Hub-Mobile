@@ -32,6 +32,11 @@ const COLORS = {
   // Background and Border Colors
   background: "#f4f4f4",
   border: "#e0e0e0",
+
+  // Colors Additonal
+  message: "#F23F42",
+  online: "#23A55A",
+  idle: "#F0B232",
 };
 
 export default COLORS;
