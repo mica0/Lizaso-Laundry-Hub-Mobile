@@ -714,18 +714,19 @@ export default function Pickup() {
                         backgroundColor: COLORS.secondary,
                         borderRadius: 20,
                         marginTop: 10,
-                        alignSelf: "center", // Center the view in its parent
-                        justifyContent: "center", // Center content vertically
-                        alignItems: "center", // Center content horizontally
-                        paddingHorizontal: "auto",
+                        alignSelf: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingHorizontal: 10,
                         paddingVertical: 5,
+                        maxWidth: "90%",
                       }}
                     >
                       <Text
                         style={{
                           fontFamily: fonts.Medium,
                           color: COLORS.white,
-                          fontSize: 12, // Set a specific font size for better readability
+                          fontSize: 12,
                         }}
                       >
                         {timeAgo(selectedService.requestDate)}
