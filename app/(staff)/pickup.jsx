@@ -25,6 +25,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { timeAgo } from "../../constants/datetime";
+import { useNavigation } from "expo-router";
 
 const mockServices = [
   {
@@ -109,6 +110,7 @@ const AnimatedIcon = () => {
 };
 
 export default function Pickup() {
+  const navigaton = useNavigation();
   const [services, setServices] = useState([]);
   const [badgeCount, setBadgeCount] = useState(1);
   const [filter, setFilter] = useState("All");
@@ -116,6 +118,7 @@ export default function Pickup() {
   const bottomPendingSheet = useRef(null);
   const snapPoints = useMemo(() => ["50%"], []);
   const [selectedService, setSelectedService] = useState(null);
+
   const renderBackdrop = useCallback(
     (props) => (
       <BottomSheetBackdrop
@@ -159,6 +162,7 @@ export default function Pickup() {
   const handleGoToMessage = async (id, name) => {
     console.log("Message ID Customer: " + id);
     console.log("Message Customer Name: " + name);
+    navigaton.navigate("message/chat", { customerId: id, customerName: name });
   };
 
   // Filter services based on the selected tab

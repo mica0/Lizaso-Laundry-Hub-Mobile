@@ -16,6 +16,7 @@ export default function RootLayout() {
       <PortalProvider>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
+          <Stack.Screen name="message/chat" />
         </Stack>
       </PortalProvider>
     </GestureHandlerRootView>

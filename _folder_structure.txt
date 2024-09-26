@@ -14,6 +14,13 @@ lizaso-laundry-hub/
 │   │   │    └── index.js
 │   │   └── sign-ups/
 │   │        └── index.js
+│   ├── message/
+│   │   ├── chat.jsx                                                                    # Screen for an individual chat or conversation
+│   │   ├── _layout.jsx                                                         # Optional layout for all message-related screens
+│   │   ├── inbox.jsx                                               
+│   │   ├── new-message.jsx    # Screen for composing a new message
+│   │   ├── message-list-item.jsx         # Component to render individual messages in a list
+│   │   └── message-service.js      # Optional: a service to manage API requests related to messages
 │   ├── _layout.tsx   
 │   └── index.tsx   
 ├── assets/
@@ -38,6 +45,12 @@ lizaso-laundry-hub/
 
 
 
+
+│   ├── message/
+│   │   └── chat.jsx     
+│   ├── _layout.tsx   
+│   └── index.tsx   
+├── assets/
 
 
 
