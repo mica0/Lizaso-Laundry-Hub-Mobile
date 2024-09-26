@@ -7,17 +7,19 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Image,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import COLORS from "../../constants/colors";
+import { fonts } from "../../constants/fonts";
+import noconvo from "../../assets/images/start_convo.png"; // Import the image here
 
 export default function Chat() {
   const route = useRoute();
   const navigation = useNavigation(); // Get the navigation object
   const { customerId, customerName } = route.params; // Extract parameters from the route
 
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Hello! How can I help you today?", sender: "customer" },
-    { id: 2, text: "I want to know the status of my order.", sender: "staff" },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const scrollViewRef = useRef(); // Reference to the ScrollView
 
@@ -35,7 +37,9 @@ export default function Chat() {
 
   useEffect(() => {
     // Scroll to the bottom when messages update
-    scrollViewRef.current.scrollToEnd({ animated: true });
+    if (messages.length > 0) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
   }, [messages]);
 
   return (
@@ -45,7 +49,7 @@ export default function Chat() {
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>Back</Text>
+          <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{customerName}</Text>
         <View style={styles.placeholder} />
@@ -53,21 +57,33 @@ export default function Chat() {
 
       {/* Chat window */}
       <ScrollView
-        contentContainerStyle={styles.chatContainer}
+        contentContainerStyle={[
+          styles.chatContainer,
+          messages.length === 0 && styles.centeredContent, // Center the "Start Conversation" message
+        ]}
         ref={scrollViewRef} // Attach the ref to the ScrollView
         keyboardShouldPersistTaps="handled" // Allows tapping on the input field while keyboard is open
       >
-        {messages.map((message) => (
-          <View
-            key={message.id}
-            style={[
-              styles.messageContainer,
-              message.sender === "staff" ? styles.sent : styles.received,
-            ]}
-          >
-            <Text style={styles.messageText}>{message.text}</Text>
+        {messages.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Image source={noconvo} style={styles.noConversationImage} />
+            <Text style={styles.startConversationText}>
+              Start a conversation now!
+            </Text>
           </View>
-        ))}
+        ) : (
+          messages.map((message) => (
+            <View
+              key={message.id}
+              style={[
+                styles.messageContainer,
+                message.sender === "staff" ? styles.sent : styles.received,
+              ]}
+            >
+              <Text style={styles.messageText}>{message.text}</Text>
+            </View>
+          ))
+        )}
       </ScrollView>
 
       {/* Message input field */}
@@ -98,7 +114,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingVertical: 5,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
   },
@@ -107,7 +124,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 20,
-    color: "#2196F3", // Change this color as per your design
+    color: COLORS.secondary, // Change this color as per your design
   },
   headerTitle: {
     fontSize: 18,
@@ -123,6 +140,26 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     paddingBottom: 10,
   },
+  centeredContent: {
+    justifyContent: "center", // Center the content vertically when no messages
+    alignItems: "center", // Center the content horizontally when no messages
+    flex: 1,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  noConversationImage: {
+    width: 200, // Adjust size as needed
+    height: 200, // Adjust size as needed
+    marginBottom: 20,
+  },
+  startConversationText: {
+    fontSize: 18,
+    color: COLORS.secondary,
+    fontFamily: fonts.Medium,
+    textAlign: "center",
+  },
   messageContainer: {
     maxWidth: "80%",
     padding: 10,
@@ -131,15 +168,16 @@ const styles = StyleSheet.create({
   },
   sent: {
     alignSelf: "flex-end",
-    backgroundColor: "#DCF8C6", // Light green color for sent messages
+    backgroundColor: "#C7D7EC",
   },
   received: {
     alignSelf: "flex-start",
-    backgroundColor: "#ECECEC", // Light gray for received messages
+    backgroundColor: "#ECECEC",
   },
   messageText: {
     fontSize: 16,
-    color: "#333",
+    color: COLORS.text3,
+    fontFamily: fonts.Medium,
   },
   inputContainer: {
     flexDirection: "row",
@@ -156,21 +194,26 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 20,
-    paddingHorizontal: 15,
-    backgroundColor: "#fff",
+    paddingHorizontal: 20,
+    backgroundColor: COLORS.white,
   },
   sendButton: {
     marginLeft: 10,
-    backgroundColor: "#2196F3",
+    backgroundColor: COLORS.secondary,
     borderRadius: 20,
     paddingHorizontal: 15,
     paddingVertical: 8,
   },
   sendButtonText: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 16,
   },
 });
+
+// const [messages, setMessages] = useState([
+//   { id: 1, text: "Hello! How can I help you today?", sender: "customer" },
+//   { id: 2, text: "I want to know the status of my order.", sender: "staff" },
+// ]);
 
 // import { useRoute } from "@react-navigation/native";
 // import React, { useState, useEffect, useRef } from "react";
