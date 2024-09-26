@@ -79,21 +79,21 @@ const mockServices = [
     messageCount: 80,
   },
 ];
-const pendingOrdersCount = mockServices.filter(
+const pendingCount = mockServices.filter(
   (service) => service.status === "Pending Pickup"
+).length;
+
+const ongoingCount = mockServices.filter(
+  (service) => service.status === "Ongoing Pickup"
 ).length;
 
 const AnimatedIcon = () => {
   const rotation = useSharedValue(0);
-
-  // Define the animated style
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ rotate: `${rotation.value}deg` }],
     };
   });
-
-  // Start the rotation animation
   useEffect(() => {
     rotation.value = withRepeat(
       withTiming(360, { duration: 1000, easing: Easing.linear }),
@@ -112,11 +112,11 @@ const AnimatedIcon = () => {
 export default function Pickup() {
   const navigaton = useNavigation();
   const [services, setServices] = useState([]);
-  const [badgeCount, setBadgeCount] = useState(1);
+  const [notiCount, setNotiCount] = useState({ count: 1 });
   const [filter, setFilter] = useState("All");
   const bottomSheetRef = useRef(null);
   const bottomPendingSheet = useRef(null);
-  const snapPoints = useMemo(() => ["50%"], []);
+  const snapPoints = useMemo(() => ["60%"], []);
   const [selectedService, setSelectedService] = useState(null);
 
   const renderBackdrop = useCallback(
@@ -176,6 +176,7 @@ export default function Pickup() {
     bottomPendingSheet.current?.close();
   };
 
+  // Going to another screen
   const handleGoToMessage = async (id, name) => {
     console.log("Message ID Customer: " + id);
     console.log("Message Customer Name: " + name);
@@ -206,26 +207,22 @@ export default function Pickup() {
   });
 
   const sortedServices = filteredServices.sort((a, b) => {
-    // For the "All" tab, prioritize "Ongoing Pickup"
     if (filter === "All") {
       if (a.status === "Ongoing Pickup" && b.status !== "Ongoing Pickup") {
-        return -1; // a comes first
+        return -1;
       }
       if (a.status !== "Ongoing Pickup" && b.status === "Ongoing Pickup") {
-        return 1; // b comes first
+        return 1;
       }
-      // If both are either "Pending Pickup" or the same status, sort by request date
       return new Date(a.requestDate) - new Date(b.requestDate);
     }
 
-    // For the "Nearest" tab, sort by distance
     if (filter === "Nearest") {
       const distanceA = parseFloat(a.distance);
       const distanceB = parseFloat(b.distance);
-      return distanceA - distanceB; // Sort by distance
+      return distanceA - distanceB;
     }
 
-    // Default sorting by request date
     return new Date(a.requestDate) - new Date(b.requestDate);
   });
 
@@ -237,7 +234,7 @@ export default function Pickup() {
 
     if (item.status === "Pending Pickup") {
       iconName = "time-outline";
-      backgroundColor = COLORS.secondary;
+      backgroundColor = COLORS.accent;
       iconComponent = (
         <Ionicons name={iconName} size={24} color={COLORS.white} />
       );
@@ -372,564 +369,702 @@ export default function Pickup() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Upper Design */}
-      <View style={{ marginBottom: 1, marginStart: 20, marginTop: 10 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: 10,
-            paddingRight: 20, // Add padding to the right to prevent the icon from touching the edge
-          }}
-        >
-          <View>
-            <Text
-              style={{
-                fontFamily: fonts.SemiBold,
-                fontSize: 18,
-                color: COLORS.white,
-              }}
-            >
-              Staff Name
-            </Text>
-            <Text
-              style={{
-                fontFamily: fonts.Medium,
-                fontSize: 14,
-                color: COLORS.white,
-                marginTop: 2,
-              }}
-            >
-              Laundry Store Name
-            </Text>
-          </View>
-          {/* Notification Bell Icon */}
-          <TouchableOpacity onPress={handleGoToNotification}>
-            <Ionicons name="notifications" size={24} color={COLORS.white} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Bottom Design */}
-      <View style={styles.listContainer}>
-        <View style={{ marginBottom: 20, alignItems: "center" }}>
-          <Text
-            style={{
-              fontFamily: fonts.Bold,
-              fontSize: 24,
-              color: COLORS.primary,
-            }}
-          >
-            Laundry Pickup
-          </Text>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, filter === "All" && styles.activeTab]}
-            onPress={() => setFilter("All")}
-          >
-            <Text
-              style={[styles.tabText, filter === "All" && styles.activeTabText]}
-            >
-              All
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, filter === "Nearest" && styles.activeTab]}
-            onPress={() => setFilter("Nearest")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                filter === "Nearest" && styles.activeTabText,
-              ]}
-            >
-              Nearest
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, filter === "Cancel" && styles.activeTab]}
-            onPress={() => setFilter("Cancel")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                filter === "Cancel" && styles.activeTabText,
-              ]}
-            >
-              Cancel
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <FlashList
-          data={sortedServices}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 60 }}
-          showsVerticalScrollIndicator={false}
-          estimatedItemSize={100}
-        />
-      </View>
-      {/* For Pending */}
-      <Portal>
-        <BottomSheet
-          ref={bottomPendingSheet}
-          index={-1}
-          snapPoints={snapPoints}
-          enablePanDownToClose={true}
-          backgroundStyle={{ backgroundColor: COLORS.white }}
-          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
-          backdropComponent={renderBackdrop}
-        >
-          <View style={styles.headerContainer}>
-            {/* Title aligned to the left */}
-            <Text style={styles.headerTitle}>Pending Pickup</Text>
-
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={closePendingModal}
-            >
-              <MaterialIcons name="close" size={24} color={COLORS.secondary} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.divider} />
+    <LinearGradient
+      colors={["#5787C8", "#71C7DA"]}
+      locations={[0, 0.8]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={styles.container}>
+        {/* Upper Design */}
+        <View style={{ marginBottom: 1, marginStart: 20, marginTop: 10 }}>
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              alignContent: "center",
-              marginStart: 20,
-              marginEnd: 20,
-              marginTop: 20,
+              alignItems: "center",
+              marginTop: 10,
+              paddingRight: 20,
             }}
           >
-            <Text style={{ fontFamily: fonts.SemiBold, fontSize: 16 }}>
-              Customer Details
-            </Text>
-            <Text
-              style={{
-                fontFamily: fonts.SemiBold,
-                fontSize: 15,
-                color: "white",
-                backgroundColor: COLORS.success,
-                borderRadius: 15,
-                paddingHorizontal: 20,
-              }}
-            >
-              {selectedService?.name || "No Service Selected"}
-            </Text>
-          </View>
-          <View style={styles.contentContainer}>
-            <View
-              style={{
-                borderWidth: 1,
-                borderColor: COLORS.divider,
-                borderRadius: 10,
-                paddingTop: 10,
-              }}
-            >
-              <View>
-                {selectedService && (
-                  <>
-                    <View style={{ paddingStart: 20, marginBottom: 10 }}>
-                      <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Bold,
-                            fontSize: 14,
-                            color: COLORS.text3,
-                          }}
-                        >
-                          Customer:
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            fontSize: 14,
-                            color: COLORS.primary,
-                          }}
-                        >
-                          {selectedService.customerName}
-                        </Text>
-                      </View>
-                      <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Bold,
-                            fontSize: 14,
-                            color: COLORS.text3,
-                          }}
-                        >
-                          Location:
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            fontSize: 14,
-                            color: COLORS.secondary,
-                            flexShrink: 1, // Allow the text to shrink
-                            flexWrap: "wrap", // Allow text to wrap to the next line
-                            maxWidth: "80%", // Adjust this percentage as needed to prevent overflow
-                          }}
-                        >
-                          {selectedService.location}
-                        </Text>
-                      </View>
-                      <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Bold,
-                            fontSize: 14,
-                            color: COLORS.text3,
-                          }}
-                        >
-                          Distance:
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            fontSize: 14,
-                            color: COLORS.success,
-                          }}
-                        >
-                          {selectedService.distance}
-                        </Text>
-                      </View>
-                    </View>
-                    {/* Divider */}
-                    <View
-                      style={{
-                        height: 1,
-                        backgroundColor: "#ddd",
-                        width: "100%",
-                      }}
-                    />
-                    <View
-                      style={{
-                        backgroundColor: COLORS.secondary,
-                        borderRadius: 20,
-                        marginTop: 10,
-                        alignSelf: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        maxWidth: "90%",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontFamily: fonts.Medium,
-                          color: COLORS.white,
-                          fontSize: 12,
-                        }}
-                      >
-                        {timeAgo(selectedService.requestDate)}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        alignSelf: "center",
-                        marginBottom: 5,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontFamily: fonts.Medium,
-                          color: COLORS.primary,
-                          fontSize: 10,
-                        }}
-                      >
-                        Waiting for confirmation
-                      </Text>
-                    </View>
-                  </>
-                )}
-              </View>
-            </View>
-
-            <View style={{ flex: 1, justifyContent: "flex-end" }}>
-              <View
+            <View>
+              <Text
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  marginBottom: 10,
-                  gap: 10,
+                  fontFamily: fonts.SemiBold,
+                  fontSize: 18,
+                  color: COLORS.white,
                 }}
               >
-                <TouchableOpacity
+                Staff Name
+              </Text>
+              <Text
+                style={{
+                  fontFamily: fonts.Medium,
+                  fontSize: 14,
+                  color: COLORS.white,
+                  marginTop: 2,
+                }}
+              >
+                Laundry Store Name
+              </Text>
+            </View>
+            {/* Notification Bell Icon */}
+            <View style={{ position: "relative" }}>
+              <TouchableOpacity
+                onPress={handleGoToNotification}
+                style={{
+                  borderWidth: 1,
+                  borderColor: COLORS.white,
+                  padding: 5,
+                  borderRadius: 5,
+                }}
+              >
+                <Ionicons
+                  name="notifications-sharp"
+                  size={24}
+                  color={COLORS.white}
+                />
+                {notiCount.count > 0 && (
+                  <View style={styles.badge}>
+                    <Text
+                      style={[
+                        styles.badgeText,
+                        { fontSize: notiCount.count > 99 ? 10 : 12 },
+                      ]}
+                    >
+                      {notiCount.count > 99 ? "99+" : notiCount.count}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        {/* Bottom Design */}
+        <View style={styles.listContainer}>
+          {/* Upper */}
+          <View style={{ marginBottom: 15, alignItems: "center" }}>
+            <Text
+              style={{
+                fontFamily: fonts.Bold,
+                fontSize: 20,
+                color: COLORS.primary,
+              }}
+            >
+              Laundry Pickup
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                width: "100%",
+                marginTop: 5,
+                gap: 15,
+              }}
+            >
+              <View
+                style={{
+                  height: 80,
+                  width: "45%",
+                  backgroundColor: COLORS.accent,
+                  borderRadius: 10,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  // Shadow Section
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 2,
+                  },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.5,
+                  elevation: 5,
+                }}
+              >
+                <View
                   style={{
-                    padding: 10,
-                    backgroundColor: COLORS.light,
-                    borderRadius: 10,
+                    justifyContent: "center",
                     alignItems: "center",
+                    height: "35%",
                   }}
-                  onPress={() => handleCancelRequest(selectedService.id)}
                 >
                   <Text
                     style={{
-                      fontFamily: fonts.SemiBold,
-                      fontSize: 16,
-                      color: COLORS.black,
-                    }}
-                  >
-                    Cancel request
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.finishButton}
-                  onPress={() => handleGetLaundry(selectedService.id)}
-                >
-                  <Text
-                    style={{
-                      fontFamily: fonts.SemiBold,
-                      fontSize: 16,
+                      fontFamily: fonts.Bold,
+                      fontSize: 24,
                       color: COLORS.white,
                     }}
                   >
-                    Get the laundry
+                    {pendingCount}
                   </Text>
-                </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontFamily: fonts.Medium,
+                      fontSize: 16,
+                      color: COLORS.white,
+                      marginTop: 2,
+                    }}
+                  >
+                    Pending
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={{
+                  height: 80,
+                  width: "45%",
+                  backgroundColor: COLORS.success,
+                  borderRadius: 10,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  // Shadow Section
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 2,
+                  },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.5,
+                  elevation: 5,
+                }}
+              >
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "35%",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: fonts.Bold,
+                      fontSize: 24,
+                      color: COLORS.white,
+                    }}
+                  >
+                    {ongoingCount}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: fonts.Medium,
+                      fontSize: 16,
+                      color: COLORS.white,
+                      marginTop: 2,
+                    }}
+                  >
+                    Ongoing
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-        </BottomSheet>
-      </Portal>
-      {/* For Ongoing */}
-      <Portal>
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={-1}
-          snapPoints={snapPoints}
-          enablePanDownToClose={true}
-          backgroundStyle={{
-            backgroundColor: COLORS.white,
-            borderRadius: 20,
-          }}
-          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
-          backdropComponent={renderBackdrop}
-        >
-          <View style={styles.headerContainer}>
-            <Text style={styles.headerTitle}>Ongoing Pickup</Text>
+
+          <View style={styles.divider} />
+          <View style={styles.tabContainer}>
             <TouchableOpacity
-              onPress={closeOngoingModal}
-              style={styles.closeButton}
+              style={[styles.tab, filter === "All" && styles.activeTab]}
+              onPress={() => setFilter("All")}
             >
-              <MaterialIcons name="close" size={24} color={COLORS.secondary} />
+              <Text
+                style={[
+                  styles.tabText,
+                  filter === "All" && styles.activeTabText,
+                ]}
+              >
+                All
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, filter === "Nearest" && styles.activeTab]}
+              onPress={() => setFilter("Nearest")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  filter === "Nearest" && styles.activeTabText,
+                ]}
+              >
+                Nearest
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, filter === "Cancel" && styles.activeTab]}
+              onPress={() => setFilter("Cancel")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  filter === "Cancel" && styles.activeTabText,
+                ]}
+              >
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.divider} />
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center", // Center text vertically
-              marginStart: 20,
-              marginEnd: 20,
-              marginTop: 20,
-            }}
+          <FlashList
+            data={sortedServices}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingBottom: 60 }}
+            showsVerticalScrollIndicator={false}
+            estimatedItemSize={100}
+          />
+        </View>
+        {/* For Pending */}
+        <Portal>
+          <BottomSheet
+            ref={bottomPendingSheet}
+            index={-1}
+            snapPoints={snapPoints}
+            enablePanDownToClose={true}
+            backgroundStyle={{ backgroundColor: COLORS.white }}
+            handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
+            backdropComponent={renderBackdrop}
           >
-            <Text
-              style={{
-                fontFamily: fonts.SemiBold,
-                fontSize: 16,
-                color: COLORS.text3,
-              }}
-            >
-              Customer Details
-            </Text>
-            <Text
-              style={{
-                fontFamily: fonts.SemiBold,
-                fontSize: 15,
-                color: "white",
-                backgroundColor: COLORS.success,
-                borderRadius: 15,
-                paddingHorizontal: 20,
-                paddingVertical: 2,
-                maxWidth: "50%",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {selectedService?.name || "No Service Selected"}
-            </Text>
-          </View>
+            <View style={styles.headerContainer}>
+              <Text style={styles.headerTitle}>Pending Pickup</Text>
 
-          <View style={styles.contentContainer}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={closePendingModal}
+              >
+                <MaterialIcons
+                  name="close"
+                  size={24}
+                  color={COLORS.secondary}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.divider} />
             <View
               style={{
-                borderWidth: 1,
-                borderColor: COLORS.divider,
-                borderRadius: 10,
-                paddingTop: 10,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignContent: "center",
+                marginStart: 20,
+                marginEnd: 20,
+                marginTop: 20,
               }}
             >
-              <View>
-                {selectedService && (
-                  <>
-                    <View style={{ paddingStart: 20, marginBottom: 10 }}>
-                      <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Bold,
-                            fontSize: 14,
-                            color: COLORS.text3,
-                          }}
-                        >
-                          Customer:
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            fontSize: 14,
-                            color: COLORS.primary,
-                          }}
-                        >
-                          {selectedService.customerName}
-                        </Text>
-                      </View>
-                      <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Bold,
-                            fontSize: 14,
-                            color: COLORS.text3,
-                          }}
-                        >
-                          Location:
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            fontSize: 14,
-                            color: COLORS.secondary,
-                            flexShrink: 1, // Allow the text to shrink
-                            flexWrap: "wrap", // Allow text to wrap to the next line
-                            maxWidth: "80%", // Adjust this percentage as needed to prevent overflow
-                          }}
-                        >
-                          {selectedService.location}
-                        </Text>
-                      </View>
-
-                      {/* <Text style={styles.modalText}>
-                        Request Date:{" "}
-                        {new Date(selectedService.requestDate).toLocaleString()}
-                      </Text>
-                      <Text style={styles.modalText}>
-                        Distance: {selectedService.distance}
-                      </Text>
-                      <Text style={styles.modalText}>
-                        Status: {selectedService.status}
-                      </Text> */}
-                    </View>
-                    {/* Divider */}
-                    <View
-                      style={{
-                        height: 1,
-                        backgroundColor: "#ddd",
-                        width: "100%",
-                      }}
-                    />
-                    <View
-                      style={{
-                        backgroundColor: COLORS.secondary,
-                        borderRadius: 20,
-                        marginTop: 10,
-                        alignSelf: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        maxWidth: "90%",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontFamily: fonts.Medium,
-                          color: COLORS.white,
-                          fontSize: 12,
-                        }}
-                      >
-                        {timeAgo(selectedService.requestDate)}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        alignSelf: "center",
-                        marginBottom: 5,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontFamily: fonts.Medium,
-                          color: COLORS.primary, // Change the color as needed
-                          fontSize: 10, // Set a specific font size for better readability
-                        }}
-                      >
-                        Waiting for Pickup
-                      </Text>
-                    </View>
-                  </>
-                )}
-              </View>
-            </View>
-            {/* Bottom Button */}
-            <View style={{ flex: 1, justifyContent: "flex-end" }}>
-              <View
+              <Text style={{ fontFamily: fonts.SemiBold, fontSize: 16 }}>
+                Customer Details
+              </Text>
+              <Text
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  marginBottom: 10,
-                  gap: 10,
+                  fontFamily: fonts.SemiBold,
+                  fontSize: 15,
+                  color: "white",
+                  backgroundColor: COLORS.accent,
+                  borderRadius: 15,
+                  paddingHorizontal: 20,
                 }}
               >
-                <TouchableOpacity
+                {selectedService?.name || "No Service Selected"}
+              </Text>
+            </View>
+            <View style={styles.contentContainer}>
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: COLORS.divider,
+                  borderRadius: 10,
+                  paddingTop: 10,
+                }}
+              >
+                <View>
+                  {selectedService && (
+                    <>
+                      <View style={{ paddingStart: 20, marginBottom: 10 }}>
+                        <View style={{ flexDirection: "row", gap: 5 }}>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Bold,
+                              fontSize: 14,
+                              color: COLORS.text3,
+                            }}
+                          >
+                            Customer:
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Medium,
+                              fontSize: 14,
+                              color: COLORS.primary,
+                            }}
+                          >
+                            {selectedService.customerName}
+                          </Text>
+                        </View>
+                        <View style={{ flexDirection: "row", gap: 5 }}>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Bold,
+                              fontSize: 14,
+                              color: COLORS.text3,
+                            }}
+                          >
+                            Location:
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Medium,
+                              fontSize: 14,
+                              color: COLORS.secondary,
+                              flexShrink: 1,
+                              flexWrap: "wrap",
+                              maxWidth: "80%",
+                            }}
+                          >
+                            {selectedService.location}
+                          </Text>
+                        </View>
+                        <View style={{ flexDirection: "row", gap: 5 }}>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Bold,
+                              fontSize: 14,
+                              color: COLORS.text3,
+                            }}
+                          >
+                            Distance:
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Medium,
+                              fontSize: 14,
+                              color: COLORS.success,
+                            }}
+                          >
+                            {selectedService.distance}
+                          </Text>
+                        </View>
+                      </View>
+                      {/* Divider */}
+                      <View
+                        style={{
+                          height: 1,
+                          backgroundColor: "#ddd",
+                          width: "100%",
+                        }}
+                      />
+                      <View
+                        style={{
+                          backgroundColor: COLORS.secondary,
+                          borderRadius: 20,
+                          marginTop: 10,
+                          alignSelf: "center",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          maxWidth: "90%",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: fonts.Medium,
+                            color: COLORS.white,
+                            fontSize: 12,
+                          }}
+                        >
+                          {timeAgo(selectedService.requestDate)}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          alignSelf: "center",
+                          marginBottom: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: fonts.Medium,
+                            color: COLORS.primary,
+                            fontSize: 10,
+                          }}
+                        >
+                          Waiting for confirmation
+                        </Text>
+                      </View>
+                    </>
+                  )}
+                </View>
+              </View>
+
+              <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                <View
                   style={{
-                    padding: 10,
-                    backgroundColor: COLORS.light,
-                    borderRadius: 10,
-                    alignItems: "center",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    marginBottom: 10,
+                    gap: 10,
                   }}
-                  onPress={() => handleReturnToPending(selectedService.id)}
                 >
-                  <Text
+                  <TouchableOpacity
                     style={{
-                      fontFamily: fonts.SemiBold,
-                      fontSize: 16,
-                      color: COLORS.black,
+                      padding: 10,
+                      backgroundColor: COLORS.light,
+                      borderRadius: 10,
+                      alignItems: "center",
                     }}
+                    onPress={() => handleCancelRequest(selectedService.id)}
                   >
-                    Return to pending
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.finishButton}
-                  onPress={() => handleFinishPickup(selectedService.id)}
-                >
-                  <Text
-                    style={{
-                      fontFamily: fonts.SemiBold,
-                      fontSize: 16,
-                      color: COLORS.white,
-                    }}
+                    <Text
+                      style={{
+                        fontFamily: fonts.SemiBold,
+                        fontSize: 16,
+                        color: COLORS.black,
+                      }}
+                    >
+                      Cancel request
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.finishButton}
+                    onPress={() => handleGetLaundry(selectedService.id)}
                   >
-                    Finish Pickup
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      style={{
+                        fontFamily: fonts.SemiBold,
+                        fontSize: 16,
+                        color: COLORS.white,
+                      }}
+                    >
+                      Get the laundry
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        </BottomSheet>
-      </Portal>
-    </SafeAreaView>
+          </BottomSheet>
+        </Portal>
+        {/* For Ongoing */}
+        <Portal>
+          <BottomSheet
+            ref={bottomSheetRef}
+            index={-1}
+            snapPoints={snapPoints}
+            enablePanDownToClose={true}
+            backgroundStyle={{
+              backgroundColor: COLORS.white,
+              borderRadius: 20,
+            }}
+            handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
+            backdropComponent={renderBackdrop}
+          >
+            <View style={styles.headerContainer}>
+              <Text style={styles.headerTitle}>Ongoing Pickup</Text>
+              <TouchableOpacity
+                onPress={closeOngoingModal}
+                style={styles.closeButton}
+              >
+                <MaterialIcons
+                  name="close"
+                  size={24}
+                  color={COLORS.secondary}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.divider} />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginStart: 20,
+                marginEnd: 20,
+                marginTop: 20,
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: fonts.SemiBold,
+                  fontSize: 16,
+                  color: COLORS.text3,
+                }}
+              >
+                Customer Details
+              </Text>
+              <Text
+                style={{
+                  fontFamily: fonts.SemiBold,
+                  fontSize: 15,
+                  color: "white",
+                  backgroundColor: COLORS.success,
+                  borderRadius: 15,
+                  paddingHorizontal: 20,
+                  paddingVertical: 2,
+                  maxWidth: "50%",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {selectedService?.name || "No Service Selected"}
+              </Text>
+            </View>
+
+            <View style={styles.contentContainer}>
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: COLORS.divider,
+                  borderRadius: 10,
+                  paddingTop: 10,
+                }}
+              >
+                <View>
+                  {selectedService && (
+                    <>
+                      <View style={{ paddingStart: 20, marginBottom: 10 }}>
+                        <View style={{ flexDirection: "row", gap: 5 }}>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Bold,
+                              fontSize: 14,
+                              color: COLORS.text3,
+                            }}
+                          >
+                            Customer:
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Medium,
+                              fontSize: 14,
+                              color: COLORS.primary,
+                            }}
+                          >
+                            {selectedService.customerName}
+                          </Text>
+                        </View>
+                        <View style={{ flexDirection: "row", gap: 5 }}>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Bold,
+                              fontSize: 14,
+                              color: COLORS.text3,
+                            }}
+                          >
+                            Location:
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Medium,
+                              fontSize: 14,
+                              color: COLORS.secondary,
+                              flexShrink: 1,
+                              flexWrap: "wrap",
+                              maxWidth: "80%",
+                            }}
+                          >
+                            {selectedService.location}
+                          </Text>
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          height: 1,
+                          backgroundColor: "#ddd",
+                          width: "100%",
+                        }}
+                      />
+                      <View
+                        style={{
+                          backgroundColor: COLORS.secondary,
+                          borderRadius: 20,
+                          marginTop: 10,
+                          alignSelf: "center",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          maxWidth: "90%",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: fonts.Medium,
+                            color: COLORS.white,
+                            fontSize: 12,
+                          }}
+                        >
+                          {timeAgo(selectedService.requestDate)}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          alignSelf: "center",
+                          marginBottom: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: fonts.Medium,
+                            color: COLORS.primary,
+                            fontSize: 10,
+                          }}
+                        >
+                          Waiting for Pickup
+                        </Text>
+                      </View>
+                    </>
+                  )}
+                </View>
+              </View>
+              {/* Bottom Button */}
+              <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    marginBottom: 10,
+                    gap: 10,
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      padding: 10,
+                      backgroundColor: COLORS.light,
+                      borderRadius: 10,
+                      alignItems: "center",
+                    }}
+                    onPress={() => handleReturnToPending(selectedService.id)}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: fonts.SemiBold,
+                        fontSize: 16,
+                        color: COLORS.black,
+                      }}
+                    >
+                      Return to pending
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.finishButton}
+                    onPress={() => handleFinishPickup(selectedService.id)}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: fonts.SemiBold,
+                        fontSize: 16,
+                        color: COLORS.white,
+                      }}
+                    >
+                      Finish Pickup
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </BottomSheet>
+        </Portal>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
@@ -970,7 +1105,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.secondary,
   },
   firstContainer: {
     padding: 16,
@@ -978,10 +1112,19 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     backgroundColor: COLORS.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
     padding: 20,
     marginTop: 20,
+    // Shadow Section
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
+    elevation: 5,
   },
   title: {
     fontSize: 32,
@@ -1100,10 +1243,9 @@ const styles = StyleSheet.create({
   },
 
   messageButton: {
-    // backgroundColor: COLORS.lightGray,
-    borderWidth: 1, // Add border width
-    borderColor: COLORS.primary, // Set border color
-    padding: 5, // Adjust this value as needed
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    padding: 5,
   },
   badge: {
     position: "absolute",

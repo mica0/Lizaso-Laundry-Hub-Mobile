@@ -38,6 +38,8 @@ const COLORS = {
   message: "#F23F42",
   online: "#23A55A",
   idle: "#F0B232",
+
+  lightgray: "#D3D3D3",
 };
 
 export default COLORS;
