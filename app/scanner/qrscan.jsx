@@ -1,5 +1,5 @@
 import { Camera, CameraView } from "expo-camera";
-import { Stack } from "expo-router";
+import { Stack, useNavigation } from "expo-router";
 import {
   AppState,
   Linking,
@@ -8,12 +8,16 @@ import {
   StatusBar,
   StyleSheet,
 } from "react-native";
-// import { Overlay } from "./Overlay";
 import { useEffect, useRef } from "react";
+import { useRoute } from "@react-navigation/native";
+import { Overlay } from "./overlay"; // Import your Overlay component
 
-export default function Home() {
+export default function Qrscan() {
   const qrLock = useRef(false);
   const appState = useRef(AppState.currentState);
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { customerId } = route.params;
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
@@ -52,7 +56,7 @@ export default function Home() {
           }
         }}
       />
-      {/* <Overlay /> */}
+      <Overlay />
     </SafeAreaView>
   );
 }

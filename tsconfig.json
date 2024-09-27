@@ -13,6 +13,9 @@
     "expo-env.d.ts",
     "components/TabBarButton.jsx",
     "constants/colors.js",
-    "app/index.tsx"
+    "app/index.tsx",
+    "app/scanner/qrscan.jsx",
+    "app/scanner/qrscan.jsx",
+    "app/scanner/overlay.jsx"
   ]
 }

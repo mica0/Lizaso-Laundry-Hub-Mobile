@@ -97,7 +97,7 @@ export default function Delivery() {
   const bottomSheetRef = useRef(null);
   const bottomPendingSheet = useRef(null);
   const snapPoints = useMemo(() => ["60%"], []);
-  const snapPointsOnDelivery = useMemo(() => ["95%"], []);
+  const snapPointsOnDelivery = useMemo(() => ["80%"], []);
   const [selectedService, setSelectedService] = useState(null);
 
   const renderBackdrop = useCallback(
@@ -135,10 +135,13 @@ export default function Delivery() {
     bottomPendingSheet.current?.close();
   };
 
-  // Ongoing
-  const handleFinishPickup = async (id) => {
-    console.log(id);
+  // On delivery
+  const handleScanCode = async (id) => {
     bottomSheetRef.current?.close();
+
+    setTimeout(() => {
+      navigaton.navigate("scanner/qrscan", { customerId: id });
+    }, 300);
   };
 
   const handleReturnToPending = async (id) => {
@@ -146,7 +149,7 @@ export default function Delivery() {
     bottomSheetRef.current?.close();
   };
 
-  // Pending
+  // Ready for delivery
   const handleGetLaundry = async (id) => {
     console.log(id);
     bottomPendingSheet.current?.close();
@@ -710,16 +713,21 @@ export default function Delivery() {
                           <View
                             style={{
                               backgroundColor: "lightgrey",
-                              height: 250,
-                              width: 250,
+                              height: 50,
+                              width: 50,
                               justifyContent: "center",
                               alignItems: "center",
                               borderRadius: 10,
                             }}
                           >
-                            <Text style={{ textAlign: "center" }}>
-                              Centered Block
-                            </Text>
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                justifyContent: "space-around",
+                                width: "100%", // Full width
+                                paddingHorizontal: 20,
+                              }}
+                            ></View>
                           </View>
                         ) : (
                           <TouchableOpacity
@@ -733,6 +741,8 @@ export default function Delivery() {
                             <Text
                               style={{
                                 color: COLORS.white,
+                                fontFamily: fonts.SemiBold,
+                                fontSize: 15,
                                 textAlign: "center",
                               }}
                             >
@@ -774,18 +784,46 @@ export default function Delivery() {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={styles.finishButton}
-                    onPress={() => handleFinishPickup(selectedService.id)}
+                    style={[
+                      styles.finishButton,
+                      {
+                        backgroundColor: isPermissionGranted
+                          ? COLORS.secondary
+                          : COLORS.disableButtonBg,
+                      },
+                    ]}
+                    onPress={
+                      isPermissionGranted
+                        ? () => handleScanCode(selectedService.id)
+                        : null
+                    }
+                    disabled={!isPermissionGranted}
                   >
-                    <Text
-                      style={{
-                        fontFamily: fonts.SemiBold,
-                        fontSize: 16,
-                        color: COLORS.white,
-                      }}
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
                     >
-                      Complete Delivery
-                    </Text>
+                      <Text
+                        style={{
+                          fontFamily: fonts.SemiBold,
+                          fontSize: 16,
+                          color: isPermissionGranted
+                            ? COLORS.white
+                            : COLORS.disableButtonTxt,
+                        }}
+                      >
+                        Scan Code
+                      </Text>
+                      <MaterialCommunityIcons
+                        name="qrcode-scan" // Use the appropriate icon name
+                        size={24} // Adjust size as needed
+                        color={
+                          isPermissionGranted
+                            ? COLORS.white
+                            : COLORS.disableButtonTxt
+                        } // Set icon color
+                        style={{ marginLeft: 8 }} // Add some space between text and icon
+                      />
+                    </View>
                   </TouchableOpacity>
                 </View>
               </View>

@@ -40,6 +40,10 @@ const COLORS = {
   idle: "#F0B232",
 
   lightgray: "#D3D3D3",
+
+  // Disable Button
+  disableButtonBg: "#E5E5E5",
+  disableButtonTxt: "#B0B0B0",
 };
 
 export default COLORS;
