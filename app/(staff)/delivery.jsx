@@ -5,7 +5,16 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Pressable,
+  Alert,
+  ScrollView,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -16,9 +25,9 @@ import { FlashList } from "@shopify/flash-list";
 import { Portal } from "@gorhom/portal";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
-import { BarCodeScanner } from "expo-barcode-scanner";
 import { timeAgo } from "../../constants/datetime";
-import { useNavigation } from "expo-router";
+import { Link, useNavigation } from "expo-router";
+import { useCameraPermissions } from "expo-camera";
 
 const mockServices = [
   {
@@ -88,7 +97,7 @@ export default function Delivery() {
   const bottomSheetRef = useRef(null);
   const bottomPendingSheet = useRef(null);
   const snapPoints = useMemo(() => ["60%"], []);
-  const snapPointsOnDelivery = useMemo(() => ["90%"], []);
+  const snapPointsOnDelivery = useMemo(() => ["95%"], []);
   const [selectedService, setSelectedService] = useState(null);
 
   const renderBackdrop = useCallback(
@@ -160,31 +169,6 @@ export default function Delivery() {
     navigaton.navigate("notification/list", {});
   };
 
-  // QR CODE
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
-  const [scannedData, setScannedData] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-    })();
-  }, []);
-
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    setScannedData(data);
-    alert(`QR code scanned: ${data}`);
-  };
-
-  if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
-  }
-
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
   // Filter services based on the selected tab
   const filteredServices = services.filter((service) => {
     if (filter === "All") {
@@ -408,6 +392,32 @@ export default function Delivery() {
     );
   };
 
+  // QR CODE SECTIOn
+  const [permission, requestPermission] = useCameraPermissions();
+  const isPermissionGranted = Boolean(permission?.granted);
+
+  useEffect(() => {
+    if (permission?.status === "denied") {
+      Alert.alert(
+        "Permission needed",
+        "Please enable camera permissions in your settings."
+      );
+    }
+  }, [permission]);
+
+  // Handle request permission
+  const handleRequestPermission = async () => {
+    const { status } = await requestPermission();
+    if (status === "granted") {
+      Alert.alert("Permission granted", "You can now scan QR codes.");
+    } else {
+      Alert.alert(
+        "Permission denied",
+        "Camera access is needed to scan QR codes."
+      );
+    }
+  };
+
   return (
     <LinearGradient
       colors={["#5787C8", "#71C7DA"]}
@@ -581,7 +591,6 @@ export default function Delivery() {
                 </Text>
               </View>
             </View>
-
             <View style={styles.contentContainer}>
               <View
                 style={{
@@ -652,7 +661,7 @@ export default function Delivery() {
                               color: COLORS.primary,
                             }}
                           >
-                            Cash on delivery (COD)
+                            Cash on delivery
                           </Text>
                         </View>
 
@@ -688,37 +697,54 @@ export default function Delivery() {
                           width: "100%",
                         }}
                       />
-                      <View style={{ alignSelf: "center", marginBottom: 10 }}>
-                        {scanned ? (
-                          <Button
-                            title={"Tap to Scan Again"}
-                            onPress={() => setScanned(false)}
-                          />
-                        ) : (
-                          <BarCodeScanner
-                            onBarCodeScanned={
-                              scanned ? undefined : handleBarCodeScanned
-                            }
-                            style={{ height: 300, width: 300 }}
-                          />
-                        )}
-                        {scannedData && (
-                          <Text
+                      <View
+                        style={{
+                          alignSelf: "center",
+                          marginBottom: 10,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingVertical: 20,
+                        }}
+                      >
+                        {isPermissionGranted ? (
+                          <View
                             style={{
-                              marginTop: 10,
-                              fontFamily: fonts.Medium,
-                              fontSize: 14,
+                              backgroundColor: "lightgrey",
+                              height: 250,
+                              width: 250,
+                              justifyContent: "center",
+                              alignItems: "center",
+                              borderRadius: 10,
                             }}
                           >
-                            Scanned Data: {scannedData}
-                          </Text>
+                            <Text style={{ textAlign: "center" }}>
+                              Centered Block
+                            </Text>
+                          </View>
+                        ) : (
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: COLORS.primary,
+                              padding: 10,
+                              borderRadius: 10,
+                            }}
+                            onPress={requestPermission}
+                          >
+                            <Text
+                              style={{
+                                color: COLORS.white,
+                                textAlign: "center",
+                              }}
+                            >
+                              Request Camera Permission
+                            </Text>
+                          </TouchableOpacity>
                         )}
                       </View>
                     </>
                   )}
                 </View>
               </View>
-              {/* Bottom Button */}
               <View style={{ flex: 1, justifyContent: "flex-end" }}>
                 <View
                   style={{
@@ -1000,19 +1026,6 @@ export default function Delivery() {
 }
 
 const styles = StyleSheet.create({
-  qrContainer: {
-    backgroundColor: COLORS.secondary,
-    borderRadius: 20,
-    alignSelf: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 10,
-    maxWidth: "90%",
-  },
-  scanner: {
-    width: "100%",
-    height: 200, // Set the desired height for the scanner
-  },
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1197,6 +1210,35 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+{
+  /* <Pressable onPress={handleRequestPermission}>
+                          <Text
+                            style={{
+                              fontFamily: fonts.SemiBold,
+                              color: COLORS.secondary,
+                              fontSize: 20,
+                            }}
+                          >
+                            Request Permission
+                          </Text>
+                        </Pressable>
+                        <Link href={"/scanner"} asChild>
+                          <Pressable disabled={!isPermissionGranted}>
+                            <Text
+                              style={{
+                                fontFamily: fonts.SemiBold,
+                                color: COLORS.secondary,
+                                fontSize: 12,
+                                opacity: isPermissionGranted ? 1 : 0.5,
+                              }}
+                            >
+                              Scan Code
+                            </Text>
+                          </Pressable>
+                        </Link> */
+}
+
 // import React, { useState, useEffect } from "react";
 // import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 // import { SafeAreaView } from "react-native-safe-area-context";
