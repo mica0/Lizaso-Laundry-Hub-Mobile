@@ -16,14 +16,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Portal } from "@gorhom/portal";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
-import nodata from "../../assets/images/no_data.png";
-import Animated, {
-  Easing,
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-} from "react-native-reanimated";
+import { BarCodeScanner } from "expo-barcode-scanner";
 import { timeAgo } from "../../constants/datetime";
 import { useNavigation } from "expo-router";
 
@@ -35,7 +28,7 @@ const mockServices = [
     customerName: "John Doe",
     requestDate: "2024-09-01T10:00:00Z",
     distance: "7 km",
-    status: "Pending Pickup",
+    status: "Ready for Delivery",
     messageCount: 1,
   },
   {
@@ -45,7 +38,7 @@ const mockServices = [
     customerName: "Jane Smith",
     requestDate: "2024-09-02T09:30:00Z",
     distance: "1 km",
-    status: "Cancel",
+    status: "Ready for Delivery",
     messageCount: 0,
   },
   {
@@ -55,7 +48,7 @@ const mockServices = [
     customerName: "Alex Johnson",
     requestDate: "2024-09-03T08:15:00Z",
     distance: "3 km",
-    status: "Pending Pickup",
+    status: "Ready for Delivery",
     messageCount: 10,
   },
   {
@@ -65,7 +58,7 @@ const mockServices = [
     customerName: "John Reynald Velarde",
     requestDate: "2024-09-04T12:45:00Z",
     distance: "5 km",
-    status: "Ongoing Pickup",
+    status: "Out for Delivery",
     messageCount: 50,
   },
   {
@@ -75,7 +68,7 @@ const mockServices = [
     customerName: "Emily Brown",
     requestDate: "2024-09-04T11:45:00Z",
     distance: "5 km",
-    status: "Ongoing Pickup",
+    status: "Out for Delivery",
     messageCount: 80,
   },
 ];
@@ -87,29 +80,7 @@ const ongoingCount = mockServices.filter(
   (service) => service.status === "Ongoing Pickup"
 ).length;
 
-const AnimatedIcon = () => {
-  const rotation = useSharedValue(0);
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ rotate: `${rotation.value}deg` }],
-    };
-  });
-  useEffect(() => {
-    rotation.value = withRepeat(
-      withTiming(360, { duration: 1000, easing: Easing.linear }),
-      -1,
-      false
-    );
-  }, [rotation]);
-
-  return (
-    <Animated.View style={animatedStyle}>
-      <Ionicons name="hourglass-outline" size={24} color={COLORS.white} />
-    </Animated.View>
-  );
-};
-
-export default function Pickup() {
+export default function Delivery() {
   const navigaton = useNavigation();
   const [services, setServices] = useState([]);
   const [notiCount, setNotiCount] = useState({ count: 1 });
@@ -117,6 +88,7 @@ export default function Pickup() {
   const bottomSheetRef = useRef(null);
   const bottomPendingSheet = useRef(null);
   const snapPoints = useMemo(() => ["60%"], []);
+  const snapPointsOnDelivery = useMemo(() => ["90%"], []);
   const [selectedService, setSelectedService] = useState(null);
 
   const renderBackdrop = useCallback(
@@ -188,18 +160,43 @@ export default function Pickup() {
     navigaton.navigate("notification/list", {});
   };
 
+  // QR CODE
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  const [scannedData, setScannedData] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    setScannedData(data);
+    alert(`QR code scanned: ${data}`);
+  };
+
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
   // Filter services based on the selected tab
   const filteredServices = services.filter((service) => {
     if (filter === "All") {
       return (
-        service.status === "Pending Pickup" ||
-        service.status === "Ongoing Pickup"
+        service.status === "Ready for Delivery" ||
+        service.status === "Out for Delivery"
       );
     }
     if (filter === "Nearest") {
       return (
-        service.status === "Pending Pickup" ||
-        service.status === "Ongoing Pickup"
+        service.status === "Ready for Delivery" ||
+        service.status === "Out for Delivery"
       );
     }
     if (filter === "Cancel") return service.status === "Cancel";
@@ -208,10 +205,10 @@ export default function Pickup() {
 
   const sortedServices = filteredServices.sort((a, b) => {
     if (filter === "All") {
-      if (a.status === "Ongoing Pickup" && b.status !== "Ongoing Pickup") {
+      if (a.status === "Out for Delivery" && b.status !== "Out for Delivery") {
         return -1;
       }
-      if (a.status !== "Ongoing Pickup" && b.status === "Ongoing Pickup") {
+      if (a.status !== "Out for Delivery" && b.status === "Out for Delivery") {
         return 1;
       }
       return new Date(a.requestDate) - new Date(b.requestDate);
@@ -230,19 +227,23 @@ export default function Pickup() {
     let iconName;
     let backgroundColor;
     let iconComponent;
-    let statusText;
 
-    if (item.status === "Pending Pickup") {
+    if (item.status === "Ready for Delivery") {
       iconName = "time-outline";
       backgroundColor = COLORS.accent;
       iconComponent = (
         <Ionicons name={iconName} size={24} color={COLORS.white} />
       );
-      statusText = "Pending";
-    } else if (item.status === "Ongoing Pickup") {
+    } else if (item.status === "Out for Delivery") {
       backgroundColor = COLORS.success;
-      // iconComponent = <AnimatedIcon />; // comment for now
-      statusText = "Ongoing";
+      iconComponent = (
+        <MaterialCommunityIcons
+          name="truck-delivery-outline"
+          size={24}
+          color={COLORS.white}
+        />
+      ); // comment for now
+      statusText = "On Delivery";
     } else if (item.status === "Cancel") {
       iconName = "book-cancel-outline";
       iconComponent = (
@@ -253,22 +254,22 @@ export default function Pickup() {
         />
       );
       backgroundColor = COLORS.error;
-      statusText = "Cancel";
     }
 
     return (
       <TouchableOpacity
         style={styles.itemContainer}
         onPress={() => {
-          if (item.status === "Pending Pickup") {
+          if (item.status === "Ready for Delivery") {
             openPendingModal(item);
-          } else if (item.status === "Ongoing Pickup") {
+          } else if (item.status === "Out for Delivery") {
             openOngoingModal(item);
           } else {
           }
         }}
         activeOpacity={
-          item.status === "Pending Pickup" || item.status === "Ongoing Pickup"
+          item.status === "Ready for Delivery" ||
+          item.status === "Out for Delivery"
             ? 0.2
             : 1
         }
@@ -290,7 +291,7 @@ export default function Pickup() {
             <View
               style={{ flexDirection: "row", alignItems: "flex-start", gap: 2 }}
             >
-              {item.status !== "Cancel" && item.status !== "Pending Pickup" && (
+              {item.status !== "Cancel" && (
                 <View style={{ position: "relative" }}>
                   <TouchableOpacity
                     onPress={() =>
@@ -322,15 +323,54 @@ export default function Pickup() {
                 <View style={[styles.button, { backgroundColor }]}>
                   {iconComponent}
                 </View>
-                <Text
-                  style={{
-                    fontFamily: fonts.Regular,
-                    fontSize: 12,
-                    color: COLORS.primary,
-                  }}
-                >
-                  {statusText}
-                </Text>
+                <View style={{ alignItems: "center" }}>
+                  {item.status === "Ready for Delivery" && (
+                    <View style={{ alignItems: "center" }}>
+                      <Text
+                        style={{
+                          fontFamily: fonts.Regular,
+                          fontSize: 12,
+                          color: COLORS.primary,
+                        }}
+                      >
+                        Ready for
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: fonts.Regular,
+                          fontSize: 12,
+                          color: COLORS.primary,
+                          marginTop: -6, // Adjust this value to reduce the gap
+                        }}
+                      >
+                        delivery
+                      </Text>
+                    </View>
+                  )}
+                  {item.status === "Out for Delivery" && (
+                    <View style={{ alignItems: "center" }}>
+                      <Text
+                        style={{
+                          fontFamily: fonts.Regular,
+                          fontSize: 12,
+                          color: COLORS.primary,
+                        }}
+                      >
+                        On
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: fonts.Regular,
+                          fontSize: 12,
+                          color: COLORS.primary,
+                          marginTop: -6, // Adjust this value to reduce the gap
+                        }}
+                      >
+                        delivery
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
           </View>
@@ -409,159 +449,11 @@ export default function Pickup() {
                 Laundry Store Name
               </Text>
             </View>
-            {/* Notification Bell Icon */}
-            <View style={{ position: "relative" }}>
-              <TouchableOpacity
-                onPress={handleGoToNotification}
-                style={{
-                  borderWidth: 1,
-                  borderColor: COLORS.white,
-                  padding: 5,
-                  borderRadius: 5,
-                }}
-              >
-                <Ionicons
-                  name="notifications-sharp"
-                  size={24}
-                  color={COLORS.white}
-                />
-                {notiCount.count > 0 && (
-                  <View style={styles.badge}>
-                    <Text
-                      style={[
-                        styles.badgeText,
-                        { fontSize: notiCount.count > 99 ? 10 : 12 },
-                      ]}
-                    >
-                      {notiCount.count > 99 ? "99+" : notiCount.count}
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
 
         {/* Bottom Design */}
         <View style={styles.listContainer}>
-          {/* Upper */}
-          <View style={{ marginBottom: 15, alignItems: "center" }}>
-            <Text
-              style={{
-                fontFamily: fonts.Bold,
-                fontSize: 20,
-                color: COLORS.primary,
-              }}
-            >
-              Laundry Pickup
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                width: "100%",
-                marginTop: 5,
-                gap: 15,
-              }}
-            >
-              <View
-                style={{
-                  height: 80,
-                  width: "45%",
-                  backgroundColor: COLORS.accent,
-                  borderRadius: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  // Shadow Section
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 3.5,
-                  elevation: 5,
-                }}
-              >
-                <View
-                  style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "35%",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: fonts.Bold,
-                      fontSize: 24,
-                      color: COLORS.white,
-                    }}
-                  >
-                    {pendingCount}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: fonts.Medium,
-                      fontSize: 16,
-                      color: COLORS.white,
-                      marginTop: 2, // Adjust this value to reduce the gap
-                    }}
-                  >
-                    Pending
-                  </Text>
-                </View>
-              </View>
-              <View
-                style={{
-                  height: 80,
-                  width: "45%",
-                  backgroundColor: COLORS.success,
-                  borderRadius: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  // Shadow Section
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 3.5,
-                  elevation: 5,
-                }}
-              >
-                <View
-                  style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "35%",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: fonts.Bold,
-                      fontSize: 24,
-                      color: COLORS.white,
-                    }}
-                  >
-                    {ongoingCount}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: fonts.Medium,
-                      fontSize: 16,
-                      color: COLORS.white,
-                      marginTop: 2,
-                    }}
-                  >
-                    Ongoing
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.divider} />
           <View style={styles.tabContainer}>
             <TouchableOpacity
               style={[styles.tab, filter === "All" && styles.activeTab]}
@@ -612,7 +504,269 @@ export default function Pickup() {
             estimatedItemSize={100}
           />
         </View>
-        {/* For Pending */}
+        {/* For On Delivery */}
+        <Portal>
+          <BottomSheet
+            ref={bottomSheetRef}
+            index={-1}
+            snapPoints={snapPointsOnDelivery}
+            enablePanDownToClose={true}
+            backgroundStyle={{
+              backgroundColor: COLORS.white,
+              borderRadius: 20,
+            }}
+            handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
+            backdropComponent={renderBackdrop}
+          >
+            <View style={styles.headerContainer}>
+              <Text style={styles.headerTitle}>On Delivery</Text>
+              <TouchableOpacity
+                onPress={closeOngoingModal}
+                style={styles.closeButton}
+              >
+                <MaterialIcons
+                  name="close"
+                  size={24}
+                  color={COLORS.secondary}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.divider} />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginStart: 20,
+                marginEnd: 20,
+                marginTop: 20,
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: fonts.SemiBold,
+                  fontSize: 16,
+                  color: COLORS.text3,
+                }}
+              >
+                Customer Details
+              </Text>
+
+              <View style={{ alignItems: "center" }}>
+                <Text
+                  style={{
+                    fontFamily: fonts.SemiBold,
+                    fontSize: 13,
+                    color: "white",
+                    backgroundColor: COLORS.error,
+                    borderRadius: 15,
+                    paddingHorizontal: 20,
+                    paddingVertical: 2,
+                  }}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {"Pending" || "No Service Selected"}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: fonts.Medium,
+                    color: COLORS.primary,
+                    fontSize: 10,
+                    marginTop: 2,
+                    textAlign: "center",
+                  }}
+                >
+                  Payment Status
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.contentContainer}>
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: COLORS.divider,
+                  borderRadius: 10,
+                  paddingTop: 10,
+                }}
+              >
+                <View>
+                  {selectedService && (
+                    <>
+                      <View style={{ paddingStart: 20, marginBottom: 10 }}>
+                        <View style={{ flexDirection: "row", gap: 5 }}>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Bold,
+                              fontSize: 14,
+                              color: COLORS.text3,
+                            }}
+                          >
+                            Customer:
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Medium,
+                              fontSize: 14,
+                              color: COLORS.primary,
+                            }}
+                          >
+                            {selectedService.customerName}
+                          </Text>
+                        </View>
+                        <View style={{ flexDirection: "row", gap: 5 }}>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Bold,
+                              fontSize: 14,
+                              color: COLORS.text3,
+                            }}
+                          >
+                            Total Amount:
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Medium,
+                              fontSize: 14,
+                              color: COLORS.primary,
+                            }}
+                          >
+                            PHP 240
+                          </Text>
+                        </View>
+                        <View style={{ flexDirection: "row", gap: 5 }}>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Bold,
+                              fontSize: 14,
+                              color: COLORS.text3,
+                            }}
+                          >
+                            Payment Method:
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Medium,
+                              fontSize: 14,
+                              color: COLORS.primary,
+                            }}
+                          >
+                            Cash on delivery (COD)
+                          </Text>
+                        </View>
+
+                        <View style={{ flexDirection: "row", gap: 5 }}>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Bold,
+                              fontSize: 14,
+                              color: COLORS.text3,
+                            }}
+                          >
+                            Location:
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: fonts.Medium,
+                              fontSize: 14,
+                              color: COLORS.secondary,
+                              flexShrink: 1,
+                              flexWrap: "wrap",
+                              maxWidth: "80%",
+                            }}
+                          >
+                            {selectedService.location}
+                          </Text>
+                        </View>
+                      </View>
+                      {/* Divider */}
+                      <View
+                        style={{
+                          height: 1,
+                          backgroundColor: "#ddd",
+                          width: "100%",
+                        }}
+                      />
+                      <View style={{ alignSelf: "center", marginBottom: 10 }}>
+                        {scanned ? (
+                          <Button
+                            title={"Tap to Scan Again"}
+                            onPress={() => setScanned(false)}
+                          />
+                        ) : (
+                          <BarCodeScanner
+                            onBarCodeScanned={
+                              scanned ? undefined : handleBarCodeScanned
+                            }
+                            style={{ height: 300, width: 300 }}
+                          />
+                        )}
+                        {scannedData && (
+                          <Text
+                            style={{
+                              marginTop: 10,
+                              fontFamily: fonts.Medium,
+                              fontSize: 14,
+                            }}
+                          >
+                            Scanned Data: {scannedData}
+                          </Text>
+                        )}
+                      </View>
+                    </>
+                  )}
+                </View>
+              </View>
+              {/* Bottom Button */}
+              <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    marginBottom: 10,
+                    gap: 10,
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      padding: 10,
+                      backgroundColor: COLORS.light,
+                      borderRadius: 10,
+                      alignItems: "center",
+                    }}
+                    onPress={() => handleReturnToPending(selectedService.id)}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: fonts.SemiBold,
+                        fontSize: 16,
+                        color: COLORS.black,
+                      }}
+                    >
+                      Return to pending
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.finishButton}
+                    onPress={() => handleFinishPickup(selectedService.id)}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: fonts.SemiBold,
+                        fontSize: 16,
+                        color: COLORS.white,
+                      }}
+                    >
+                      Complete Delivery
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </BottomSheet>
+        </Portal>
+        {/* For Ready for delivery */}
         <Portal>
           <BottomSheet
             ref={bottomPendingSheet}
@@ -840,235 +994,25 @@ export default function Pickup() {
             </View>
           </BottomSheet>
         </Portal>
-        {/* For Ongoing */}
-        <Portal>
-          <BottomSheet
-            ref={bottomSheetRef}
-            index={-1}
-            snapPoints={snapPoints}
-            enablePanDownToClose={true}
-            backgroundStyle={{
-              backgroundColor: COLORS.white,
-              borderRadius: 20,
-            }}
-            handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
-            backdropComponent={renderBackdrop}
-          >
-            <View style={styles.headerContainer}>
-              <Text style={styles.headerTitle}>Ongoing Pickup</Text>
-              <TouchableOpacity
-                onPress={closeOngoingModal}
-                style={styles.closeButton}
-              >
-                <MaterialIcons
-                  name="close"
-                  size={24}
-                  color={COLORS.secondary}
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.divider} />
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginStart: 20,
-                marginEnd: 20,
-                marginTop: 20,
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: fonts.SemiBold,
-                  fontSize: 16,
-                  color: COLORS.text3,
-                }}
-              >
-                Customer Details
-              </Text>
-              <Text
-                style={{
-                  fontFamily: fonts.SemiBold,
-                  fontSize: 15,
-                  color: "white",
-                  backgroundColor: COLORS.success,
-                  borderRadius: 15,
-                  paddingHorizontal: 20,
-                  paddingVertical: 2,
-                  maxWidth: "50%",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {selectedService?.name || "No Service Selected"}
-              </Text>
-            </View>
-
-            <View style={styles.contentContainer}>
-              <View
-                style={{
-                  borderWidth: 1,
-                  borderColor: COLORS.divider,
-                  borderRadius: 10,
-                  paddingTop: 10,
-                }}
-              >
-                <View>
-                  {selectedService && (
-                    <>
-                      <View style={{ paddingStart: 20, marginBottom: 10 }}>
-                        <View style={{ flexDirection: "row", gap: 5 }}>
-                          <Text
-                            style={{
-                              fontFamily: fonts.Bold,
-                              fontSize: 14,
-                              color: COLORS.text3,
-                            }}
-                          >
-                            Customer:
-                          </Text>
-                          <Text
-                            style={{
-                              fontFamily: fonts.Medium,
-                              fontSize: 14,
-                              color: COLORS.primary,
-                            }}
-                          >
-                            {selectedService.customerName}
-                          </Text>
-                        </View>
-                        <View style={{ flexDirection: "row", gap: 5 }}>
-                          <Text
-                            style={{
-                              fontFamily: fonts.Bold,
-                              fontSize: 14,
-                              color: COLORS.text3,
-                            }}
-                          >
-                            Location:
-                          </Text>
-                          <Text
-                            style={{
-                              fontFamily: fonts.Medium,
-                              fontSize: 14,
-                              color: COLORS.secondary,
-                              flexShrink: 1,
-                              flexWrap: "wrap",
-                              maxWidth: "80%",
-                            }}
-                          >
-                            {selectedService.location}
-                          </Text>
-                        </View>
-                      </View>
-                      <View
-                        style={{
-                          height: 1,
-                          backgroundColor: "#ddd",
-                          width: "100%",
-                        }}
-                      />
-                      <View
-                        style={{
-                          backgroundColor: COLORS.secondary,
-                          borderRadius: 20,
-                          marginTop: 10,
-                          alignSelf: "center",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          paddingHorizontal: 10,
-                          paddingVertical: 5,
-                          maxWidth: "90%",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            color: COLORS.white,
-                            fontSize: 12,
-                          }}
-                        >
-                          {timeAgo(selectedService.requestDate)}
-                        </Text>
-                      </View>
-                      <View
-                        style={{
-                          alignSelf: "center",
-                          marginBottom: 5,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            color: COLORS.primary,
-                            fontSize: 10,
-                          }}
-                        >
-                          Waiting for Pickup
-                        </Text>
-                      </View>
-                    </>
-                  )}
-                </View>
-              </View>
-              {/* Bottom Button */}
-              <View style={{ flex: 1, justifyContent: "flex-end" }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    marginBottom: 10,
-                    gap: 10,
-                  }}
-                >
-                  <TouchableOpacity
-                    style={{
-                      padding: 10,
-                      backgroundColor: COLORS.light,
-                      borderRadius: 10,
-                      alignItems: "center",
-                    }}
-                    onPress={() => handleReturnToPending(selectedService.id)}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: fonts.SemiBold,
-                        fontSize: 16,
-                        color: COLORS.black,
-                      }}
-                    >
-                      Return to pending
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.finishButton}
-                    onPress={() => handleFinishPickup(selectedService.id)}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: fonts.SemiBold,
-                        fontSize: 16,
-                        color: COLORS.white,
-                      }}
-                    >
-                      Finish Pickup
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </BottomSheet>
-        </Portal>
       </SafeAreaView>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  qrContainer: {
+    backgroundColor: COLORS.secondary,
+    borderRadius: 20,
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    maxWidth: "90%",
+  },
+  scanner: {
+    width: "100%",
+    height: 200, // Set the desired height for the scanner
+  },
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1112,19 +1056,8 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     backgroundColor: COLORS.white,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
     padding: 20,
     marginTop: 20,
-    // Shadow Section
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5,
   },
   title: {
     fontSize: 32,

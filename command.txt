@@ -34,4 +34,6 @@ npx expo install react-native-gesture-handler
 npm install -g yarn
 npm install @gorhom/portal
 npm install --save luxon
+npx expo install expo-barcode-scanner
+npx expo install expo-camera
 
