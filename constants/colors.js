@@ -31,8 +31,9 @@ const COLORS = {
 
   // Background and Border Colors
   background: "#f4f4f4",
-  border: "#e0e0e0",
-  border1: "#ccc",
+  border: "#ddd",
+  border1: "#e0e0e0",
+  border2: "#ccc",
 
   // Colors Additonal
   message: "#F23F42",
