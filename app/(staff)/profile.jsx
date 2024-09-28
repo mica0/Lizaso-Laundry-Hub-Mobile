@@ -283,7 +283,7 @@ export default function Profile() {
             {headerTitle === "Edit Profile" ? (
               <ScrollView
                 contentContainerStyle={{ flexGrow: 1 }}
-                style={{ flex: 1, minHeight: "80%" }}
+                style={{ flex: 1, minHeight: "70%" }}
               >
                 <View style={styles.editProfileContainer}>
                   {/* Username */}
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   editProfileContainer: {
-    padding: 30,
+    padding: 20,
   },
   input: {
     borderWidth: 1,
