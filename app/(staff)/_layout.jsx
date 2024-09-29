@@ -1,9 +1,22 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, BackHandler } from "react-native";
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import TabBar from "../../components/TabBar";
 
 export default function TabLayout() {
+  useEffect(() => {
+    const backAction = () => {
+      BackHandler.exitApp();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Tabs
@@ -22,24 +35,28 @@ export default function TabLayout() {
           name="pickup"
           options={{
             tabBarLabel: "Pickup",
+            lazy: true,
           }}
         />
         <Tabs.Screen
           name="delivery"
           options={{
             tabBarLabel: "Delivery",
+            lazy: true,
           }}
         />
         <Tabs.Screen
           name="history"
           options={{
             tabBarLabel: "History",
+            lazy: true,
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
             tabBarLabel: "Profile",
+            lazy: true,
           }}
         />
       </Tabs>

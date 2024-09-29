@@ -156,8 +156,8 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import Lottie from "lottie-react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
-import { useRouter } from "expo-router"; // Import router for navigation
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import Onboarding from "../components/Onboarding";
 import animated_logo from "../assets/lottie/logo_move.json";
 import COLORS from "@/constants/colors";
@@ -181,13 +181,11 @@ export default function Index() {
             router.replace("/auth/sign-in");
           }, 2000);
         } else {
-          // Show splash screen, then show onboarding
           setSplashVisible(true);
           setTimeout(() => setSplashVisible(false), 2000);
         }
       } catch (error) {
         console.error("Error checking onboarding status:", error);
-        // In case of error, still proceed to show onboarding after splash screen
         setSplashVisible(true);
         setTimeout(() => setSplashVisible(false), 1000);
       }
