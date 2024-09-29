@@ -36,4 +36,4 @@ npm install @gorhom/portal
 npm install --save luxon
 npx expo install expo-camera
 npx expo install @shopify/react-native-skia
-
+npx expo install lottie-react-native
