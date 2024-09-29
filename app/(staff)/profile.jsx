@@ -1,5 +1,11 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   View,
   Text,
@@ -21,13 +27,26 @@ import {
 } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
-import defaultProfile from "../../assets/images/icon.png";
 import { Portal } from "@gorhom/portal";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet/";
 import { Picker } from "@react-native-picker/picker";
 
+import d_profile1 from "../../assets/images/d_profile1.png";
+import d_profile2 from "../../assets/images/d_profile2.png";
+import d_profile3 from "../../assets/images/d_profile3.png";
+import d_profile4 from "../../assets/images/d_profile4.png";
+
+// Randomize Default Image
+const defaultProfileImages = [d_profile1, d_profile2, d_profile3, d_profile4];
+
+const getRandomDefaultImage = () => {
+  const randomIndex = Math.floor(Math.random() * defaultProfileImages.length);
+  return defaultProfileImages[randomIndex];
+};
+
 export default function Profile() {
   // const snapPoints = useMemo(() => ["40%"], []);
+  const [randomProfileImage, setRandomProfileImage] = useState(null);
   const [snapPoints, setSnapPoints] = useState(["10%"]);
   const [enablePanDownToClose, setenablePanDownToClose] = useState(true);
   const bottomSheetRef = useRef(null);
@@ -43,6 +62,20 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  const user = {
+    name: "John Reynald P. Velarde",
+    username: "macArthur16",
+    // profilePicture: "https://via.placeholder.com/150",
+    profilePicture: "",
+    mobileNumber: "09472727061",
+  };
+
+  useEffect(() => {
+    if (!user.profilePicture) {
+      setRandomProfileImage(getRandomDefaultImage());
+    }
+  }, [user.profilePicture]);
+
   const renderBackdrop = useCallback(
     (props) => (
       <BottomSheetBackdrop
@@ -53,13 +86,6 @@ export default function Profile() {
     ),
     []
   );
-
-  const user = {
-    name: "John Reynald P. Velarde",
-    username: "macArthur16",
-    profilePicture: "https://via.placeholder.com/150",
-    mobileNumber: "09472727061",
-  };
 
   const validateFields = () => {
     const newErrors = {};
@@ -161,7 +187,7 @@ export default function Profile() {
                 source={
                   user.profilePicture
                     ? { uri: user.profilePicture }
-                    : defaultProfile
+                    : randomProfileImage
                 }
                 style={styles.profileImage}
               />
