@@ -26,66 +26,61 @@ import Animated, {
 } from "react-native-reanimated";
 import { timeAgo } from "../../constants/datetime";
 import { useNavigation } from "expo-router";
+import { getLaundryPickup } from "../../data/api/getApi";
+import { ActivityIndicator } from "react-native-web";
 
-const mockServices = [
-  {
-    id: "1",
-    name: "Washing",
-    location: "123 Main St, City Center",
-    customerName: "John Doe",
-    requestDate: "2024-09-01T10:00:00Z",
-    distance: "7 km",
-    status: "Pending Pickup",
-    messageCount: 1,
-  },
-  {
-    id: "2",
-    name: "Dry Cleaning",
-    location: "456 Park Ave, Downtown",
-    customerName: "Jane Smith",
-    requestDate: "2024-09-02T09:30:00Z",
-    distance: "1 km",
-    status: "Cancel",
-    messageCount: 0,
-  },
-  {
-    id: "3",
-    name: "Ironing",
-    location: "789 Elm St, Suburbs",
-    customerName: "Alex Johnson",
-    requestDate: "2024-09-03T08:15:00Z",
-    distance: "3 km",
-    status: "Pending Pickup",
-    messageCount: 10,
-  },
-  {
-    id: "4",
-    name: "Laundry",
-    location: "321 River St, Uptown",
-    customerName: "John Reynald Velarde",
-    requestDate: "2024-09-04T12:45:00Z",
-    distance: "5 km",
-    status: "Ongoing Pickup",
-    messageCount: 50,
-  },
-  {
-    id: "5",
-    name: "Laundry",
-    location: "321 River St, Uptowns",
-    customerName: "Emily Brown",
-    requestDate: "2024-09-04T11:45:00Z",
-    distance: "5 km",
-    status: "Ongoing Pickup",
-    messageCount: 80,
-  },
-];
-const pendingCount = mockServices.filter(
-  (service) => service.status === "Pending Pickup"
-).length;
-
-const ongoingCount = mockServices.filter(
-  (service) => service.status === "Ongoing Pickup"
-).length;
+// const mockServices = [
+//   {
+//     id: "1",
+//     name: "Washing",
+//     location: "123 Main St, City Center",
+//     customerName: "John Doe",
+//     requestDate: "2024-09-01T10:00:00Z",
+//     distance: "7 km",
+//     status: "Pending Pickup",
+//     messageCount: 1,
+//   },
+//   {
+//     id: "2",
+//     name: "Dry Cleaning",
+//     location: "456 Park Ave, Downtown",
+//     customerName: "Jane Smith",
+//     requestDate: "2024-09-02T09:30:00Z",
+//     distance: "1 km",
+//     status: "Cancel",
+//     messageCount: 0,
+//   },
+//   {
+//     id: "3",
+//     name: "Ironing",
+//     location: "789 Elm St, Suburbs",
+//     customerName: "Alex Johnson",
+//     requestDate: "2024-09-03T08:15:00Z",
+//     distance: "3 km",
+//     status: "Pending Pickup",
+//     messageCount: 10,
+//   },
+//   {
+//     id: "4",
+//     name: "Laundry",
+//     location: "321 River St, Uptown",
+//     customerName: "John Reynald Velarde",
+//     requestDate: "2024-09-04T12:45:00Z",
+//     distance: "5 km",
+//     status: "Ongoing Pickup",
+//     messageCount: 50,
+//   },
+//   {
+//     id: "5",
+//     name: "Laundry",
+//     location: "321 River St, Uptowns",
+//     customerName: "Emily Brown",
+//     requestDate: "2024-09-04T11:45:00Z",
+//     distance: "5 km",
+//     status: "Ongoing Pickup",
+//     messageCount: 80,
+//   },
+// ];
 
 const AnimatedIcon = () => {
   const rotation = useSharedValue(0);
@@ -111,13 +106,53 @@ const AnimatedIcon = () => {
 
 export default function Pickup() {
   const navigaton = useNavigation();
-  const [services, setServices] = useState([]);
   const [notiCount, setNotiCount] = useState({ count: 1 });
   const [filter, setFilter] = useState("All");
   const bottomSheetRef = useRef(null);
   const bottomPendingSheet = useRef(null);
   const snapPoints = useMemo(() => ["60%"], []);
   const [selectedService, setSelectedService] = useState(null);
+
+  // #Data Section
+  const [pickupData, setPickupData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [storeId] = useState(1);
+
+  const fetchLaundryPickup = async () => {
+    try {
+      const data = await getLaundryPickup(storeId);
+      setPickupData(data);
+    } catch (err) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLaundryPickup();
+  }, [storeId]);
+
+  const pendingCount = Array.isArray(pickupData)
+    ? pickupData.filter(
+        (service) => service.request_status === "Pending Pickup"
+      ).length
+    : 0;
+
+  const ongoingCount = Array.isArray(pickupData)
+    ? pickupData.filter(
+        (service) => service.request_status === "Ongoing Pickup"
+      ).length
+    : 0;
+
+  // if (loading) {
+  //   return <ActivityIndicator size="large" color="#0000ff" />;
+  // }
+
+  // if (error) {
+  //   return <Text>Error: {error}</Text>;
+  // }
 
   const renderBackdrop = useCallback(
     (props) => (
@@ -129,10 +164,6 @@ export default function Pickup() {
     ),
     []
   );
-
-  useEffect(() => {
-    setServices(mockServices);
-  }, []);
 
   const openPendingModal = (service) => {
     setSelectedService(service);
@@ -189,32 +220,35 @@ export default function Pickup() {
   };
 
   // Filter services based on the selected tab
-  const filteredServices = services.filter((service) => {
+  const filteredServices = pickupData.filter((service) => {
     if (filter === "All") {
       return (
-        service.status === "Pending Pickup" ||
-        service.status === "Ongoing Pickup"
+        service.request_status === "Pending Pickup" ||
+        service.request_status === "Ongoing Pickup"
       );
     }
     if (filter === "Nearest") {
       return (
-        service.status === "Pending Pickup" ||
-        service.status === "Ongoing Pickup"
+        service.request_status === "Pending Pickup" ||
+        service.request_status === "Ongoing Pickup"
       );
     }
-    if (filter === "Cancel") return service.status === "Cancel";
+    if (filter === "Cancel") return service.request_status === "Cancel";
     return true;
   });
 
   const sortedServices = filteredServices.sort((a, b) => {
     if (filter === "All") {
-      if (a.status === "Ongoing Pickup" && b.status !== "Ongoing Pickup") {
+      if (
+        a.request_status === "Ongoing Pickup" &&
+        b.request_status !== "Ongoing Pickup"
+      ) {
         return -1;
       }
       if (a.status !== "Ongoing Pickup" && b.status === "Ongoing Pickup") {
         return 1;
       }
-      return new Date(a.requestDate) - new Date(b.requestDate);
+      return new Date(a.request_date) - new Date(b.request_date);
     }
 
     if (filter === "Nearest") {
@@ -223,7 +257,7 @@ export default function Pickup() {
       return distanceA - distanceB;
     }
 
-    return new Date(a.requestDate) - new Date(b.requestDate);
+    return new Date(a.request_date) - new Date(b.request_date);
   });
 
   const renderItem = ({ item }) => {
@@ -232,18 +266,18 @@ export default function Pickup() {
     let iconComponent;
     let statusText;
 
-    if (item.status === "Pending Pickup") {
+    if (item.request_status === "Pending Pickup") {
       iconName = "time-outline";
       backgroundColor = COLORS.accent;
       iconComponent = (
         <Ionicons name={iconName} size={24} color={COLORS.white} />
       );
       statusText = "Pending";
-    } else if (item.status === "Ongoing Pickup") {
+    } else if (item.request_status === "Ongoing Pickup") {
       backgroundColor = COLORS.success;
       // iconComponent = <AnimatedIcon />; // comment for now
       statusText = "Ongoing";
-    } else if (item.status === "Cancel") {
+    } else if (item.request_status === "Cancel") {
       iconName = "book-cancel-outline";
       iconComponent = (
         <MaterialCommunityIcons
@@ -260,15 +294,16 @@ export default function Pickup() {
       <TouchableOpacity
         style={styles.itemContainer}
         onPress={() => {
-          if (item.status === "Pending Pickup") {
+          if (item.request_status === "Pending Pickup") {
             openPendingModal(item);
-          } else if (item.status === "Ongoing Pickup") {
+          } else if (item.request_status === "Ongoing Pickup") {
             openOngoingModal(item);
           } else {
           }
         }}
         activeOpacity={
-          item.status === "Pending Pickup" || item.status === "Ongoing Pickup"
+          item.request_status === "Pending Pickup" ||
+          item.request_status === "Ongoing Pickup"
             ? 0.2
             : 1
         }
@@ -283,41 +318,45 @@ export default function Pickup() {
             }}
           >
             <View style={{ flex: 1 }}>
-              <Text style={styles.customerText}>{item.customerName}</Text>
-              <Text style={styles.itemText}>{item.name}</Text>
-              <Text style={styles.locationText}>{item.location}</Text>
+              <Text style={styles.customerText}>{item.customer_fullname}</Text>
+              <Text style={styles.itemText}>{item.service_name}</Text>
+              <Text style={styles.locationText}>{item.address_line1}</Text>
             </View>
             <View
               style={{ flexDirection: "row", alignItems: "flex-start", gap: 2 }}
             >
-              {item.status !== "Cancel" && item.status !== "Pending Pickup" && (
-                <View style={{ position: "relative" }}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      handleGoToMessage(item.id, item.customerName)
-                    }
-                    style={[styles.button, styles.messageButton]}
-                  >
-                    <Ionicons
-                      name="chatbubble-ellipses"
-                      size={24}
-                      color={COLORS.primary}
-                    />
-                    {item.messageCount > 0 && (
-                      <View style={styles.badge}>
-                        <Text
-                          style={[
-                            styles.badgeText,
-                            { fontSize: item.messageCount > 99 ? 10 : 12 },
-                          ]}
-                        >
-                          {item.messageCount > 99 ? "99+" : item.messageCount}
-                        </Text>
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                </View>
-              )}
+              {item.request_status !== "Cancel" &&
+                item.request_status !== "Pending Pickup" && (
+                  <View style={{ position: "relative" }}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        handleGoToMessage(
+                          item.customer_id,
+                          item.customer_fullname
+                        )
+                      }
+                      style={[styles.button, styles.messageButton]}
+                    >
+                      <Ionicons
+                        name="chatbubble-ellipses"
+                        size={24}
+                        color={COLORS.primary}
+                      />
+                      {1 > 0 && (
+                        <View style={styles.badge}>
+                          <Text
+                            style={[
+                              styles.badgeText,
+                              { fontSize: 1 > 99 ? 10 : 12 },
+                            ]}
+                          >
+                            {1 > 99 ? "99+" : 1}
+                          </Text>
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                )}
               <View style={{ alignItems: "center" }}>
                 <View style={[styles.button, { backgroundColor }]}>
                   {iconComponent}
@@ -346,7 +385,7 @@ export default function Pickup() {
                   style={{ paddingRight: 5 }}
                 />
                 <Text style={styles.dateText}>
-                  {new Date(item.requestDate).toLocaleString()}
+                  {new Date(item.request_date).toLocaleString()}
                 </Text>
               </View>
             </View>
@@ -359,7 +398,7 @@ export default function Pickup() {
                   color={COLORS.success}
                   style={{ paddingRight: 2 }}
                 />
-                <Text style={styles.statusText}>{item.distance}</Text>
+                <Text style={styles.statusText}>{item.latitude}</Text>
               </View>
             </View>
           </View>
@@ -606,7 +645,7 @@ export default function Pickup() {
           <FlashList
             data={sortedServices}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.request_id}
             contentContainerStyle={{ paddingBottom: 60 }}
             showsVerticalScrollIndicator={false}
             estimatedItemSize={100}
@@ -661,7 +700,7 @@ export default function Pickup() {
                   paddingHorizontal: 20,
                 }}
               >
-                {selectedService?.name || "No Service Selected"}
+                {selectedService?.service_name || "No Service Selected"}
               </Text>
             </View>
             <View style={styles.contentContainer}>
@@ -694,7 +733,7 @@ export default function Pickup() {
                               color: COLORS.primary,
                             }}
                           >
-                            {selectedService.customerName}
+                            {selectedService.customer_fullname}
                           </Text>
                         </View>
                         <View style={{ flexDirection: "row", gap: 5 }}>
@@ -717,7 +756,7 @@ export default function Pickup() {
                               maxWidth: "80%",
                             }}
                           >
-                            {selectedService.location}
+                            {selectedService.address_line1}
                           </Text>
                         </View>
                         <View style={{ flexDirection: "row", gap: 5 }}>
@@ -737,7 +776,7 @@ export default function Pickup() {
                               color: COLORS.success,
                             }}
                           >
-                            {selectedService.distance}
+                            {selectedService.latitude}
                           </Text>
                         </View>
                       </View>
@@ -769,7 +808,7 @@ export default function Pickup() {
                             fontSize: 12,
                           }}
                         >
-                          {timeAgo(selectedService.requestDate)}
+                          {timeAgo(selectedService.request_date)}
                         </Text>
                       </View>
                       <View
@@ -809,7 +848,9 @@ export default function Pickup() {
                       borderRadius: 10,
                       alignItems: "center",
                     }}
-                    onPress={() => handleCancelRequest(selectedService.id)}
+                    onPress={() =>
+                      handleCancelRequest(selectedService.request_id)
+                    }
                   >
                     <Text
                       style={{
@@ -823,7 +864,7 @@ export default function Pickup() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.finishButton}
-                    onPress={() => handleGetLaundry(selectedService.id)}
+                    onPress={() => handleGetLaundry(selectedService.request_id)}
                   >
                     <Text
                       style={{
@@ -904,7 +945,7 @@ export default function Pickup() {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {selectedService?.name || "No Service Selected"}
+                {selectedService?.service_name || "No Service Selected"}
               </Text>
             </View>
 
@@ -938,7 +979,7 @@ export default function Pickup() {
                               color: COLORS.primary,
                             }}
                           >
-                            {selectedService.customerName}
+                            {selectedService.customer_fullname}
                           </Text>
                         </View>
                         <View style={{ flexDirection: "row", gap: 5 }}>
@@ -961,7 +1002,7 @@ export default function Pickup() {
                               maxWidth: "80%",
                             }}
                           >
-                            {selectedService.location}
+                            {selectedService.address_line1}
                           </Text>
                         </View>
                       </View>
@@ -992,7 +1033,7 @@ export default function Pickup() {
                             fontSize: 12,
                           }}
                         >
-                          {timeAgo(selectedService.requestDate)}
+                          {timeAgo(selectedService.request_date)}
                         </Text>
                       </View>
                       <View
@@ -1032,7 +1073,9 @@ export default function Pickup() {
                       borderRadius: 10,
                       alignItems: "center",
                     }}
-                    onPress={() => handleReturnToPending(selectedService.id)}
+                    onPress={() =>
+                      handleReturnToPending(selectedService.request_id)
+                    }
                   >
                     <Text
                       style={{
@@ -1046,7 +1089,9 @@ export default function Pickup() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.finishButton}
-                    onPress={() => handleFinishPickup(selectedService.id)}
+                    onPress={() =>
+                      handleFinishPickup(selectedService.request_id)
+                    }
                   >
                     <Text
                       style={{
@@ -1264,891 +1309,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
-{
-  /* <View
-              style={{
-                borderWidth: 1,
-                borderColor: COLORS.divider,
-                borderRadius: 10,
-                alignItems: "flex-start",
-                paddingTop: 10,
-                paddingBottom: 20,
-              }}
-            >
-              <View style={{ paddingStart: 20 }}>
-                {selectedService && (
-                  <>
-                    <Text
-                      style={{
-                        fontFamily: fonts.SemiBold,
-                        fontSize: 20,
-                        color: COLORS.primary,
-                      }}
-                    >
-                      {selectedService.name}
-                    </Text>
-                    <View style={{ flexDirection: "row", gap: 10 }}>
-                      <Text
-                        style={{
-                          fontFamily: fonts.SemiBold, // Semi-bold for "Customer:"
-                          fontSize: 16,
-                          color: COLORS.black,
-                        }}
-                      >
-                        Customer:
-                      </Text>
-                      <Text
-                        style={{
-                          fontFamily: fonts.Medium,
-                          fontSize: 16,
-                          color: COLORS.black,
-                        }}
-                      >
-                        {selectedService.customerName}
-                      </Text>
-                    </View>
-
-                    <Text style={styles.modalText}>
-                      Location: {selectedService.location}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Request Date:{" "}
-                      {new Date(selectedService.requestDate).toLocaleString()}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Distance: {selectedService.distance}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Status: {selectedService.status}
-                    </Text>
-                  </>
-                )}
-              </View>
-            </View> */
-}
-
-{
-  /* <View
-              style={{
-                borderWidth: 1,
-                borderColor: COLORS.divider,
-                borderRadius: 10,
-                alignItems: "flex-start",
-                paddingTop: 10,
-                paddingBottom: 20,
-              }}
-            >
-              <View style={{ paddingStart: 10 }}>
-                {selectedService && (
-                  <>
-                    <Text style={styles.modalTitle}>
-                      {selectedService.name}
-                    </Text>
-                    <Text
-                      style={{
-                        fontFamily: fonts.SemiBold,
-                        fontSize: 16,
-                        color: COLORS.primary,
-                      }}
-                    >
-                      {selectedService.customerName}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      {selectedService.location}
-                    </Text>
-                  </>
-                )}
-              </View>
-              <View style={styles.divider} />
-              <View style={{ paddingStart: 10, flexDirection: "row", gap: 10 }}>
-                {selectedService && (
-                  <>
-                    <Text style={styles.modalText}>
-                      Request Date:
-                      {new Date(selectedService.requestDate).toLocaleString()}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Distance: {selectedService.distance}
-                    </Text>
-                  </>
-                )}
-              </View>
-            </View> */
-}
-
-// import React, {
-//   useState,
-//   useEffect,
-//   useRef,
-//   useMemo,
-//   useCallback,
-// } from "react";
-// import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-// import { SafeAreaView } from "react-native-safe-area-context";
-// import { Ionicons } from "@expo/vector-icons";
-// import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-// import { fonts } from "../../constants/fonts";
-// import COLORS from "../../constants/colors";
-// import { FlashList } from "@shopify/flash-list";
-// import { Portal } from "@gorhom/portal";
-// import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-// import { LinearGradient } from "expo-linear-gradient";
-// import nodata from "../../assets/images/no_data.png";
-// import Animated, {
-//   Easing,
-//   useSharedValue,
-//   useAnimatedStyle,
-//   withRepeat,
-//   withTiming,
-// } from "react-native-reanimated";
-
-// const mockServices = [
-//   {
-//     id: "1",
-//     name: "Washing",
-//     location: "123 Main St, City Center",
-//     customerName: "John Doe",
-//     requestDate: "2024-09-01T10:00:00Z",
-//     distance: "7 km",
-//     status: "Pending Pickup",
-//   },
-//   {
-//     id: "2",
-//     name: "Dry Cleaning",
-//     location: "456 Park Ave, Downtown",
-//     customerName: "Jane Smith",
-//     requestDate: "2024-09-02T09:30:00Z",
-//     distance: "1 km",
-//     status: "Cancel",
-//   },
-//   {
-//     id: "3",
-//     name: "Ironing",
-//     location: "789 Elm St, Suburbs",
-//     customerName: "Alex Johnson",
-//     requestDate: "2024-09-03T08:15:00Z",
-//     distance: "3 km",
-//     status: "Pending Pickup",
-//   },
-//   {
-//     id: "4",
-//     name: "Laundry",
-//     location: "321 River St, Uptown",
-//     customerName: "John Reynald Velarde",
-//     requestDate: "2024-09-04T12:45:00Z",
-//     distance: "5 km",
-//     status: "Ongoing Pickup",
-//   },
-//   {
-//     id: "5",
-//     name: "Laundry",
-//     location: "321 River St, Uptown",
-//     customerName: "Emily Brown",
-//     requestDate: "2024-09-04T11:45:00Z",
-//     distance: "5 km",
-//     status: "Ongoing Pickup",
-//   },
-// ];
-// const pendingOrdersCount = mockServices.filter(
-//   (service) => service.status === "Pending Pickup"
-// ).length;
-
-// const AnimatedIcon = () => {
-//   const rotation = useSharedValue(0);
-
-//   // Define the animated style
-//   const animatedStyle = useAnimatedStyle(() => {
-//     return {
-//       transform: [{ rotate: `${rotation.value}deg` }],
-//     };
-//   });
-
-//   // Start the rotation animation
-//   useEffect(() => {
-//     rotation.value = withRepeat(
-//       withTiming(360, { duration: 1000, easing: Easing.linear }),
-//       -1,
-//       false
-//     );
-//   }, [rotation]);
-
-//   return (
-//     <Animated.View style={animatedStyle}>
-//       <Ionicons name="hourglass-outline" size={24} color={COLORS.white} />
-//     </Animated.View>
-//   );
-// };
-
-// export default function Pickup() {
-//   const [services, setServices] = useState([]);
-//   const [filter, setFilter] = useState("All");
-
-//   const bottomSheetRef = useRef(null);
-//   const bottomPendingSheet = useRef(null);
-//   const snapPoints = useMemo(() => ["50%"], []);
-//   const [selectedService, setSelectedService] = useState(null);
-//   const renderBackdrop = useCallback(
-//     (props) => (
-//       <BottomSheetBackdrop
-//         appearsOnIndex={0}
-//         disappearsOnIndex={-1}
-//         {...props}
-//       />
-//     ),
-//     []
-//   );
-
-//   useEffect(() => {
-//     setServices(mockServices);
-//   }, []);
-
-//   const openPendingModal = (service) => {
-//     setSelectedService(service);
-//     bottomPendingSheet.current?.expand();
-//   };
-
-//   const openOngoingModal = (service) => {
-//     setSelectedService(service);
-//     bottomSheetRef.current?.expand();
-//   };
-
-//   const handleGetLaundry = async (id) => {
-//     console.log(id);
-//     bottomPendingSheet.current?.close();
-//   };
-
-//   const handleFinishPickup = async (id) => {
-//     console.log(id);
-//     bottomSheetRef.current?.close();
-//   };
-
-//   // Filter services based on the selected tab
-//   const filteredServices = services.filter((service) => {
-//     if (filter === "All") {
-//       return (
-//         service.status === "Pending Pickup" ||
-//         service.status === "Ongoing Pickup"
-//       );
-//     }
-//     if (filter === "Nearest") {
-//       return (
-//         service.status === "Pending Pickup" ||
-//         service.status === "Ongoing Pickup"
-//       );
-//     }
-//     if (filter === "Cancel") return service.status === "Cancel";
-//     return true;
-//   });
-
-//   const sortedServices = filteredServices.sort((a, b) => {
-//     // For the "All" tab, prioritize "Ongoing Pickup"
-//     if (filter === "All") {
-//       if (a.status === "Ongoing Pickup" && b.status !== "Ongoing Pickup") {
-//         return -1; // a comes first
-//       }
-//       if (a.status !== "Ongoing Pickup" && b.status === "Ongoing Pickup") {
-//         return 1; // b comes first
-//       }
-//       // If both are either "Pending Pickup" or the same status, sort by request date
-//       return new Date(a.requestDate) - new Date(b.requestDate);
-//     }
-
-//     // For the "Nearest" tab, sort by distance
-//     if (filter === "Nearest") {
-//       const distanceA = parseFloat(a.distance);
-//       const distanceB = parseFloat(b.distance);
-//       return distanceA - distanceB; // Sort by distance
-//     }
-
-//     // Default sorting by request date
-//     return new Date(a.requestDate) - new Date(b.requestDate);
-//   });
-
-//   const renderItem = ({ item }) => {
-//     let iconName;
-//     let backgroundColor;
-//     let iconComponent;
-//     let statusText;
-
-//     if (item.status === "Pending Pickup") {
-//       iconName = "time-outline";
-//       backgroundColor = COLORS.secondary;
-//       iconComponent = (
-//         <Ionicons name={iconName} size={24} color={COLORS.white} />
-//       );
-//       statusText = "Pending";
-//     } else if (item.status === "Ongoing Pickup") {
-//       backgroundColor = COLORS.success;
-//       // iconComponent = <AnimatedIcon />; // comment for now
-//       statusText = "Ongoing";
-//     } else if (item.status === "Cancel") {
-//       iconName = "book-cancel-outline";
-//       iconComponent = (
-//         <MaterialCommunityIcons
-//           name={iconName}
-//           size={24}
-//           color={COLORS.white}
-//         />
-//       );
-//       backgroundColor = COLORS.error;
-//       statusText = "Cancel";
-//     }
-
-//     return (
-//       <TouchableOpacity
-//         style={styles.itemContainer}
-//         onPress={() => {
-//           if (item.status === "Pending Pickup") {
-//             openPendingModal(item);
-//           } else if (item.status === "Ongoing Pickup") {
-//             openOngoingModal(item);
-//           } else {
-//           }
-//         }}
-//         activeOpacity={
-//           item.status === "Pending Pickup" || item.status === "Ongoing Pickup"
-//             ? 0.2
-//             : 1
-//         }
-//       >
-//         <View style={styles.itemDetails}>
-//           <View
-//             style={{
-//               flexDirection: "row",
-//               justifyContent: "space-between",
-//               alignItems: "center",
-//               flex: 1,
-//             }}
-//           >
-//             <View style={{ flex: 1 }}>
-//               <Text style={styles.customerText}>{item.customerName}</Text>
-//               <Text style={styles.itemText}>{item.name}</Text>
-//               <Text style={styles.locationText}>{item.location}</Text>
-//             </View>
-//             <View
-//               style={{ flexDirection: "row", alignItems: "flex-start", gap: 2 }}
-//             >
-//               {item.status !== "Cancel" && (
-//                 <TouchableOpacity style={[styles.button, styles.messageButton]}>
-//                   <Ionicons
-//                     name="chatbubble-outline"
-//                     size={24}
-//                     color={COLORS.danger}
-//                   />
-//                 </TouchableOpacity>
-//               )}
-//               <View style={{ alignItems: "center" }}>
-//                 <View style={[styles.button, { backgroundColor }]}>
-//                   {iconComponent}
-//                 </View>
-//                 <Text
-//                   style={{
-//                     fontFamily: fonts.Regular,
-//                     fontSize: 12,
-//                     color: COLORS.primary,
-//                   }}
-//                 >
-//                   {statusText}
-//                 </Text>
-//               </View>
-//             </View>
-//           </View>
-//           <View style={styles.divider} />
-//           <View style={styles.rowBetween}>
-//             <View style={styles.requestStatusContainer}>
-//               <Text style={styles.labelText}>Request Date</Text>
-//               <View style={styles.dateContainer}>
-//                 <Ionicons
-//                   name="calendar-outline"
-//                   size={18}
-//                   color={COLORS.secondary}
-//                   style={{ paddingRight: 5 }}
-//                 />
-//                 <Text style={styles.dateText}>
-//                   {new Date(item.requestDate).toLocaleString()}
-//                 </Text>
-//               </View>
-//             </View>
-//             <View style={styles.requestStatusContainer}>
-//               <Text style={styles.labelText}>Distance</Text>
-//               <View style={styles.statusContainer}>
-//                 <Ionicons
-//                   name="location-outline"
-//                   size={18}
-//                   color={COLORS.success}
-//                   style={{ paddingRight: 2 }}
-//                 />
-//                 <Text style={styles.statusText}>{item.distance}</Text>
-//               </View>
-//             </View>
-//           </View>
-//         </View>
-//       </TouchableOpacity>
-//     );
-//   };
-
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       {/* Upper Design */}
-//       <View style={{ marginBottom: 1, alignItems: "center" }}>
-//         <Text style={{ fontSize: 24, fontWeight: "bold", color: COLORS.white }}>
-//           Pickup Orders
-//         </Text>
-//         <View
-//           style={{
-//             width: 40,
-//             height: 40,
-//             borderRadius: 20,
-//             backgroundColor: "#FF6F61", // Example color
-//             justifyContent: "center",
-//             alignItems: "center",
-//             marginVertical: 8,
-//           }}
-//         >
-//           <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
-//             {pendingOrdersCount}
-//           </Text>
-//         </View>
-//         <Text style={{ fontSize: 16, color: "white" }}>Pending</Text>
-//       </View>
-
-//       {/* Bottom Design */}
-//       <View style={styles.listContainer}>
-//         <View style={styles.tabContainer}>
-//           <TouchableOpacity
-//             style={[styles.tab, filter === "All" && styles.activeTab]}
-//             onPress={() => setFilter("All")}
-//           >
-//             <Text
-//               style={[styles.tabText, filter === "All" && styles.activeTabText]}
-//             >
-//               All
-//             </Text>
-//           </TouchableOpacity>
-//           <TouchableOpacity
-//             style={[styles.tab, filter === "Nearest" && styles.activeTab]}
-//             onPress={() => setFilter("Nearest")}
-//           >
-//             <Text
-//               style={[
-//                 styles.tabText,
-//                 filter === "Nearest" && styles.activeTabText,
-//               ]}
-//             >
-//               Nearest
-//             </Text>
-//           </TouchableOpacity>
-//           <TouchableOpacity
-//             style={[styles.tab, filter === "Cancel" && styles.activeTab]}
-//             onPress={() => setFilter("Cancel")}
-//           >
-//             <Text
-//               style={[
-//                 styles.tabText,
-//                 filter === "Cancel" && styles.activeTabText,
-//               ]}
-//             >
-//               Cancel
-//             </Text>
-//           </TouchableOpacity>
-//         </View>
-//         <FlashList
-//           data={sortedServices}
-//           renderItem={renderItem}
-//           keyExtractor={(item) => item.id}
-//           contentContainerStyle={{ paddingBottom: 60 }}
-//           showsVerticalScrollIndicator={false}
-//           estimatedItemSize={100}
-//         />
-//       </View>
-//       {/* For Pending */}
-//       <Portal>
-//         <BottomSheet
-//           ref={bottomPendingSheet}
-//           index={-1}
-//           snapPoints={snapPoints}
-//           enablePanDownToClose={true}
-//           backgroundStyle={{ backgroundColor: COLORS.white }}
-//           handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
-//           backdropComponent={renderBackdrop}
-//         >
-//           <View style={styles.contentContainer}>
-//             {selectedService && (
-//               <>
-//                 <Text style={styles.modalTitle}>{selectedService.name}</Text>
-//                 <Text style={styles.modalText}>
-//                   Customer: {selectedService.customerName}
-//                 </Text>
-//                 <Text style={styles.modalText}>
-//                   Location: {selectedService.location}
-//                 </Text>
-//                 <Text style={styles.modalText}>
-//                   Request Date:{" "}
-//                   {new Date(selectedService.requestDate).toLocaleString()}
-//                 </Text>
-//                 <Text style={styles.modalText}>
-//                   Distance: {selectedService.distance}
-//                 </Text>
-//                 <Text style={styles.modalText}>
-//                   Status: {selectedService.status}
-//                 </Text>
-//               </>
-//             )}
-
-//             <View style={{ flex: 1, justifyContent: "flex-end" }}>
-//               <TouchableOpacity
-//                 style={styles.finishButton}
-//                 onPress={() => handleGetLaundry(selectedService.id)}
-//               >
-//                 <Text
-//                   style={{
-//                     fontFamily: fonts.SemiBold,
-//                     fontSize: 16,
-//                     color: COLORS.white,
-//                   }}
-//                 >
-//                   Get the laundry
-//                 </Text>
-//               </TouchableOpacity>
-//             </View>
-//           </View>
-//         </BottomSheet>
-//       </Portal>
-//       {/* For Ongoing */}
-//       <Portal>
-//         <BottomSheet
-//           ref={bottomSheetRef}
-//           index={-1}
-//           snapPoints={snapPoints}
-//           enablePanDownToClose={true}
-//           backgroundStyle={{
-//             backgroundColor: COLORS.white,
-//             borderRadius: 20,
-//           }}
-//           handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
-//           backdropComponent={renderBackdrop}
-//         >
-//           <View style={styles.contentContainer}>
-//             {selectedService && (
-//               <>
-//                 <Text style={styles.modalTitle}>{selectedService.name}</Text>
-//                 <Text style={styles.modalText}>
-//                   Customer: {selectedService.customerName}
-//                 </Text>
-//                 <Text style={styles.modalText}>
-//                   Location: {selectedService.location}
-//                 </Text>
-//                 <Text style={styles.modalText}>
-//                   Request Date:{" "}
-//                   {new Date(selectedService.requestDate).toLocaleString()}
-//                 </Text>
-//                 <Text style={styles.modalText}>
-//                   Distance: {selectedService.distance}
-//                 </Text>
-//                 <Text style={styles.modalText}>
-//                   Status: {selectedService.status}
-//                 </Text>
-//               </>
-//             )}
-
-//             <View style={{ flex: 1, justifyContent: "flex-end" }}>
-//               <TouchableOpacity
-//                 style={styles.finishButton}
-//                 onPress={() => handleFinishPickup(selectedService.id)}
-//               >
-//                 <Text
-//                   style={{
-//                     fontFamily: fonts.SemiBold,
-//                     fontSize: 16,
-//                     color: COLORS.white,
-//                   }}
-//                 >
-//                   Finish Pickup
-//                 </Text>
-//               </TouchableOpacity>
-//             </View>
-//           </View>
-//         </BottomSheet>
-//       </Portal>
-//     </SafeAreaView>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   contentContainer: {
-//     flex: 1,
-//     padding: 20,
-//   },
-//   modalTitle: {
-//     fontSize: 24,
-//   },
-//   modalText: {
-//     fontSize: 16,
-//   },
-//   finishButton: {
-//     padding: 10,
-//     backgroundColor: COLORS.secondary,
-//     borderRadius: 10,
-//     alignItems: "center",
-//   },
-//   container: {
-//     flex: 1,
-//     backgroundColor: COLORS.secondary,
-//   },
-//   firstContainer: {
-//     padding: 16,
-//   },
-//   listContainer: {
-//     flex: 1,
-//     backgroundColor: COLORS.white,
-//     borderTopLeftRadius: 50,
-//     borderTopRightRadius: 50,
-//     padding: 20,
-//     marginTop: 50,
-//   },
-//   title: {
-//     fontSize: 32,
-//     fontFamily: fonts.Bold,
-//     marginBottom: 16,
-//     color: "#333",
-//   },
-//   itemContainer: {
-//     padding: 18,
-//     backgroundColor: COLORS.white,
-//     marginBottom: 10,
-//     borderRadius: 10,
-//     borderWidth: 1,
-//     borderColor: "#ccc",
-//     width: "100%",
-//   },
-//   itemDetails: {
-//     flexDirection: "column",
-//     width: "100%",
-//   },
-//   rowBetween: {
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     marginTop: 8,
-//   },
-//   customerText: {
-//     fontSize: 16,
-//     fontFamily: fonts.Bold,
-//     color: COLORS.primary,
-//     marginBottom: 2,
-//   },
-//   itemText: {
-//     fontSize: 12,
-//     fontFamily: fonts.Medium,
-//     color: COLORS.primary,
-//     marginBottom: 2,
-//   },
-//   locationText: {
-//     fontSize: 14,
-//     fontFamily: fonts.SemiBold,
-//     color: COLORS.secondary,
-//     marginBottom: 8,
-//   },
-//   divider: {
-//     height: 1,
-//     backgroundColor: "#ddd",
-//     marginBottom: 5,
-//     width: "100%",
-//   },
-//   requestStatusContainer: {
-//     flexDirection: "column",
-//     alignItems: "flex-start",
-//   },
-//   dateContainer: {
-//     flexDirection: "row",
-//   },
-//   statusContainer: {
-//     flexDirection: "row",
-//   },
-//   labelText: {
-//     fontSize: 12,
-//     fontFamily: fonts.SemiBold,
-//     color: COLORS.primary,
-//   },
-//   dateText: {
-//     fontSize: 12,
-//     fontFamily: fonts.Regular,
-//     color: COLORS.black,
-//   },
-//   statusText: {
-//     fontSize: 12,
-//     fontFamily: fonts.Regular,
-//     color: COLORS.primary,
-//   },
-//   tabContainer: {
-//     flexDirection: "row",
-//     paddingVertical: 10,
-//     backgroundColor: COLORS.lightGray,
-//     borderRadius: 10,
-//     marginBottom: 12,
-//     gap: 12,
-//     alignItems: "center",
-//   },
-//   tab: {
-//     flex: 1,
-//     height: 40,
-//     paddingVertical: 8,
-//     paddingHorizontal: 12,
-//     borderRadius: 5,
-//     borderWidth: 1,
-//     borderColor: COLORS.secondary,
-//     backgroundColor: "transparent",
-//     justifyContent: "center",
-//     alignItems: "center",
-//   },
-//   activeTab: {
-//     backgroundColor: COLORS.secondary,
-//     borderColor: COLORS.secondary,
-//   },
-
-//   tabText: {
-//     fontSize: 15,
-//     color: COLORS.secondary,
-//     fontFamily: fonts.SemiBold,
-//   },
-
-//   activeTabText: {
-//     color: COLORS.white,
-//   },
-//   button: {
-//     width: 40,
-//     height: 40,
-//     justifyContent: "center",
-//     alignItems: "center",
-//     borderRadius: 5,
-//   },
-//   messageButton: {
-//     backgroundColor: COLORS.lightGray,
-//   },
-//   acceptButton: {
-//     backgroundColor: COLORS.pending,
-//   },
-// });
-
-{
-  /* <BottomSheet
-          ref={bottomSheetRef}
-          index={-1}
-          snapPoints={snapPoints}
-          enablePanDownToClose={true}
-          backgroundStyle={{ backgroundColor: COLORS.white }}
-          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
-          backdropComponent={renderBackdrop}
-        >
-          <View style={styles.contentContainer}>
-            {selectedService && (
-              <>
-                <Text style={styles.modalTitle}>{selectedService.name}</Text>
-                <Text style={styles.modalText}>
-                  Customer: {selectedService.customerName}
-                </Text>
-                <Text style={styles.modalText}>
-                  Location: {selectedService.location}
-                </Text>
-                <Text style={styles.modalText}>
-                  Request Date:{" "}
-                  {new Date(selectedService.requestDate).toLocaleString()}
-                </Text>
-                <Text style={styles.modalText}>
-                  Distance: {selectedService.distance}
-                </Text>
-                <Text style={styles.modalText}>
-                  Status: {selectedService.status}
-                </Text>
-              </>
-            )}
-          </View>
-        </BottomSheet> */
-}
-
-{
-  /* <LinearGradient
-colors={["#5787C8", "#71C7DA"]}
-start={{ x: 0, y: 0 }}
-end={{ x: 1, y: 0 }}
-style={{ flex: 1 }}
->
-<SafeAreaView style={styles.container}>
-  <View style={{ marginBottom: 1, alignItems: "center" }}>
-    <Text
-      style={{ fontSize: 24, fontWeight: "bold", color: COLORS.white }}
-    >
-      Pickup Orders
-    </Text>
-    <View
-      style={{
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: "#FF6F61", // Example color
-        justifyContent: "center",
-        alignItems: "center",
-        marginVertical: 8,
-      }}
-    >
-      <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
-        {pendingOrdersCount}
-      </Text>
-    </View>
-    <Text style={{ fontSize: 16, color: "white" }}>Pending</Text>
-  </View>
-
-  <View style={styles.listContainer}>
-    <View style={styles.tabContainer}>
-      <TouchableOpacity
-        style={[styles.tab, filter === "All" && styles.activeTab]}
-        onPress={() => setFilter("All")}
-      >
-        <Text
-          style={[
-            styles.tabText,
-            filter === "All" && styles.activeTabText,
-          ]}
-        >
-          All
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.tab, filter === "Nearest" && styles.activeTab]}
-        onPress={() => setFilter("Nearest")}
-      >
-        <Text
-          style={[
-            styles.tabText,
-            filter === "Nearest" && styles.activeTabText,
-          ]}
-        >
-          Nearest
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.tab, filter === "Cancel" && styles.activeTab]}
-        onPress={() => setFilter("Cancel")}
-      >
-        <Text
-          style={[
-            styles.tabText,
-            filter === "Cancel" && styles.activeTabText,
-          ]}
-        >
-          Cancel
-        </Text>
-      </TouchableOpacity>
-    </View>
-    <FlashList
-      data={sortedServices}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={{ paddingBottom: 60 }}
-      showsVerticalScrollIndicator={false}
-      estimatedItemSize={100}
-    />
-  </View>
-</SafeAreaView>
-</LinearGradient> */
-}

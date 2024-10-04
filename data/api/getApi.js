@@ -7,14 +7,14 @@ import { api } from "../axios";
 // Get Customer request services for laundry pickup module
 export const getLaundryPickup = async (storeId) => {
   try {
-    const response = await api.get(`/laundry-pickup?store_id=${storeId}`);
+    const response = await api.get(`/staff/${storeId}/get-laundry-pickup`);
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-// Get Customer request services for laundry delivery module //
+// Get Customer request services for laundry delivery module
 export const getLaundryDelivery = async (data) => {
   try {
     const response = await api.post("/login", data);
@@ -23,6 +23,15 @@ export const getLaundryDelivery = async (data) => {
     throw error;
   }
 };
+
+// export const getLaundryPickup = async (storeId) => {
+//   try {
+//     const response = await api.get(`/laundry-pickup?store_id=${storeId}`);
+//     return response.data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 
 // export const getLaundryPickup = async (data) => {
 //   try {
