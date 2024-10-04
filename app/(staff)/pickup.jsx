@@ -28,6 +28,11 @@ import { timeAgo } from "../../constants/datetime";
 import { useNavigation } from "expo-router";
 import { getLaundryPickup } from "../../data/api/getApi";
 import { ActivityIndicator } from "react-native-web";
+import {
+  updateServiceRequestBackToPending,
+  updateServiceRequestCancel,
+  updateServiceRequestGetLaundry,
+} from "../../data/api/putApi";
 
 // const mockServices = [
 //   {
@@ -184,19 +189,49 @@ export default function Pickup() {
   };
 
   const handleReturnToPending = async (id) => {
-    console.log(id);
-    bottomSheetRef.current?.close();
+    try {
+      const response = await updateServiceRequestBackToPending(id);
+      if (response.success) {
+        console.log("Request back to pending successfully.");
+      } else {
+        console.error("Failed to get request:", response.message);
+      }
+    } catch (error) {
+      console.error("Error getting request:", error);
+    } finally {
+      bottomSheetRef.current?.close();
+    }
   };
 
   // Pending
   const handleGetLaundry = async (id) => {
-    console.log(id);
-    bottomPendingSheet.current?.close();
+    try {
+      const response = await updateServiceRequestGetLaundry(id);
+      if (response.success) {
+        console.log("Request get laundry successfully.");
+      } else {
+        console.error("Failed to get request:", response.message);
+      }
+    } catch (error) {
+      console.error("Error getting request:", error);
+    } finally {
+      bottomPendingSheet.current?.close();
+    }
   };
 
   const handleCancelRequest = async (id) => {
-    console.log(id);
-    bottomPendingSheet.current?.close();
+    try {
+      const response = await updateServiceRequestCancel(id);
+      if (response.success) {
+        console.log("Request cancelled successfully.");
+      } else {
+        console.error("Failed to cancel request:", response.message);
+      }
+    } catch (error) {
+      console.error("Error cancelling request:", error);
+    } finally {
+      bottomPendingSheet.current?.close();
+    }
   };
 
   // Going to another screen
@@ -225,7 +260,7 @@ export default function Pickup() {
         service.request_status === "Ongoing Pickup"
       );
     }
-    if (filter === "Cancel") return service.request_status === "Cancel";
+    if (filter === "Cancel") return service.request_status === "Cancelled";
     return true;
   });
 
@@ -320,7 +355,7 @@ export default function Pickup() {
             <View
               style={{ flexDirection: "row", alignItems: "flex-start", gap: 2 }}
             >
-              {item.request_status !== "Cancel" &&
+              {item.request_status !== "Cancelled" &&
                 item.request_status !== "Pending Pickup" && (
                   <View style={{ position: "relative" }}>
                     <TouchableOpacity
