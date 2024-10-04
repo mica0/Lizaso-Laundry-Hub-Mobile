@@ -146,14 +146,6 @@ export default function Pickup() {
       ).length
     : 0;
 
-  // if (loading) {
-  //   return <ActivityIndicator size="large" color="#0000ff" />;
-  // }
-
-  // if (error) {
-  //   return <Text>Error: {error}</Text>;
-  // }
-
   const renderBackdrop = useCallback(
     (props) => (
       <BottomSheetBackdrop
@@ -245,7 +237,10 @@ export default function Pickup() {
       ) {
         return -1;
       }
-      if (a.status !== "Ongoing Pickup" && b.status === "Ongoing Pickup") {
+      if (
+        a.request_status !== "Ongoing Pickup" &&
+        b.request_status === "Ongoing Pickup"
+      ) {
         return 1;
       }
       return new Date(a.request_date) - new Date(b.request_date);
@@ -275,7 +270,7 @@ export default function Pickup() {
       statusText = "Pending";
     } else if (item.request_status === "Ongoing Pickup") {
       backgroundColor = COLORS.success;
-      // iconComponent = <AnimatedIcon />; // comment for now
+      iconComponent = <AnimatedIcon />;
       statusText = "Ongoing";
     } else if (item.request_status === "Cancel") {
       iconName = "book-cancel-outline";
@@ -398,7 +393,7 @@ export default function Pickup() {
                   color={COLORS.success}
                   style={{ paddingRight: 2 }}
                 />
-                <Text style={styles.statusText}>{item.latitude}</Text>
+                <Text style={styles.statusText}>{item.distance}</Text>
               </View>
             </View>
           </View>
@@ -642,6 +637,7 @@ export default function Pickup() {
               </Text>
             </TouchableOpacity>
           </View>
+          {/* sdsd */}
           <FlashList
             data={sortedServices}
             renderItem={renderItem}
@@ -776,7 +772,7 @@ export default function Pickup() {
                               color: COLORS.success,
                             }}
                           >
-                            {selectedService.latitude}
+                            {selectedService.distance}
                           </Text>
                         </View>
                       </View>
@@ -1294,14 +1290,14 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: "absolute",
-    right: -5, // Adjust this value as needed
-    top: -5, // Adjust this value as needed
+    right: -5,
+    top: -5,
     backgroundColor: COLORS.message,
-    borderRadius: 10, // Circular badge
-    width: 20, // Width of the badge
-    height: 20, // Height of the badge
-    justifyContent: "center", // Center text vertically
-    alignItems: "center", // Center text horizontally
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
   },
   badgeText: {
     color: "white",
@@ -1309,3 +1305,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+// if (loading) {
+//   return <ActivityIndicator size="large" color="#0000ff" />;
+// }
+
+// if (error) {
+//   return <Text>Error: {error}</Text>;
+// }
