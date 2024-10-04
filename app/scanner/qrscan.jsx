@@ -17,7 +17,7 @@ export default function Qrscan() {
   const appState = useRef(AppState.currentState);
   const route = useRoute();
   const navigation = useNavigation();
-  const { customerId } = route.params;
+  // const { customerId } = route.params;
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {

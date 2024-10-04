@@ -1,62 +1,47 @@
-[
-  {
-    address_line1: "Perez Bulakan, Bulacan",
-    customer_fullname: "John Reynald Velarde",
-    customer_id: 1,
-    default_price: "65.00",
-    delivery_date: null,
-    distance: 5.573550690522479,
-    latitude: "14.766846",
-    longitude: "120.896249",
-    pickup_date: null,
-    request_date: "2024-10-03T20:26:10.000Z",
-    request_id: 1,
-    request_status: "Ongoing Pickup",
-    service_name: "Wash",
-  },
-  {
-    address_line1: "Perez Bulakan, Bulacan",
-    customer_fullname: "John Reynald Velarde",
-    customer_id: 1,
-    default_price: "55.00",
-    delivery_date: null,
-    distance: 5.573550690522479,
-    latitude: "14.766846",
-    longitude: "120.896249",
-    pickup_date: null,
-    request_date: "2024-10-04T00:02:22.000Z",
-    request_id: 2,
-    request_status: "Pending Pickup",
-    service_name: "Dry",
-  },
-  {
-    address_line1: "Malolos, Bulakan, Bulakan",
-    customer_fullname: "Alexia Midgar",
-    customer_id: 4,
-    default_price: "30.00",
-    delivery_date: null,
-    distance: 10.770478505993621,
-    latitude: "14.851215",
-    longitude: "120.818412",
-    pickup_date: null,
-    request_date: "2024-10-04T00:17:22.000Z",
-    request_id: 3,
-    request_status: "Pending Pickup",
-    service_name: "Fold",
-  },
-  {
-    address_line1: "Malolos, Bulakan, Bulakan",
-    customer_fullname: "Alexia Midgar",
-    customer_id: 4,
-    default_price: "55.00",
-    delivery_date: null,
-    distance: 10.770478505993621,
-    latitude: "14.851215",
-    longitude: "120.818412",
-    pickup_date: null,
-    request_date: "2024-10-04T01:09:50.000Z",
-    request_id: 4,
-    request_status: "Pending Pickup",
-    service_name: "Dry",
-  },
-];
+import { api } from "../axios";
+// CUSTOMER SECTION API REQUEST
+
+// STAFF SECTION API REQUEST
+// For pending cancel request
+export const updateServiceRequestCancel = async (requestId) => {
+  try {
+    const response = await api.put(`/staff/${requestId}/update-request-cancel`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// For pending get laundry change the request status to ongoing pickup
+export const updateServiceRequestGetLaundry = async (requestId) => {
+  try {
+    const response = await api.put(
+      `/staff/${requestId}/update-request-ongoing`
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// For ongoing service request back to pending pickup
+export const updateServiceRequestBackToPending = async (requestId) => {
+  try {
+    const response = await api.put(
+      `/staff/${requestId}/update-request-back-pending`
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// For ongoing request it use QR CODE
+export const updateServiceRequestOnGoing = async (qrCode) => {
+  try {
+    const response = await api.put(`/staff/${qrCode}/update-request-ongoing`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
