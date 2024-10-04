@@ -8,7 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { icons } from "../assets/icons";
 
-export default function TabBarButton(props) {
+export default function StaffTabBarButton(props) {
   const { isFocused, label, routeName, color } = props;
   const scale = useSharedValue(0);
   useEffect(() => {
@@ -56,6 +56,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 4,
+    gap: 5,
   },
 });

@@ -49,10 +49,19 @@ export default function Qrscan() {
         facing="back"
         onBarcodeScanned={({ data }) => {
           if (data && !qrLock.current) {
-            qrLock.current = true;
-            setTimeout(async () => {
-              await Linking.openURL(data);
-            }, 500);
+            if (data && !qrLock.current) {
+              qrLock.current = true;
+              console.log("Scanned QR code data:", data); // Log the scanned data to the console
+
+              setTimeout(() => {
+                qrLock.current = false;
+                navigation.goBack();
+              }, 500);
+            }
+            // qrLock.current = true;
+            // setTimeout(async () => {
+            //   await Linking.openURL(data);
+            // }, 500);
           }
         }}
       />

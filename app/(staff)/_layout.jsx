@@ -1,7 +1,7 @@
 import { View, StyleSheet, BackHandler } from "react-native";
 import { Tabs } from "expo-router";
 import React, { useEffect } from "react";
-import TabBar from "../../components/TabBar";
+import StaffTabBar from "../../components/staffTabBar";
 
 export default function TabLayout() {
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function TabLayout() {
   return (
     <View style={styles.container}>
       <Tabs
-        tabBar={(props) => <TabBar {...props} />}
+        tabBar={(props) => <StaffTabBar {...props} />}
         screenOptions={{
           headerShown: false,
           tabBarStyle: {

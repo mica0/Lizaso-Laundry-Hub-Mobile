@@ -90,7 +90,7 @@ const ongoingCount = mockServices.filter(
 ).length;
 
 export default function Delivery() {
-  const navigaton = useNavigation();
+  const navigation = useNavigation();
   const [services, setServices] = useState([]);
   const [notiCount, setNotiCount] = useState({ count: 1 });
   const [filter, setFilter] = useState("All");
@@ -140,7 +140,7 @@ export default function Delivery() {
     bottomSheetRef.current?.close();
 
     setTimeout(() => {
-      navigaton.navigate("scanner/qrscan", { customerId: id });
+      navigation.navigate("scanner/qrscan", { customerId: id });
     }, 300);
   };
 
