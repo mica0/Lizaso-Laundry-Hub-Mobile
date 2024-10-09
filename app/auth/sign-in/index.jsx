@@ -16,8 +16,8 @@ import { fonts } from "../../../constants/fonts";
 import { login } from "../../../data/api/authApi";
 
 export default function SignIn() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("12345");
+  const [password, setPassword] = useState("12345");
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});

@@ -508,14 +508,14 @@ export default function Delivery() {
               </Text>
             </TouchableOpacity>
           </View>
-          <FlashList
+          {/* <FlashList
             data={sortedServices}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ paddingBottom: 60 }}
             showsVerticalScrollIndicator={false}
             estimatedItemSize={100}
-          />
+          /> */}
         </View>
         {/* For On Delivery */}
         <Portal>

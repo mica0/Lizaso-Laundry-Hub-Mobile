@@ -6,7 +6,7 @@ export const icons = {
   home: (props) => <Entypo name="home" size={26} {...props} />,
   explore: (props) => <AntDesign name="search1" size={26} {...props} />,
   payment: (props) => <MaterialIcons name="payments" size={26} {...props} />,
-  history: (props) => <MaterialIcons name="payments" size={26} {...props} />,
+  d_messages: (props) => <AntDesign name="message1" size={26} {...props} />,
   profile: (props) => <FontAwesome5 name="user-alt" size={24} {...props} />,
   delivery: (props) => (
     <MaterialIcons name="delivery-dining" size={24} {...props} />

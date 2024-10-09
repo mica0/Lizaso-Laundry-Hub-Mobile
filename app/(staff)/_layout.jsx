@@ -46,9 +46,9 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="history"
+          name="d_messages"
           options={{
-            tabBarLabel: "History",
+            tabBarLabel: "Message",
             lazy: true,
           }}
         />
