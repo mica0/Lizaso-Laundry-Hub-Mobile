@@ -14,11 +14,12 @@ import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
 import noconvo from "../../assets/images/start_convo.png";
 import { LinearGradient } from "expo-linear-gradient";
+import { setPostNewMessage } from "../../data/api/postApi";
 
 export default function Chat() {
   const route = useRoute();
-  const navigation = useNavigation(); // Get the navigation object
-  const { customerId, customerName } = route.params; // Extract parameters from the route
+  const navigation = useNavigation();
+  const { customerId, customerName } = route.params;
 
   // Sample messages data
   const sampleMessages = [
@@ -37,14 +38,21 @@ export default function Chat() {
   const [newMessage, setNewMessage] = useState("");
   const scrollViewRef = useRef();
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim()) {
+      const senderId = 3;
       const newMsg = {
-        id: messages.length + 1,
+        recieverId: customerId,
         text: newMessage,
-        sender: "staff", // Or "customer", based on the chat's direction
+        senderType: "Staff",
       };
-      setMessages((prevMessages) => [...prevMessages, newMsg]);
+
+      try {
+        const response = await setPostNewMessage(senderId, newMsg);
+      } catch (error) {
+        console.error("Failed to send message:", error);
+      }
+
       setNewMessage("");
     }
   };
@@ -115,8 +123,8 @@ export default function Chat() {
           onChangeText={setNewMessage}
           placeholder="Type a message"
           style={styles.input}
-          onSubmitEditing={handleSendMessage} // Send message on enter
-          returnKeyType="send" // Change keyboard button to "Send"
+          onSubmitEditing={handleSendMessage}
+          returnKeyType="send"
         />
         <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
           <Text style={styles.sendButtonText}>Send</Text>
@@ -206,15 +214,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderTopWidth: 1,
-    borderColor: "#ccc",
+    borderColor: COLORS.border,
     paddingHorizontal: 10,
     paddingVertical: 5,
     backgroundColor: "#f9f9f9",
   },
   input: {
     flex: 1,
-    height: 40,
-    borderColor: "#ccc",
+    height: 45,
+    borderColor: COLORS.border,
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 20,

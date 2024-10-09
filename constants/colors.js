@@ -28,13 +28,13 @@ const COLORS = {
   grayDark: "#343a40",
 
   // Accent Colors
-  accent: "#ff7f50", // Optional accent color for special components
+  accent: "#ff7f50",
 
   // Background and Border Colors
   background: "#f4f4f4",
-  border: "#ddd",
-  border1: "#e0e0e0",
-  border2: "#ccc",
+  border: "#ccc",
+  border1: "#ddd",
+  border2: "#e0e0e0",
 
   // Colors Additonal
   message: "#F23F42",
