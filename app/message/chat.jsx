@@ -12,16 +12,30 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
-import noconvo from "../../assets/images/start_convo.png"; // Import the image here
+import noconvo from "../../assets/images/start_convo.png";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Chat() {
   const route = useRoute();
   const navigation = useNavigation(); // Get the navigation object
   const { customerId, customerName } = route.params; // Extract parameters from the route
 
-  const [messages, setMessages] = useState([]);
+  // Sample messages data
+  const sampleMessages = [
+    { id: 1, text: "Hi there! How can I assist you today?", sender: "staff" },
+    { id: 2, text: "I need help with my order.", sender: "customer" },
+    {
+      id: 3,
+      text: "Sure! Can you provide me with your order number?",
+      sender: "staff",
+    },
+    { id: 4, text: "It's #12345.", sender: "customer" },
+    { id: 5, text: "Thank you! I will check that for you.", sender: "staff" },
+  ];
+
+  const [messages, setMessages] = useState(sampleMessages);
   const [newMessage, setNewMessage] = useState("");
-  const scrollViewRef = useRef(); // Reference to the ScrollView
+  const scrollViewRef = useRef();
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
@@ -44,16 +58,22 @@ export default function Chat() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <LinearGradient
+        colors={["#5787C8", "#71C7DA"]}
+        locations={[0, 0.8]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1.5, y: 0 }}
+        style={styles.header}
+      >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{customerName}</Text>
         <View style={styles.placeholder} />
-      </View>
+      </LinearGradient>
 
       {/* Chat window */}
       <ScrollView
@@ -63,6 +83,8 @@ export default function Chat() {
         ]}
         ref={scrollViewRef} // Attach the ref to the ScrollView
         keyboardShouldPersistTaps="handled" // Allows tapping on the input field while keyboard is open
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
       >
         {messages.length === 0 ? (
           <View style={styles.emptyContainer}>
@@ -108,41 +130,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 10,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 10,
+    paddingTop: 40,
     paddingVertical: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    backgroundColor: COLORS.secondary,
   },
   backButton: {
     padding: 10,
   },
   backButtonText: {
     fontSize: 20,
-    color: COLORS.secondary, // Change this color as per your design
+    color: COLORS.secondary,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: fonts.Bold,
     textAlign: "center",
     flex: 1,
+    color: COLORS.white,
   },
   placeholder: {
-    width: 50, // Placeholder width for alignment
+    width: 50,
   },
   chatContainer: {
     flexGrow: 1,
     justifyContent: "flex-end",
     paddingBottom: 10,
+    paddingLeft: 5,
+    paddingRight: 5,
   },
   centeredContent: {
-    justifyContent: "center", // Center the content vertically when no messages
-    alignItems: "center", // Center the content horizontally when no messages
+    justifyContent: "center",
+    alignItems: "center",
     flex: 1,
   },
   emptyContainer: {
@@ -150,8 +173,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   noConversationImage: {
-    width: 200, // Adjust size as needed
-    height: 200, // Adjust size as needed
+    width: 200,
+    height: 200,
     marginBottom: 20,
   },
   startConversationText: {

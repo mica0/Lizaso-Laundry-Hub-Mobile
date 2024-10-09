@@ -1,3 +1,4 @@
+import { format, isToday, isYesterday, parseISO } from "date-fns";
 export const haversineDistance = (lat1, lon1, lat2, lon2) => {
   const toRadians = (degrees) => (degrees * Math.PI) / 180;
 
@@ -12,4 +13,22 @@ export const haversineDistance = (lat1, lon1, lat2, lon2) => {
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c; // Distance in kilometers
+};
+
+export const truncateMessage = (message, limit = 30) => {
+  return message.length > limit ? message.slice(0, limit) + "..." : message;
+};
+
+export const formatDate = (dateString) => {
+  const date = parseISO(dateString); // Parse the date string to a Date object
+  if (isToday(date)) {
+    return format(date, "hh:mm a"); // Format as "8:08 PM"
+  } else if (isYesterday(date)) {
+    return "Yesterday"; // Format for yesterday
+  } else if (date.getTime() > Date.now() - 604800000) {
+    // Within the last week
+    return format(date, "eee"); // Format as "Tue"
+  } else {
+    return format(date, "MMM d"); // Format as "Oct 1"
+  }
 };

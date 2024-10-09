@@ -27,7 +27,6 @@ import Animated, {
 import { timeAgo } from "../../constants/datetime";
 import { useNavigation } from "expo-router";
 import { getLaundryPickup } from "../../data/api/getApi";
-import { ActivityIndicator } from "react-native-web";
 import {
   updateServiceRequestBackToPending,
   updateServiceRequestCancel,
@@ -442,7 +441,7 @@ export default function Pickup() {
       colors={["#5787C8", "#71C7DA"]}
       locations={[0, 0.8]}
       start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
+      end={{ x: 1.5, y: 0 }}
       style={{ flex: 1 }}
     >
       <SafeAreaView style={styles.container}>
