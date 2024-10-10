@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,10 +13,11 @@ import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
 import { formatDate, truncateMessage } from "../../constants/method";
 import d_profile from "../../assets/images/d_profile1.png";
-import { useNavigation } from "expo-router";
+import { useFocusEffect, useNavigation } from "expo-router";
 import noconvo from "../../assets/images/start_convo.png";
 import { getStaffMessage } from "../../data/api/getApi";
 import useAuth from "../context/AuthContext";
+import usePolling from "../../hooks/usePolling";
 
 // const customers = [
 //   {
@@ -35,8 +36,65 @@ export default function D_messages() {
   const userDetails = useAuth();
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [customers, setCustomer] = useState([]);
-  const [filteredCustomers, setFilteredCustomers] = useState(customers);
+
+  const userId = 6;
+
+  // const fetchMessages = useCallback(async () => {
+  //   try {
+  //     const response = await getStaffMessage(userId);
+
+  //     if (response && response.length > 0) {
+  //       const messageData = response[0];
+
+  //       return messageData.messages;
+  //     } else {
+  //       return [];
+  //     }
+  //   } catch (error) {
+  //     return []; // Return an empty array in case of error
+  //   }
+
+  //   // const response = await getStaffMessage(userId);
+  //   // console.log(1);
+  //   // console.log(response);
+  //   // return response;
+  // }, [userId]);
+
+  // const {
+  //   data: messages,
+  //   loading,
+  //   error,
+  //   setIsPolling,
+  // } = usePolling(fetchMessages, 2000);
+  const fetchMessages = useCallback(async () => {
+    try {
+      const response = await getStaffMessage(userId);
+      return response;
+    } catch (error) {
+      return [];
+    }
+  }, [userId]);
+
+  const {
+    data: inboxData,
+    loading,
+    error,
+    setIsPolling,
+  } = usePolling(fetchMessages, 2000);
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsPolling(true);
+
+      return () => {
+        setIsPolling(false);
+      };
+    }, [])
+  );
+
+  console.log(inboxData.recipient_fullname);
+
+  // const [filteredCustomers, setFilteredCustomers] = useState([]);
 
   // const fetchMessaqge = async () => {
   //   try {
@@ -67,10 +125,10 @@ export default function D_messages() {
     setFilteredCustomers(filteredData);
   };
 
-  const handleCustomerSelect = (customer) => {
+  const handleCustomerSelect = (item) => {
     navigation.navigate("message/chat", {
-      customerId: customer.id,
-      customerName: customer.name,
+      customerId: item.id,
+      customerName: item.recipient_full_name,
       sender_type: "Staff",
       receiver_type: "Customer",
     });
@@ -89,14 +147,14 @@ export default function D_messages() {
       </View>
 
       {/* Display filtered customers or no messages message */}
-      {filteredCustomers.length === 0 ? (
+      {/* {messages.length === 0 ? (
         <View style={styles.noMessagesContainer}>
           <Image source={noconvo} style={styles.noMessagesImage} />
           <Text style={styles.noMessagesText}>No messages yet</Text>
         </View>
       ) : (
         <FlatList
-          data={filteredCustomers}
+          data={messages}
           keyExtractor={(item) => item.id}
           renderItem={({ item, index }) => (
             <Pressable
@@ -111,24 +169,62 @@ export default function D_messages() {
                 style={styles.avatar}
               />
               <View style={styles.messageContainer}>
-                <Text style={styles.customerName}>{item.name}</Text>
+                <Text style={styles.customerName}>
+                  {item.recipient_fullname}
+                </Text>
                 <Text
                   style={[
                     styles.latestMessage,
                     item.isRead === 0 && styles.unreadMessage,
                   ]}
                 >
-                  {truncateMessage(item.latestMessage, 50)}
+                  {truncateMessage(item.message, 50)}
                 </Text>
               </View>
-              <Text style={styles.timestamp}>{formatDate(item.date_send)}</Text>
+              <Text style={styles.timestamp}>{formatDate(item.date_sent)}</Text>
             </Pressable>
           )}
           contentContainerStyle={styles.customerList}
           showsVerticalScrollIndicator={false}
           estimatedItemSize={100}
         />
-      )}
+
+        // <FlatList
+        //   data={messages}
+        //   keyExtractor={(item) => item.id}
+        //   renderItem={({ item, index }) => (
+        //     <Pressable
+        //       style={[
+        //         styles.customerContainer,
+        //         index === 0 && styles.firstItem,
+        //       ]}
+        //       onPress={() => handleCustomerSelect(item)}
+        //     >
+        //       <Image
+        //         source={item.avatar ? { uri: item.avatar } : d_profile}
+        //         style={styles.avatar}
+        //       />
+        //       <View style={styles.messageContainer}>
+        //         <Text style={styles.customerName}>
+        //           {item.recipient_customer_fullname}
+        //         </Text>
+        //         <Text
+        //           style={[
+        //             styles.latestMessage,
+        //             item.isRead === 0 && styles.unreadMessage,
+        //           ]}
+        //         >
+        //           {truncateMessage(item.message, 50)}
+        //         </Text>
+        //       </View>
+        //       <Text style={styles.timestamp}>{formatDate(item.date_sent)}</Text>
+        //     </Pressable>
+        //   )}
+        //   contentContainerStyle={styles.customerList}
+        //   showsVerticalScrollIndicator={false}
+        //   estimatedItemSize={100}
+        // />
+      )} */}
     </SafeAreaView>
   );
 }
@@ -206,9 +302,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   noMessagesImage: {
-    width: 100, // Adjust as needed
-    height: 100, // Adjust as needed
-    marginBottom: 16, // Space between the image and text
+    width: 100,
+    height: 100,
+    marginBottom: 16,
   },
   noMessagesText: {
     fontSize: 18,

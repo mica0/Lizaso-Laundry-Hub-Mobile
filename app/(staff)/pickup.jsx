@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -32,7 +33,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { timeAgo } from "../../constants/datetime";
-import { useNavigation } from "expo-router";
+import { useFocusEffect, useNavigation } from "expo-router";
 import { getLaundryPickup } from "../../data/api/getApi";
 import {
   updateServiceRequestBackToPending,
@@ -77,6 +78,7 @@ export default function Pickup() {
   const [storeId] = useState(1);
 
   const fetchLaundryPickup = useCallback(async () => {
+    // console.log("Fetching laundry pickup data for store ID:", storeId);
     const response = await getLaundryPickup(storeId);
     return response;
   }, [storeId]);
@@ -85,7 +87,18 @@ export default function Pickup() {
     data: pickupData,
     loading,
     error,
+    setIsPolling,
   } = usePolling(fetchLaundryPickup, 2000);
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsPolling(true);
+
+      return () => {
+        setIsPolling(false);
+      };
+    }, [])
+  );
 
   const pendingCount = Array.isArray(pickupData)
     ? pickupData.filter(
@@ -281,7 +294,7 @@ export default function Pickup() {
     }
 
     return (
-      <TouchableOpacity
+      <Pressable
         style={styles.itemContainer}
         onPress={() => {
           if (item.request_status === "Pending Pickup") {
@@ -393,7 +406,7 @@ export default function Pickup() {
             </View>
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 

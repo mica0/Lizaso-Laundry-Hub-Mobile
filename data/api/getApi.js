@@ -45,9 +45,9 @@ export const getLaundryDelivery = async (data) => {
 //#LAUNDRY DELIVERY MODULE
 
 // #MESSAGE MODULE
-export const getStaffMessage = async (id, data) => {
+export const getStaffMessage = async (id) => {
   try {
-    const response = await api.get(`/staff/${id}/get-staff-list-convo`, data);
+    const response = await api.get(`/staff/${id}/get-staff-list-convo`);
     return response.data;
   } catch (error) {
     throw error;
