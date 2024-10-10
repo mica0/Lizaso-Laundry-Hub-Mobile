@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,56 +15,44 @@ import { formatDate, truncateMessage } from "../../constants/method";
 import d_profile from "../../assets/images/d_profile1.png";
 import { useNavigation } from "expo-router";
 import noconvo from "../../assets/images/start_convo.png";
+import { getStaffMessage } from "../../data/api/getApi";
+import useAuth from "../context/AuthContext";
 
-const customers = [
-  {
-    id: "1",
-    name: "John Doe",
-    latestMessage: "Hello, I have a question about my order.",
-    avatar: "",
-    isRead: 0,
-    date_send: "2024-10-09 09:30:00",
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    latestMessage: "When will my laundry be delivered?",
-    avatar: "",
-    isRead: 1,
-    date_send: "2024-10-07 09:32:00",
-  },
-  {
-    id: "3",
-    name: "Alice Johnson",
-    latestMessage: "Thank you for the quick delivery!",
-    avatar: "",
-    isRead: 0,
-    date_send: "2024-10-06 10:35:00",
-  },
-  {
-    id: "4",
-    name: "Michael Brown",
-    latestMessage: "Can you provide an update on my order?",
-    avatar: "",
-    isRead: 1,
-    date_send: "2024-10-05 10:30:00",
-  },
-  {
-    id: "5",
-    name: "Emily Davis",
-    latestMessage: "My laundry is not complete, can you check?",
-    avatar: "",
-    isRead: 0,
-    date_send: "2024-09-30 10:32:00",
-  },
-];
+// const customers = [
+//   {
+//     id: "1",
+//     name: "Rose Oriana",
+//     latestMessage: "Hello, I have a question about my service request.",
+//     avatar: "",
+//     sender_type: "Staff",
+//     receiver_type: "Customer",
+//     isRead: 0,
+//     date_send: "2024-10-09 09:30:00",
+//   },
+// ];
 
 export default function D_messages() {
+  const userDetails = useAuth();
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [customers, setCustomer] = useState([]);
   const [filteredCustomers, setFilteredCustomers] = useState(customers);
 
-  // Search handler function
+  // const fetchMessaqge = async () => {
+  //   try {
+  //     const data = await getStaffMessage(storeId);
+  //     setPickupData(data);
+  //   } catch (err) {
+  //     setError(err.message || "Something went wrong");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchLaundryPickup();
+  // }, [storeId]);
+
   const handleSearch = (text) => {
     setSearchQuery(text);
 
@@ -83,6 +71,8 @@ export default function D_messages() {
     navigation.navigate("message/chat", {
       customerId: customer.id,
       customerName: customer.name,
+      sender_type: "Staff",
+      receiver_type: "Customer",
     });
   };
 

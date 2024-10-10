@@ -19,7 +19,7 @@ import { setPostNewMessage } from "../../data/api/postApi";
 export default function Chat() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { customerId, customerName } = route.params;
+  const { customerId, customerName, sender_type, receiver_type } = route.params;
 
   // Sample messages data
   const sampleMessages = [
@@ -42,9 +42,10 @@ export default function Chat() {
     if (newMessage.trim()) {
       const senderId = 3;
       const newMsg = {
-        recieverId: customerId,
+        receiverId: customerId,
         text: newMessage,
-        senderType: "Staff",
+        senderType: sender_type,
+        receiverType: receiver_type,
       };
 
       try {

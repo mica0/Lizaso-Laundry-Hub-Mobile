@@ -17,8 +17,8 @@
 import axios from "axios";
 
 // Base URL of your server
-// const BASE_URL = "http://192.168.254.162:3002/api";
-const BASE_URL = "http://192.168.254.139:3002/api";
+const BASE_URL = "http://192.168.254.162:3002/api";
+// const BASE_URL = "http://192.168.254.139:3002/api";
 
 // Create an instance of axios
 export const api = axios.create({

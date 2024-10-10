@@ -5,7 +5,14 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -30,61 +37,10 @@ import { getLaundryPickup } from "../../data/api/getApi";
 import {
   updateServiceRequestBackToPending,
   updateServiceRequestCancel,
+  updateServiceRequestFinishiPickup,
   updateServiceRequestGetLaundry,
 } from "../../data/api/putApi";
-
-// const mockServices = [
-//   {
-//     id: "1",
-//     name: "Washing",
-//     location: "123 Main St, City Center",
-//     customerName: "John Doe",
-//     requestDate: "2024-09-01T10:00:00Z",
-//     distance: "7 km",
-//     status: "Pending Pickup",
-//     messageCount: 1,
-//   },
-//   {
-//     id: "2",
-//     name: "Dry Cleaning",
-//     location: "456 Park Ave, Downtown",
-//     customerName: "Jane Smith",
-//     requestDate: "2024-09-02T09:30:00Z",
-//     distance: "1 km",
-//     status: "Cancel",
-//     messageCount: 0,
-//   },
-//   {
-//     id: "3",
-//     name: "Ironing",
-//     location: "789 Elm St, Suburbs",
-//     customerName: "Alex Johnson",
-//     requestDate: "2024-09-03T08:15:00Z",
-//     distance: "3 km",
-//     status: "Pending Pickup",
-//     messageCount: 10,
-//   },
-//   {
-//     id: "4",
-//     name: "Laundry",
-//     location: "321 River St, Uptown",
-//     customerName: "John Reynald Velarde",
-//     requestDate: "2024-09-04T12:45:00Z",
-//     distance: "5 km",
-//     status: "Ongoing Pickup",
-//     messageCount: 50,
-//   },
-//   {
-//     id: "5",
-//     name: "Laundry",
-//     location: "321 River St, Uptowns",
-//     customerName: "Emily Brown",
-//     requestDate: "2024-09-04T11:45:00Z",
-//     distance: "5 km",
-//     status: "Ongoing Pickup",
-//     messageCount: 80,
-//   },
-// ];
+import usePolling from "../../hooks/usePolling";
 
 const AnimatedIcon = () => {
   const rotation = useSharedValue(0);
@@ -118,25 +74,18 @@ export default function Pickup() {
   const [selectedService, setSelectedService] = useState(null);
 
   // #Data Section
-  const [pickupData, setPickupData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [storeId] = useState(1);
 
-  const fetchLaundryPickup = async () => {
-    try {
-      const data = await getLaundryPickup(storeId);
-      setPickupData(data);
-    } catch (err) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLaundryPickup();
+  const fetchLaundryPickup = useCallback(async () => {
+    const response = await getLaundryPickup(storeId);
+    return response;
   }, [storeId]);
+
+  const {
+    data: pickupData,
+    loading,
+    error,
+  } = usePolling(fetchLaundryPickup, 2000);
 
   const pendingCount = Array.isArray(pickupData)
     ? pickupData.filter(
@@ -183,8 +132,17 @@ export default function Pickup() {
 
   // Ongoing
   const handleFinishPickup = async (id) => {
-    console.log(id);
-    bottomSheetRef.current?.close();
+    try {
+      const response = await updateServiceRequestFinishiPickup(id);
+      if (response.success) {
+      } else {
+        console.error("Failed to get request:", response.message);
+      }
+    } catch (error) {
+      console.error("Error getting request:", error);
+    } finally {
+      bottomSheetRef.current?.close();
+    }
   };
 
   const handleReturnToPending = async (id) => {
@@ -235,9 +193,12 @@ export default function Pickup() {
 
   // Going to another screen
   const handleGoToMessage = async (id, name) => {
-    console.log("Message ID Customer: " + id);
-    console.log("Message Customer Name: " + name);
-    navigaton.navigate("message/chat", { customerId: id, customerName: name });
+    navigaton.navigate("message/chat", {
+      customerId: id,
+      customerName: name,
+      sender_type: "Staff",
+      receiver_type: "Customer",
+    });
   };
 
   const handleGoToNotification = async (id) => {
@@ -671,15 +632,22 @@ export default function Pickup() {
               </Text>
             </TouchableOpacity>
           </View>
-          {/* sdsd */}
-          <FlashList
-            data={sortedServices}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.request_id}
-            contentContainerStyle={{ paddingBottom: 60 }}
-            showsVerticalScrollIndicator={false}
-            estimatedItemSize={100}
-          />
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            {loading && !pickupData.length ? (
+              <ActivityIndicator size="large" color={COLORS.secondary} />
+            ) : error ? (
+              <ActivityIndicator size="large" color={COLORS.secondary} />
+            ) : (
+              <FlashList
+                data={sortedServices}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.request_id.toString()}
+                contentContainerStyle={{ paddingBottom: 60 }}
+                showsVerticalScrollIndicator={false}
+                estimatedItemSize={100}
+              />
+            )}
+          </View>
         </View>
         {/* For Pending */}
         <Portal>
@@ -1347,3 +1315,81 @@ const styles = StyleSheet.create({
 // if (error) {
 //   return <Text>Error: {error}</Text>;
 // }
+
+// const [pickupData, setPickupData] = useState([]);
+// const [loading, setLoading] = useState(true);
+// const [error, setError] = useState(null);
+
+// const fetchLaundryPickup = async () => {
+//   try {
+//     const data = await getLaundryPickup(storeId);
+//     setPickupData(data);
+//     console.log(1);
+//   } catch (err) {
+//     setError(err.message || "Something went wrong");
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
+// useEffect(() => {
+//   fetchLaundryPickup();
+//   const intervalId = setInterval(() => {
+//     fetchLaundryPickup();
+//   }, 10000);
+
+//   return () => clearInterval(intervalId);
+// }, [storeId]);
+
+// const mockServices = [
+//   {
+//     id: "1",
+//     name: "Washing",
+//     location: "123 Main St, City Center",
+//     customerName: "John Doe",
+//     requestDate: "2024-09-01T10:00:00Z",
+//     distance: "7 km",
+//     status: "Pending Pickup",
+//     messageCount: 1,
+//   },
+//   {
+//     id: "2",
+//     name: "Dry Cleaning",
+//     location: "456 Park Ave, Downtown",
+//     customerName: "Jane Smith",
+//     requestDate: "2024-09-02T09:30:00Z",
+//     distance: "1 km",
+//     status: "Cancel",
+//     messageCount: 0,
+//   },
+//   {
+//     id: "3",
+//     name: "Ironing",
+//     location: "789 Elm St, Suburbs",
+//     customerName: "Alex Johnson",
+//     requestDate: "2024-09-03T08:15:00Z",
+//     distance: "3 km",
+//     status: "Pending Pickup",
+//     messageCount: 10,
+//   },
+//   {
+//     id: "4",
+//     name: "Laundry",
+//     location: "321 River St, Uptown",
+//     customerName: "John Reynald Velarde",
+//     requestDate: "2024-09-04T12:45:00Z",
+//     distance: "5 km",
+//     status: "Ongoing Pickup",
+//     messageCount: 50,
+//   },
+//   {
+//     id: "5",
+//     name: "Laundry",
+//     location: "321 River St, Uptowns",
+//     customerName: "Emily Brown",
+//     requestDate: "2024-09-04T11:45:00Z",
+//     distance: "5 km",
+//     status: "Ongoing Pickup",
+//     messageCount: 80,
+//   },
+// ];

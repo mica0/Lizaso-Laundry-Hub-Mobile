@@ -36,6 +36,18 @@ export const updateServiceRequestBackToPending = async (requestId) => {
   }
 };
 
+// For ongoing pickup to finish picup
+export const updateServiceRequestFinishiPickup = async (requestId) => {
+  try {
+    const response = await api.put(
+      `/staff/${requestId}/update-request-finish-pickup`
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // For ongoing request it use QR CODE
 export const updateServiceRequestOnGoing = async (qrCode) => {
   try {
