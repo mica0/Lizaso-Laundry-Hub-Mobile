@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // or wherever you are importing this from
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
@@ -7,7 +14,10 @@ import COLORS from "../../constants/colors";
 export const ServiceItem = ({ item, isExpanded, onToggle }) => {
   return (
     <View style={styles.serviceItem}>
-      <Image source={{ uri: item.image }} style={styles.serviceImage} />
+      <Image
+        source={{ uri: "https://via.placeholder.com/150" }}
+        style={styles.serviceImage}
+      />
 
       <View style={styles.serviceInfo}>
         <View
@@ -17,12 +27,24 @@ export const ServiceItem = ({ item, isExpanded, onToggle }) => {
           }}
         >
           <View style={{ flex: 1 }}>
-            <Text style={styles.serviceName}>{item.name}</Text>
-            <Text style={styles.serviceDescription}>{item.description}</Text>
-            <Text style={styles.servicePrice}>{item.price}</Text>
-            {item.promo &&
+            <Text style={styles.serviceName}>{item.service_name}</Text>
+            <Text style={styles.serviceDescription}>{item.service_name}</Text>
+            <Text style={styles.servicePrice}>PHP {item.default_price}</Text>
+            {item.isActive &&
               isExpanded && ( // Show promo details if expanded
                 <>
+                  <Text style={styles.promoDetails}>
+                    Special Promo Details!
+                  </Text>
+                  <Text style={styles.promoDetails}>
+                    Special Promo Details!
+                  </Text>
+                  <Text style={styles.promoDetails}>
+                    Special Promo Details!
+                  </Text>
+                  <Text style={styles.promoDetails}>
+                    Special Promo Details!
+                  </Text>
                   <Text style={styles.promoDetails}>
                     Special Promo Details!
                   </Text>
@@ -38,10 +60,10 @@ export const ServiceItem = ({ item, isExpanded, onToggle }) => {
               flexDirection: "row",
             }}
           >
-            {item.promo && !isExpanded && (
+            {item.isActive && !isExpanded && (
               <Text style={styles.promoBadge}>Promo</Text>
             )}
-            {item.promo && (
+            {item.isActive && (
               <TouchableOpacity
                 onPress={onToggle}
                 style={styles.collapseIconContainer}
@@ -55,9 +77,9 @@ export const ServiceItem = ({ item, isExpanded, onToggle }) => {
             )}
           </View>
         </View>
-        <TouchableOpacity style={styles.serviceButton}>
+        <Pressable style={styles.serviceButton}>
           <Text style={styles.buttonText}>Select</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
@@ -67,11 +89,12 @@ const styles = StyleSheet.create({
   serviceItem: {
     flexDirection: "row",
     backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.border2,
     borderRadius: 10,
     padding: 10,
     marginVertical: 5,
     alignItems: "center",
-    elevation: 3,
     position: "relative",
   },
   serviceImage: {
@@ -87,12 +110,13 @@ const styles = StyleSheet.create({
   },
   serviceName: {
     fontFamily: fonts.Bold,
+    color: COLORS.primary,
     fontSize: 16,
   },
   serviceDescription: {
-    fontFamily: fonts.Regular,
-    fontSize: 12,
-    color: COLORS.gray,
+    fontFamily: fonts.Medium,
+    fontSize: 11,
+    color: COLORS.grayMedium,
   },
   servicePrice: {
     fontFamily: fonts.Bold,
@@ -100,10 +124,10 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
   },
   promoBadge: {
-    position: "absolute", // Use absolute positioning for the promo badge
+    position: "absolute",
     top: 10,
     right: 10,
-    backgroundColor: "orange",
+    backgroundColor: COLORS.error,
     color: COLORS.white,
     fontWeight: "bold",
     paddingVertical: 2,

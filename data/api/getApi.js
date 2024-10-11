@@ -1,8 +1,19 @@
 import { api } from "../axios";
 // CUSTOMER SECTION API REQUEST
 // #SERVICE REQUEST
+export const getLaundryServices = async (storeId) => {
+  try {
+    const response = await api.get(`/customers/${storeId}/get-service-types`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // #TRACK ORDER
+
 // #PAYMENT HISTORY
+
 // #PROFILE MANAGEMENT
 
 // #MESSAGE MODULE

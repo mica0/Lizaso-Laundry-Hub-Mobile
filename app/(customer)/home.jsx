@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import { useNavigation } from "expo-router";
+import { useFocusEffect, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList } from "react-native-gesture-handler"; // Use FlatList from 'react-native-gesture-handler' for better performance
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,6 +15,8 @@ import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
 import { ServiceItem } from "../../components/customer/ServiceItem";
+import usePolling from "../../hooks/usePolling";
+import { getLaundryServices } from "../../data/api/getApi";
 
 const sampleServices = [
   {
@@ -30,7 +32,7 @@ const sampleServices = [
     name: "Dry Cleaning",
     description: "Professional dry cleaning service.",
     price: "$25",
-    promo: false,
+    promo: true,
     image: "https://via.placeholder.com/150",
   },
   {
@@ -46,7 +48,7 @@ const sampleServices = [
     name: "Laundry Pickup",
     description: "Convenient laundry pickup service.",
     price: "$5",
-    promo: false,
+    promo: true,
     image: "https://via.placeholder.com/150",
   },
 ];
@@ -62,6 +64,31 @@ const laundryItems = [
 export default function Home() {
   const navigation = useNavigation();
   const [notiCount, setNotiCount] = useState({ count: 1 });
+
+  const storeId = 1;
+
+  const fetchLaundryServices = useCallback(async () => {
+    // console.log("Fetching laundry pickup data for store ID:", storeId);
+    const response = await getLaundryServices(storeId);
+    return response;
+  }, [storeId]);
+
+  const {
+    data: servicesData,
+    loading,
+    error,
+    setIsPolling,
+  } = usePolling(fetchLaundryServices, 2000);
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsPolling(true);
+
+      return () => {
+        setIsPolling(false);
+      };
+    }, [])
+  );
 
   const handleGoToNotification = () => {
     console.log("Navigating to notifications");
@@ -81,8 +108,8 @@ export default function Home() {
     return (
       <ServiceItem
         item={item}
-        isExpanded={!!expandedItems[item.id]} // Check if this item's ID is in the expanded state
-        onToggle={() => toggleExpanded(item.id)} // Pass the toggle function
+        isExpanded={!!expandedItems[item.service_id]} // Check if this item's ID is in the expanded state
+        onToggle={() => toggleExpanded(item.service_id)} // Pass the toggle function
       />
     );
   };
@@ -185,12 +212,10 @@ export default function Home() {
             </TouchableOpacity>
           </View>
         </View>
-
         {/* Title for Laundry Items */}
         <View style={styles.carouselTitleContainer}>
           <Text style={styles.carouselTitle}>Available Laundry Items</Text>
         </View>
-
         {/* Carousel for Laundry Items */}
         <View style={styles.carouselContainer}>
           <FlatList
@@ -210,7 +235,7 @@ export default function Home() {
         {/* Services List */}
         <View style={styles.listContainer}>
           <FlatList
-            data={sampleServices}
+            data={servicesData}
             renderItem={renderServiceItem}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ paddingBottom: 60 }}
@@ -268,6 +293,22 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingVertical: 20,
+    paddingBottom: 30,
+    flex: 1,
+    backgroundColor: COLORS.background,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginTop: 20,
+    // Shadow Section
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
+    elevation: 5,
   },
   serviceItem: {
     flexDirection: "row",
@@ -276,7 +317,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
     alignItems: "center",
-    elevation: 3,
     position: "relative", // Set position relative to position promo badge absolutely
   },
   serviceImage: {
