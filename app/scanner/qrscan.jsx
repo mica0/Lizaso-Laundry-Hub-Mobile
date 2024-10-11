@@ -10,7 +10,8 @@ import {
 } from "react-native";
 import { useEffect, useRef } from "react";
 import { useRoute } from "@react-navigation/native";
-import { Overlay } from "./overlay"; // Import your Overlay component
+import { Overlay } from "./overlay";
+import { updateServiceRequestUsingQRCode } from "../../data/api/putApi";
 
 export default function Qrscan() {
   const qrLock = useRef(false);
@@ -35,6 +36,25 @@ export default function Qrscan() {
     };
   }, []);
 
+  const handleBarcodeScanned = async ({ data }) => {
+    if (data && !qrLock.current) {
+      qrLock.current = true;
+      const qrData = {
+        code: data,
+      };
+      try {
+        const response = await updateServiceRequestUsingQRCode(data, qrData);
+        console.log("Response from service request:", response);
+      } catch (error) {
+        console.error("Error updating service request:", error);
+      }
+      setTimeout(() => {
+        qrLock.current = false; // Unlock scanning
+        navigation.goBack(); // Navigate back after a delay
+      }, 500);
+    }
+  };
+
   return (
     <SafeAreaView style={StyleSheet.absoluteFillObject}>
       <Stack.Screen
@@ -47,23 +67,7 @@ export default function Qrscan() {
       <CameraView
         style={StyleSheet.absoluteFillObject}
         facing="back"
-        onBarcodeScanned={({ data }) => {
-          if (data && !qrLock.current) {
-            if (data && !qrLock.current) {
-              qrLock.current = true;
-              console.log("Scanned QR code data:", data); // Log the scanned data to the console
-
-              setTimeout(() => {
-                qrLock.current = false;
-                navigation.goBack();
-              }, 500);
-            }
-            // qrLock.current = true;
-            // setTimeout(async () => {
-            //   await Linking.openURL(data);
-            // }, 500);
-          }
-        }}
+        onBarcodeScanned={handleBarcodeScanned}
       />
       <Overlay />
     </SafeAreaView>

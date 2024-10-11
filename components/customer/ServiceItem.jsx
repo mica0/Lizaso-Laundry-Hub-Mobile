@@ -28,7 +28,7 @@ export const ServiceItem = ({ item, isExpanded, onToggle }) => {
         >
           <View style={{ flex: 1 }}>
             <Text style={styles.serviceName}>{item.service_name}</Text>
-            <Text style={styles.serviceDescription}>{item.service_name}</Text>
+            <Text style={styles.serviceDescription}>{item.description}</Text>
             <Text style={styles.servicePrice}>PHP {item.default_price}</Text>
             {item.isActive &&
               isExpanded && ( // Show promo details if expanded
