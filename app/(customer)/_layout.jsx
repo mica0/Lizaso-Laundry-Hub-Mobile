@@ -19,9 +19,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="track"
         options={{
-          tabBarLabel: "Explore",
+          tabBarLabel: "Track Order",
         }}
       />
       <Tabs.Screen

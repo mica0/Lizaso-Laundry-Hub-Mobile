@@ -179,7 +179,7 @@ export default function Index() {
           setOnboardingComplete(true);
           setTimeout(() => {
             router.replace("/auth/sign-in");
-          }, 2000);
+          }, 200);
         } else {
           setSplashVisible(true);
           setTimeout(() => setSplashVisible(false), 2000);

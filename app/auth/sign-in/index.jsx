@@ -82,7 +82,8 @@ export default function SignIn() {
 
         // const response = await login(data);
         if (true) {
-          router.push("/(staff)/pickup");
+          // router.push("/(staff)/pickup");
+          router.push("/(customer)/home");
         } else {
           setErrors((prevErrors) => ({
             ...prevErrors,
