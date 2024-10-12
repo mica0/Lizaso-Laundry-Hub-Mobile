@@ -240,7 +240,7 @@ export default function Pickup() {
         service.request_status === "Ongoing Pickup"
       );
     }
-    if (filter === "Cancel") return service.request_status === "Cancelled";
+    if (filter === "Cancel") return service.request_status === "Canceled";
     return true;
   });
 
@@ -335,7 +335,7 @@ export default function Pickup() {
             <View
               style={{ flexDirection: "row", alignItems: "flex-start", gap: 2 }}
             >
-              {item.request_status !== "Cancelled" &&
+              {item.request_status !== "Canceled" &&
                 item.request_status !== "Pending Pickup" && (
                   <View style={{ position: "relative" }}>
                     <TouchableOpacity

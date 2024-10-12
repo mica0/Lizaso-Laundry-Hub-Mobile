@@ -41,14 +41,18 @@ export default function Qrscan() {
       qrLock.current = true;
       try {
         const response = await updateServiceRequestUsingQRCode(data);
-        console.log("Response from service request:", response);
+        if (response.success) {
+          console.log("Gago success kaya");
+          setTimeout(() => {
+            qrLock.current = false;
+            navigation.goBack();
+          }, 500);
+        } else {
+          console.log(response.message);
+        }
       } catch (error) {
         console.error("Error updating service request:", error);
       }
-      setTimeout(() => {
-        qrLock.current = false; // Unlock scanning
-        navigation.goBack(); // Navigate back after a delay
-      }, 500);
     }
   };
 
