@@ -39,11 +39,8 @@ export default function Qrscan() {
   const handleBarcodeScanned = async ({ data }) => {
     if (data && !qrLock.current) {
       qrLock.current = true;
-      const qrData = {
-        code: data,
-      };
       try {
-        const response = await updateServiceRequestUsingQRCode(data, qrData);
+        const response = await updateServiceRequestUsingQRCode(data);
         console.log("Response from service request:", response);
       } catch (error) {
         console.error("Error updating service request:", error);

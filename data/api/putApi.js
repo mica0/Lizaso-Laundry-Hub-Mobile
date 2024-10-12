@@ -49,18 +49,19 @@ export const updateServiceRequestFinishiPickup = async (requestId) => {
 };
 
 // For ongoing request it use QR CODE
-export const updateServiceRequestUsingQRCode = async (code, qrData) => {
+export const updateServiceRequestUsingQRCode = async (code) => {
   try {
-    const match = code.match(/SR-(\d+)-/);
-    const serviceRequestId = match ? match[1] : null; // Get the matched number
+    const match = code.match(/SR-(\d+)-(.+)/);
+    const serviceRequestId = match ? match[1] : null;
+    const qrData = match ? match[2] : null;
 
-    if (!serviceRequestId) {
+    if (!serviceRequestId || !qrData) {
       throw new Error("Invalid QR code format");
     }
 
     const response = await api.put(
       `/staff/${serviceRequestId}/update-request-qr-code`,
-      qrData
+      { code: qrData }
     );
     return response;
   } catch (error) {
