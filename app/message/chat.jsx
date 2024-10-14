@@ -1,5 +1,5 @@
 import { useRoute, useNavigation } from "@react-navigation/native";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -15,28 +15,38 @@ import { fonts } from "../../constants/fonts";
 import noconvo from "../../assets/images/start_convo.png";
 import { LinearGradient } from "expo-linear-gradient";
 import { setPostNewMessage } from "../../data/api/postApi";
+import { getStaffMessage } from "../../data/api/getApi";
+import usePolling from "../../hooks/usePolling";
+import { useFocusEffect } from "expo-router";
 
 export default function Chat() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { customerId, customerName, sender_type, receiver_type } = route.params;
-
-  // Sample messages data
-  const sampleMessages = [
-    { id: 1, text: "Hi there! How can I assist you today?", sender: "staff" },
-    { id: 2, text: "I need help with my order.", sender: "customer" },
-    {
-      id: 3,
-      text: "Sure! Can you provide me with your order number?",
-      sender: "staff",
-    },
-    { id: 4, text: "It's #12345.", sender: "customer" },
-    { id: 5, text: "Thank you! I will check that for you.", sender: "staff" },
-  ];
-
-  const [messages, setMessages] = useState(sampleMessages);
+  const { customerId, customerName, userId } = route.params;
   const [newMessage, setNewMessage] = useState("");
   const scrollViewRef = useRef();
+
+  const fetchStaffConvo = useCallback(async () => {
+    const response = await getStaffMessage(customerId);
+    return response;
+  }, [customerId]);
+
+  const {
+    data: messages,
+    loading,
+    error,
+    setIsPolling,
+  } = usePolling(fetchStaffConvo, 2000);
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsPolling(true);
+
+      return () => {
+        setIsPolling(false);
+      };
+    }, [])
+  );
 
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
@@ -44,12 +54,10 @@ export default function Chat() {
       const newMsg = {
         receiverId: customerId,
         text: newMessage,
-        senderType: sender_type,
-        receiverType: receiver_type,
       };
 
       try {
-        const response = await setPostNewMessage(senderId, newMsg);
+        // const response = await setPostNewMessage(senderId, newMsg);
       } catch (error) {
         console.error("Failed to send message:", error);
       }
@@ -105,13 +113,13 @@ export default function Chat() {
         ) : (
           messages.map((message) => (
             <View
-              key={message.id}
+              key={message.message_id}
               style={[
                 styles.messageContainer,
-                message.sender === "staff" ? styles.sent : styles.received,
+                message.sender_type === "User" ? styles.sent : styles.received,
               ]}
             >
-              <Text style={styles.messageText}>{message.text}</Text>
+              <Text style={styles.messageText}>{message.message}</Text>
             </View>
           ))
         )}

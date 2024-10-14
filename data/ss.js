@@ -116,3 +116,24 @@
     username: "juandc",
   },
 ];
+
+[
+  {
+    address_line1: "Perez, Bulakan, Bulacan",
+    customer_fullname: "Rose Oriana",
+    customer_id: 1,
+    customer_latitude: "14.766846",
+    customer_longitude: "120.896249",
+    default_price: "60.00",
+    delivery_date: null,
+    distance: "5.57 km",
+    pickup_date: null,
+    request_date: "2024-10-14T08:35:28.000Z",
+    request_id: 59,
+    request_status: "Ongoing Pickup",
+    service_name: "Wash",
+    store_latitude: "14.814821",
+    store_longitude: "120.911270",
+    unread_messages: 0,
+  },
+];

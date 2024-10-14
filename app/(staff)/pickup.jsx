@@ -10,7 +10,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Image,
   ActivityIndicator,
   Pressable,
 } from "react-native";
@@ -24,7 +23,6 @@ import { FlashList } from "@shopify/flash-list";
 import { Portal } from "@gorhom/portal";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
-import nodata from "../../assets/images/no_data.png";
 import Animated, {
   Easing,
   useSharedValue,
@@ -42,7 +40,6 @@ import {
   updateServiceRequestGetLaundry,
 } from "../../data/api/putApi";
 import usePolling from "../../hooks/usePolling";
-import { useLoading } from "../../hooks/useLoading";
 import { useAuth } from "../context/AuthContext";
 
 const AnimatedIcon = () => {
@@ -68,10 +65,9 @@ const AnimatedIcon = () => {
 };
 
 export default function Pickup() {
-  const navigaton = useNavigation();
   const { userDetails } = useAuth();
+  const navigaton = useNavigation();
   const userData = { user_id: userDetails.userId };
-  const { customLoading, startLoading, stopLoading } = useLoading();
   const [notiCount, setNotiCount] = useState({ count: 1 });
   const [filter, setFilter] = useState("All");
   const bottomSheetRef = useRef(null);
@@ -80,11 +76,13 @@ export default function Pickup() {
   const [selectedService, setSelectedService] = useState(null);
 
   // #Data Section
-
   const fetchLaundryPickup = useCallback(async () => {
-    const response = await getLaundryPickup(userDetails.storeId);
+    const response = await getLaundryPickup(
+      userDetails.storeId,
+      userDetails.userId
+    );
     return response;
-  }, [userDetails.storeId]);
+  }, [userDetails.storeId, userDetails.userId]);
 
   const {
     data: pickupData,
@@ -179,8 +177,6 @@ export default function Pickup() {
 
   //#PICKUP PENDING TO ONGOING
   const handleGetLaundry = async (id) => {
-    startLoading();
-
     try {
       const response = await updateServiceRequestGetLaundry(id, userData);
       if (response.success) {
@@ -191,7 +187,6 @@ export default function Pickup() {
     } catch (error) {
       console.error("Error getting request:", error);
     } finally {
-      stopLoading();
       bottomPendingSheet.current?.close();
     }
   };
@@ -220,8 +215,7 @@ export default function Pickup() {
     navigaton.navigate("message/chat", {
       customerId: id,
       customerName: name,
-      sender_type: "Staff",
-      receiver_type: "Customer",
+      userId: userDetails.userId,
     });
   };
 
@@ -289,7 +283,7 @@ export default function Pickup() {
       statusText = "Pending";
     } else if (item.request_status === "Ongoing Pickup") {
       backgroundColor = COLORS.success;
-      iconComponent = <AnimatedIcon />;
+      // iconComponent = <AnimatedIcon />;
       statusText = "Ongoing";
     } else if (item.request_status === "Cancel") {
       iconName = "book-cancel-outline";
@@ -356,15 +350,17 @@ export default function Pickup() {
                         size={24}
                         color={COLORS.primary}
                       />
-                      {1 > 0 && (
+                      {item.unread_messages > 0 && (
                         <View style={styles.badge}>
                           <Text
                             style={[
                               styles.badgeText,
-                              { fontSize: 1 > 99 ? 10 : 12 },
+                              { fontSize: item.unread_messages > 99 ? 10 : 12 }, // Adjust font size based on the unread count
                             ]}
                           >
-                            {1 > 99 ? "99+" : 1}
+                            {item.unread_messages > 99
+                              ? "99+"
+                              : item.unread_messages}
                           </Text>
                         </View>
                       )}

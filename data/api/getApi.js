@@ -34,9 +34,11 @@ export const getCustomerMessage = async (id, data) => {
 // # LAUNDRY PICKUP MODULE
 
 // Get Customer request services for laundry pickup module
-export const getLaundryPickup = async (storeId) => {
+export const getLaundryPickup = async (storeId, user_id) => {
   try {
-    const response = await api.get(`/staff/${storeId}/get-laundry-pickup`);
+    const response = await api.get(`/staff/${storeId}/get-laundry-pickup`, {
+      params: { user_id },
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -58,7 +60,7 @@ export const getLaundryDelivery = async (data) => {
 // #MESSAGE MODULE
 export const getStaffMessage = async (id) => {
   try {
-    const response = await api.get(`/staff/${id}/get-staff-list-convo`);
+    const response = await api.get(`/staff/${id}/get-staff-convo`);
     return response.data;
   } catch (error) {
     throw error;
