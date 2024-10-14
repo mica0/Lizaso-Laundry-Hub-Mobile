@@ -12,9 +12,11 @@ import { useEffect, useRef } from "react";
 import { useRoute } from "@react-navigation/native";
 import { Overlay } from "./overlay";
 import { updateServiceRequestUsingQRCode } from "../../data/api/putApi";
+import useAuth from "../context/AuthContext";
 
 export default function Qrscan() {
   const qrLock = useRef(false);
+  const { userDetails } = useAuth();
   const appState = useRef(AppState.currentState);
   const route = useRoute();
   const navigation = useNavigation();
@@ -40,7 +42,10 @@ export default function Qrscan() {
     if (data && !qrLock.current) {
       qrLock.current = true;
       try {
-        const response = await updateServiceRequestUsingQRCode(data);
+        const response = await updateServiceRequestUsingQRCode(
+          data,
+          userDetails.userId
+        );
         if (response.success) {
           console.log("Gago success kaya");
           setTimeout(() => {

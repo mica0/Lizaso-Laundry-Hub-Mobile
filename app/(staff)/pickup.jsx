@@ -43,6 +43,7 @@ import {
 } from "../../data/api/putApi";
 import usePolling from "../../hooks/usePolling";
 import { useLoading } from "../../hooks/useLoading";
+import { useAuth } from "../context/AuthContext";
 
 const AnimatedIcon = () => {
   const rotation = useSharedValue(0);
@@ -68,6 +69,8 @@ const AnimatedIcon = () => {
 
 export default function Pickup() {
   const navigaton = useNavigation();
+  const { userDetails } = useAuth();
+  const userData = { user_id: userDetails.userId };
   const { customLoading, startLoading, stopLoading } = useLoading();
   const [notiCount, setNotiCount] = useState({ count: 1 });
   const [filter, setFilter] = useState("All");
@@ -77,13 +80,11 @@ export default function Pickup() {
   const [selectedService, setSelectedService] = useState(null);
 
   // #Data Section
-  const [storeId] = useState(1);
 
   const fetchLaundryPickup = useCallback(async () => {
-    // console.log("Fetching laundry pickup data for store ID:", storeId);
-    const response = await getLaundryPickup(storeId);
+    const response = await getLaundryPickup(userDetails.storeId);
     return response;
-  }, [storeId]);
+  }, [userDetails.storeId]);
 
   const {
     data: pickupData,
@@ -145,7 +146,7 @@ export default function Pickup() {
     bottomPendingSheet.current?.close();
   };
 
-  // Ongoing
+  // PENDING ONGOING TO COMPLETED PICKUP
   const handleFinishPickup = async (id) => {
     try {
       const response = await updateServiceRequestFinishiPickup(id);
@@ -160,9 +161,10 @@ export default function Pickup() {
     }
   };
 
+  //#PICKUP ONGOING TO PENDING
   const handleReturnToPending = async (id) => {
     try {
-      const response = await updateServiceRequestBackToPending(id);
+      const response = await updateServiceRequestBackToPending(id, userData);
       if (response.success) {
         console.log("Request back to pending successfully.");
       } else {
@@ -175,12 +177,12 @@ export default function Pickup() {
     }
   };
 
-  // Pending
+  //#PICKUP PENDING TO ONGOING
   const handleGetLaundry = async (id) => {
     startLoading();
 
     try {
-      const response = await updateServiceRequestGetLaundry(id);
+      const response = await updateServiceRequestGetLaundry(id, userData);
       if (response.success) {
         console.log("Request get laundry successfully.");
       } else {
@@ -194,10 +196,12 @@ export default function Pickup() {
     }
   };
 
+  //#PICKUP PENDING TO CANCEL
   const handleCancelRequest = async (id) => {
     startLoading();
+
     try {
-      const response = await updateServiceRequestCancel(id);
+      const response = await updateServiceRequestCancel(id, userData);
       if (response.success) {
         console.log("Request cancelled successfully.");
       } else {

@@ -95,3 +95,24 @@
     valid_days: null,
   },
 ];
+
+[
+  {
+    email: "juan@example.com",
+    firstname: "Juan",
+    fullName: "Juan Dela Cruz",
+    lastname: "Cruz",
+    middlename: "Dela",
+    permissions: {
+      canDelete: false,
+      canEdit: true,
+      canRead: true,
+      canWrite: true,
+    },
+    phone: "09123456789",
+    roleName: "Staff",
+    storeId: 1,
+    userId: 6,
+    username: "juandc",
+  },
+];

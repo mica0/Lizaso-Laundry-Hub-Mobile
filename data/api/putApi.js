@@ -1,11 +1,15 @@
 import { api } from "../axios";
+
 // CUSTOMER SECTION API REQUEST
 
 // STAFF SECTION API REQUEST
 // For pending cancel request
-export const updateServiceRequestCancel = async (requestId) => {
+export const updateServiceRequestCancel = async (requestId, data) => {
   try {
-    const response = await api.put(`/staff/${requestId}/update-request-cancel`);
+    const response = await api.put(
+      `/staff/${requestId}/update-request-cancel`,
+      data
+    );
     return response;
   } catch (error) {
     throw error;
@@ -13,10 +17,11 @@ export const updateServiceRequestCancel = async (requestId) => {
 };
 
 // For pending get laundry change the request status to ongoing pickup
-export const updateServiceRequestGetLaundry = async (requestId) => {
+export const updateServiceRequestGetLaundry = async (requestId, data) => {
   try {
     const response = await api.put(
-      `/staff/${requestId}/update-request-ongoing`
+      `/staff/${requestId}/update-request-ongoing`,
+      data
     );
     return response;
   } catch (error) {
@@ -25,10 +30,11 @@ export const updateServiceRequestGetLaundry = async (requestId) => {
 };
 
 // For ongoing service request back to pending pickup
-export const updateServiceRequestBackToPending = async (requestId) => {
+export const updateServiceRequestBackToPending = async (requestId, data) => {
   try {
     const response = await api.put(
-      `/staff/${requestId}/update-request-back-pending`
+      `/staff/${requestId}/update-request-back-pending`,
+      data
     );
     return response;
   } catch (error) {
@@ -49,7 +55,7 @@ export const updateServiceRequestFinishiPickup = async (requestId) => {
 };
 
 // For ongoing request it use QR CODE
-export const updateServiceRequestUsingQRCode = async (code) => {
+export const updateServiceRequestUsingQRCode = async (code, id) => {
   try {
     const match = code.match(/SR-(\d+)-(.+)/);
     const serviceRequestId = match ? match[1] : null;
@@ -61,7 +67,7 @@ export const updateServiceRequestUsingQRCode = async (code) => {
 
     const response = await api.put(
       `/staff/${serviceRequestId}/update-request-qr-code`,
-      { code: qrData }
+      { code: qrData, user_id: id }
     );
     return response;
   } catch (error) {
