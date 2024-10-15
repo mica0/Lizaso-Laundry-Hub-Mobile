@@ -17,9 +17,7 @@ export default function Track() {
       <SafeAreaView style={styles.container}>
         <Text
           style={{ fontSize: 40, fontFamily: fonts.Regular, marginBottom: 16 }}
-        >
-          Explore
-        </Text>
+        ></Text>
       </SafeAreaView>
     </LinearGradient>
   );

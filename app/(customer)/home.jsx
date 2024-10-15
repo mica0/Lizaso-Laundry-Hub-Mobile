@@ -68,9 +68,8 @@ export default function Home() {
   const storeId = 1;
 
   const fetchLaundryServices = useCallback(async () => {
-    // console.log("Fetching laundry pickup data for store ID:", storeId);
     const response = await getLaundryServices(storeId);
-    return response;
+    return response.data;
   }, [storeId]);
 
   const {
@@ -78,7 +77,7 @@ export default function Home() {
     loading,
     error,
     setIsPolling,
-  } = usePolling(fetchLaundryServices, 2000);
+  } = usePolling(fetchLaundryServices, 10000);
 
   useFocusEffect(
     useCallback(() => {
@@ -113,63 +112,6 @@ export default function Home() {
       />
     );
   };
-
-  // const renderServiceItem = ({ item }) => {
-  //   return (
-  //     <View style={styles.serviceItem}>
-  //       <Image source={{ uri: item.image }} style={styles.serviceImage} />
-  //       <View style={styles.serviceInfo}>
-  //         <Text style={styles.serviceName}>{item.name}</Text>
-  //         <Text style={styles.serviceDescription}>{item.description}</Text>
-  //         <Text style={styles.servicePrice}>{item.price}</Text>
-  //         <TouchableOpacity style={styles.serviceButton}>
-  //           <Text style={styles.buttonText}>Select</Text>
-  //         </TouchableOpacity>
-  //       </View>
-  //       {item.promo && <Text style={styles.promoBadge}>Promo</Text>}
-  //       {/* Promo Badge */}
-  //     </View>
-  //   );
-  // };
-  // const [expanded, setExpanded] = useState(false);
-
-  // const renderServiceItem = ({ item }) => {
-  //   const toggleDetails = () => {
-  //     setExpanded(!expanded);
-  //   };
-
-  //   return (
-  //     <View style={styles.serviceItem}>
-  //       <Image source={{ uri: item.image }} style={styles.serviceImage} />
-  //       <View style={styles.serviceInfo}>
-  //         <Text style={styles.serviceName}>{item.name}</Text>
-  //         <Text style={styles.serviceDescription}>{item.description}</Text>
-  //         <Text style={styles.servicePrice}>{item.price}</Text>
-  //         {expanded && (
-  //           <>
-  //             <Text style={styles.promoDetails}>Special Promo Details!</Text>
-  //             <Text style={styles.promoDetails}>Special Promo Details!</Text>
-  //           </>
-  //         )}
-  //         {/* Promo details */}
-  //         <TouchableOpacity style={styles.serviceButton}>
-  //           <Text style={styles.buttonText}>Select</Text>
-  //         </TouchableOpacity>
-  //       </View>
-  //       {item.promo && <Text style={styles.promoBadge}>Promo</Text>}
-  //       <TouchableOpacity
-  //         onPress={toggleDetails}
-  //         style={styles.collapseIconContainer}
-  //       >
-  //         <Ionicons
-  //           name={expanded ? "chevron-up" : "chevron-down"}
-  //           size={24}
-  //           color={COLORS.primary}
-  //         />
-  //       </TouchableOpacity>
-  //     </View>
-  //   );
-  // };
 
   return (
     <LinearGradient
@@ -411,6 +353,63 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
   },
 });
+
+// const renderServiceItem = ({ item }) => {
+//   return (
+//     <View style={styles.serviceItem}>
+//       <Image source={{ uri: item.image }} style={styles.serviceImage} />
+//       <View style={styles.serviceInfo}>
+//         <Text style={styles.serviceName}>{item.name}</Text>
+//         <Text style={styles.serviceDescription}>{item.description}</Text>
+//         <Text style={styles.servicePrice}>{item.price}</Text>
+//         <TouchableOpacity style={styles.serviceButton}>
+//           <Text style={styles.buttonText}>Select</Text>
+//         </TouchableOpacity>
+//       </View>
+//       {item.promo && <Text style={styles.promoBadge}>Promo</Text>}
+//       {/* Promo Badge */}
+//     </View>
+//   );
+// };
+// const [expanded, setExpanded] = useState(false);
+
+// const renderServiceItem = ({ item }) => {
+//   const toggleDetails = () => {
+//     setExpanded(!expanded);
+//   };
+
+//   return (
+//     <View style={styles.serviceItem}>
+//       <Image source={{ uri: item.image }} style={styles.serviceImage} />
+//       <View style={styles.serviceInfo}>
+//         <Text style={styles.serviceName}>{item.name}</Text>
+//         <Text style={styles.serviceDescription}>{item.description}</Text>
+//         <Text style={styles.servicePrice}>{item.price}</Text>
+//         {expanded && (
+//           <>
+//             <Text style={styles.promoDetails}>Special Promo Details!</Text>
+//             <Text style={styles.promoDetails}>Special Promo Details!</Text>
+//           </>
+//         )}
+//         {/* Promo details */}
+//         <TouchableOpacity style={styles.serviceButton}>
+//           <Text style={styles.buttonText}>Select</Text>
+//         </TouchableOpacity>
+//       </View>
+//       {item.promo && <Text style={styles.promoBadge}>Promo</Text>}
+//       <TouchableOpacity
+//         onPress={toggleDetails}
+//         style={styles.collapseIconContainer}
+//       >
+//         <Ionicons
+//           name={expanded ? "chevron-up" : "chevron-down"}
+//           size={24}
+//           color={COLORS.primary}
+//         />
+//       </TouchableOpacity>
+//     </View>
+//   );
+// };
 
 // import React, {
 //   useState,
