@@ -46,7 +46,7 @@ export default function Qrscan() {
           data,
           userDetails.userId
         );
-        if (response.success) {
+        if (response) {
           console.log("Gago success kaya");
           setTimeout(() => {
             qrLock.current = false;

@@ -14,7 +14,10 @@ import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
 import noconvo from "../../assets/images/start_convo.png";
 import { LinearGradient } from "expo-linear-gradient";
-import { setPostNewMessage } from "../../data/api/postApi";
+import {
+  createMessageSenderStaff,
+  setPostNewMessage,
+} from "../../data/api/postApi";
 import { getStaffMessage } from "../../data/api/getApi";
 import usePolling from "../../hooks/usePolling";
 import { useFocusEffect } from "expo-router";
@@ -28,7 +31,7 @@ export default function Chat() {
 
   const fetchStaffConvo = useCallback(async () => {
     const response = await getStaffMessage(customerId);
-    return response;
+    return response.data;
   }, [customerId]);
 
   const {
@@ -50,21 +53,49 @@ export default function Chat() {
 
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      const senderId = 3;
-      const newMsg = {
-        receiverId: customerId,
-        text: newMessage,
+      const messageData = {
+        sender_id: userId,
+        receiver_id: customerId,
+        message: newMessage,
       };
 
       try {
-        // const response = await setPostNewMessage(senderId, newMsg);
+        const response = await createMessageSenderStaff(messageData);
+        if (response && response.success) {
+          setNewMessage("");
+        } else {
+          console.error("Message failed to send", response);
+        }
       } catch (error) {
         console.error("Failed to send message:", error);
       }
-
-      setNewMessage("");
+    } else {
+      console.log("Cannot send an empty message.");
     }
   };
+
+  // const handleSendMessage = async () => {
+  //   if (newMessage.trim()) {
+  //     const messageData = {
+  //       sender_id: userId,
+  //       receiver_id: customerId,
+  //       message: newMessage,
+  //     };
+
+  //     try {
+  //       const response = await createMessageSenderStaff(messageData);
+  //       if (response) {
+  //         setNewMessage("");
+  //       } else {
+  //         console.error("Message failed to send", response);
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to send message:", error);
+  //     }
+  //   } else {
+  //     console.log("Cannot send an empty message.");
+  //   }
+  // };
 
   useEffect(() => {
     // Scroll to the bottom when messages update

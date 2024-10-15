@@ -47,7 +47,7 @@ api.interceptors.request.use(
 // Response Interceptor
 api.interceptors.response.use(
   (response) => {
-    return response.data; // Return only the data from the response
+    return response; // Return only the data from the response
   },
   (error) => {
     // Handle any errors

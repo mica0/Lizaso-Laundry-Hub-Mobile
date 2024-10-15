@@ -81,7 +81,7 @@ export default function Pickup() {
       userDetails.storeId,
       userDetails.userId
     );
-    return response;
+    return response.data;
   }, [userDetails.storeId, userDetails.userId]);
 
   const {
@@ -148,7 +148,7 @@ export default function Pickup() {
   const handleFinishPickup = async (id) => {
     try {
       const response = await updateServiceRequestFinishiPickup(id);
-      if (response.success) {
+      if (response) {
       } else {
         console.error("Failed to get request:", response.message);
       }
@@ -163,7 +163,7 @@ export default function Pickup() {
   const handleReturnToPending = async (id) => {
     try {
       const response = await updateServiceRequestBackToPending(id, userData);
-      if (response.success) {
+      if (response) {
         console.log("Request back to pending successfully.");
       } else {
         console.error("Failed to get request:", response.message);
@@ -179,7 +179,7 @@ export default function Pickup() {
   const handleGetLaundry = async (id) => {
     try {
       const response = await updateServiceRequestGetLaundry(id, userData);
-      if (response.success) {
+      if (response) {
         console.log("Request get laundry successfully.");
       } else {
         console.error("Failed to get request:", response.message);
@@ -197,7 +197,7 @@ export default function Pickup() {
 
     try {
       const response = await updateServiceRequestCancel(id, userData);
-      if (response.success) {
+      if (response) {
         console.log("Request cancelled successfully.");
       } else {
         console.error("Failed to cancel request:", response.message);
