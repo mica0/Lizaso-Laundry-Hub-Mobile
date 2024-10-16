@@ -19,11 +19,18 @@ export default function OrderItem({ item, index }) {
     setCollapsedStates(newStates);
   };
 
-  // Going to another screen
+  // Going to message page
   const handleGoToMessage = async (id, name) => {
     navigaton.navigate("message/chat", {
       customerId: id,
       fullname: name,
+    });
+  };
+
+  // Going to message page
+  const handleGoToPayNow = async (id) => {
+    navigaton.navigate("pay/payment", {
+      service_id: id,
     });
   };
 
@@ -93,10 +100,10 @@ export default function OrderItem({ item, index }) {
           <View>
             <TouchableOpacity
               style={styles.qrCodeContainer}
-              onPress={() => enlargeQRCode(qrcode)} // Use the static QR code image
+              onPress={() => enlargeQRCode(qrcode)}
             >
               <Image
-                source={qrcode} // Display the static QR code image
+                source={qrcode}
                 style={styles.qrCodeImage}
                 resizeMode="contain"
               />
@@ -139,7 +146,10 @@ export default function OrderItem({ item, index }) {
               alignItems: "center",
             }}
           >
-            <TouchableOpacity style={styles.compeletePaymentButton}>
+            <TouchableOpacity
+              style={styles.compeletePaymentButton}
+              onPress={() => handleGoToPayNow(item.id)}
+            >
               <Text style={styles.paymentText}>Pay Now</Text>
             </TouchableOpacity>
 
