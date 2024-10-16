@@ -1,16 +1,43 @@
-import { View, Text, StyleSheet } from "react-native";
 import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import Collapsible from "react-native-collapsible";
+import { Portal } from "@gorhom/portal";
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
+import qrcode from "../../assets/images/qrcode.png";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "expo-router";
 
-export default function OrderItem({ item, isExpanded, onToggle }) {
-  const [collapsedStates, setCollapsedStates] = useState(item.map(() => true));
-
-  // Toggle collapsibility for each order's progress
+export default function OrderItem({ item, index }) {
+  const navigaton = useNavigation();
+  const [collapsedStates, setCollapsedStates] = useState(
+    item.progress.map(() => true)
+  );
   const toggleCollapsible = (index) => {
     const newStates = [...collapsedStates];
     newStates[index] = !newStates[index];
     setCollapsedStates(newStates);
+  };
+
+  // Going to another screen
+  const handleGoToMessage = async (id, name) => {
+    navigaton.navigate("message/chat", {
+      customerId: id,
+      fullname: name,
+    });
+  };
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedQRCode, setSelectedQRCode] = useState(null);
+
+  const enlargeQRCode = (qrCode) => {
+    setSelectedQRCode(qrCode);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedQRCode(null);
   };
   return (
     <View style={styles.orderContainer}>
@@ -195,33 +222,28 @@ export default function OrderItem({ item, isExpanded, onToggle }) {
           </View>
         </Collapsible>
       </View>
+      {/* Modal for Enlarged QR Code */}
+      {selectedQRCode && (
+        <Portal>
+          <View style={styles.overlayContainer}>
+            <TouchableOpacity
+              onPress={closeModal}
+              style={styles.overlayBackground}
+            >
+              <Image
+                source={qrcode}
+                style={styles.enlargedQRCode}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+        </Portal>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  carouselContainer: {
-    paddingVertical: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  carouselTitle: {
-    fontSize: 18,
-    textAlign: "center",
-    fontFamily: fonts.Bold,
-    color: COLORS.white,
-  },
-  bottomContainer: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  listContainer: {
-    flex: 1,
-    marginBottom: 40,
-  },
   orderContainer: {
     padding: 10,
   },
@@ -291,7 +313,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: -6,
     top: -6,
-    backgroundColor: "red",
+    backgroundColor: COLORS.error,
     borderRadius: 10,
     width: 18,
     height: 18,
