@@ -13,7 +13,7 @@ import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import Collapsible from "react-native-collapsible";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import qrcode from "../../assets/images/qrcode.png";
 import { Portal } from "@gorhom/portal";
 
@@ -214,10 +214,31 @@ export default function Track() {
               </Text>
             </Text>
           </View>
-          {/* Collapsible Button inside the floating box */}
-          <TouchableOpacity style={styles.compeletePaymentButton}>
-            <Text style={styles.collapsibleText}>Pay Now</Text>
-          </TouchableOpacity>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <TouchableOpacity style={styles.compeletePaymentButton}>
+              <Text style={styles.paymentText}>Pay Now</Text>
+            </TouchableOpacity>
+
+            {/* Message Button with Icon and Badge */}
+            <View style={styles.iconWithBadge}>
+              <TouchableOpacity style={styles.messageButton}>
+                <Ionicons
+                  name="chatbubble-ellipses-outline"
+                  size={24}
+                  color={COLORS.secondary}
+                />
+              </TouchableOpacity>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>3</Text>
+              </View>
+            </View>
+          </View>
         </View>
 
         {/* Divider */}
@@ -395,10 +416,46 @@ const styles = StyleSheet.create({
     marginVertical: 15,
   },
   compeletePaymentButton: {
+    flex: 1,
     padding: 10,
     backgroundColor: COLORS.primary,
     borderRadius: 10,
     alignItems: "center",
+  },
+  paymentText: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontFamily: fonts.SemiBold,
+  },
+  messageButton: {
+    padding: 8,
+    borderWidth: 1,
+    borderColor: COLORS.secondary,
+    borderRadius: 10,
+    alignItems: "center",
+    marginLeft: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  iconWithBadge: {
+    position: "relative",
+    alignItems: "center",
+  },
+  badge: {
+    position: "absolute",
+    right: -6,
+    top: -6,
+    backgroundColor: "red",
+    borderRadius: 10,
+    width: 18,
+    height: 18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  badgeText: {
+    color: "white",
+    fontSize: 10,
+    fontWeight: "bold",
   },
   collapsibleButton: {
     padding: 10,
