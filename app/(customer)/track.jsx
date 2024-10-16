@@ -24,7 +24,43 @@ const orders = [
     customerName: "Jane Smith",
     pickupDate: "2024-10-14",
     deliveryDate: "2024-10-15",
-    totalPrice: "$40.00",
+    totalPrice: "40.00",
+    request_status: "Pending Pickup",
+    service_name: "Wash",
+    service_default_price: "60:00",
+    user_name: "Juan Tamad",
+    progress: [
+      {
+        stage: "Pending Pickup",
+        description: "Pickup requested; staff on the way.",
+        status_date: "2024-10-14 09:00 AM",
+        completed: true,
+        falseDescription:
+          "Pickup request received; waiting for staff assignment.",
+      },
+      {
+        stage: "Ongoing Pickup",
+        description: "Pickup requested; staff on the way.",
+        status_date: "2024-10-14 09:00 AM",
+        completed: false,
+        falseDescription:
+          "Pickup request received; waiting for staff assignment.",
+      },
+      {
+        stage: "Completed Delivery",
+        description: "Delivered and payment confirmed.",
+        status_date: "2024-10-15 05:00 PM",
+        completed: false,
+        falseDescription: "Delivery has not been completed.",
+      },
+    ],
+  },
+  {
+    orderId: "#293BFDFF6FE14FF2AE412",
+    customerName: "Jane Smith",
+    pickupDate: "2024-10-14",
+    deliveryDate: "2024-10-15",
+    totalPrice: "40.00",
     request_status: "Pending Pickup",
     service_name: "Wash",
     service_default_price: "60:00",
@@ -174,7 +210,7 @@ export default function Track() {
                   color: COLORS.secondary,
                 }}
               >
-                {item.totalPrice}
+                ₱{item.totalPrice}
               </Text>
             </Text>
           </View>
@@ -256,31 +292,42 @@ export default function Track() {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={styles.container}>
+        {/* Title for Laundry Items */}
+        <View style={styles.carouselContainer}>
+          <Text style={styles.carouselTitle}>Track Your Laundry Order</Text>
+        </View>
+
         {/* FlatList to display multiple orders */}
-        <FlatList
-          data={orders}
-          renderItem={renderOrderItem}
-          keyExtractor={(item) => item.orderId}
-          contentContainerStyle={{ paddingBottom: 30 }}
-        />
-      </SafeAreaView>
-      {/* Modal for Enlarged QR Code */}
-      {selectedQRCode && (
-        <Portal>
-          <View style={styles.overlayContainer}>
-            <TouchableOpacity
-              onPress={closeModal}
-              style={styles.overlayBackground}
-            >
-              <Image
-                source={qrcode}
-                style={styles.enlargedQRCode}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
+        <View style={styles.bottomContainer}>
+          <View style={styles.listContainer}>
+            <FlatList
+              data={orders}
+              renderItem={renderOrderItem}
+              keyExtractor={(item) => item.orderId}
+              contentContainerStyle={{ paddingBottom: 40 }}
+              showsVerticalScrollIndicator={false}
+            />
           </View>
-        </Portal>
-      )}
+        </View>
+
+        {/* Modal for Enlarged QR Code */}
+        {selectedQRCode && (
+          <Portal>
+            <View style={styles.overlayContainer}>
+              <TouchableOpacity
+                onPress={closeModal}
+                style={styles.overlayBackground}
+              >
+                <Image
+                  source={qrcode}
+                  style={styles.enlargedQRCode}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            </View>
+          </Portal>
+        )}
+      </SafeAreaView>
     </LinearGradient>
   );
 }
@@ -289,21 +336,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  carouselContainer: {
+    paddingVertical: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  carouselTitle: {
+    fontSize: 18,
+    textAlign: "center",
+    fontFamily: fonts.Bold,
+    color: COLORS.white,
+  },
+  bottomContainer: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  listContainer: {
+    flex: 1,
+    marginBottom: 40,
+  },
   orderContainer: {
     padding: 10,
   },
   orderDetailsContainer: {
     padding: 20,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5,
   },
   title: {
     fontSize: 22,
@@ -334,31 +394,32 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
     marginVertical: 15,
   },
-  collapsibleButton: {
-    padding: 10,
-    backgroundColor: COLORS.secondary,
-    borderRadius: 10,
-    alignItems: "center",
-  },
   compeletePaymentButton: {
     padding: 10,
     backgroundColor: COLORS.primary,
     borderRadius: 10,
     alignItems: "center",
   },
+  collapsibleButton: {
+    padding: 10,
+    backgroundColor: COLORS.secondary,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 10,
+  },
   collapsibleText: {
-    color: "#fff",
-    fontSize: 16,
+    color: COLORS.white,
+    fontSize: 14,
     fontFamily: fonts.SemiBold,
   },
   progressContainer: {
     paddingHorizontal: 10,
-    paddingVertical: 20,
+    paddingVertical: 10,
   },
   progressStep: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginBottom: 20,
+    marginBottom: 10,
     position: "relative",
   },
   iconContainer: {
@@ -373,7 +434,7 @@ const styles = StyleSheet.create({
     width: 2,
     height: "100%",
     position: "absolute",
-    top: 30,
+    top: 22,
     zIndex: 0,
   },
   progressItem: {
