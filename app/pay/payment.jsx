@@ -215,13 +215,13 @@ const styles = StyleSheet.create({
   },
 
   breakdownRow: {
-    flexDirection: "column", // Stack items vertically
-    alignItems: "center", // Center items in the row
+    flexDirection: "column",
+    alignItems: "center",
   },
   multiplicationSign: {
     fontFamily: fonts.SemiBold,
     fontSize: 20,
-    color: COLORS.error, // Change to desired color
+    color: COLORS.error,
   },
   laundryWeightLabel: {
     fontSize: 12,
