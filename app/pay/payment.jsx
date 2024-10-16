@@ -52,7 +52,7 @@ export default function Payment() {
           >
             <Ionicons name="arrow-back" size={24} color={COLORS.white} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Complete Payment Details</Text>
+          <Text style={styles.headerTitle}>Payment Details</Text>
         </View>
 
         <View style={styles.bottomContainer}>

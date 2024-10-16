@@ -7,55 +7,44 @@ import {
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import qrcode from "../../assets/images/qrcode.png";
 
 import OrderItem from "../../components/customer/OrderItem";
+import { getLaundryTrackOrder } from "../../data/api/getApi";
+import usePolling from "../../hooks/usePolling";
+import { useFocusEffect } from "expo-router";
+import noOrdersImage from "../../assets/images/no_data.png";
 
 export default function Track() {
-  const [orders, setOrders] = useState([
-    {
-      id: 63,
-      tracking_code: "#293BFDFF6FE14FF2AE41",
-      customerName: "Jane Smith",
-      pickupDate: "2024-10-14",
-      deliveryDate: "2024-10-15",
-      totalPrice: "40.00",
-      request_status: "Pending Pickup",
-      service_name: "Wash",
-      service_default_price: "60:00",
-      user_id: 6,
-      user_name: "Juan Tamad",
-      progress: [
-        {
-          stage: "Pending Pickup",
-          description: "Pickup requested; staff on the way.",
-          status_date: "2024-10-14 09:00 AM",
-          completed: true,
-          falseDescription:
-            "Pickup request received; waiting for staff assignment.",
-        },
-        {
-          stage: "Ongoing Pickup",
-          description: "Pickup requested; staff on the way.",
-          status_date: "2024-10-14 09:00 AM",
-          completed: false,
-          falseDescription:
-            "Pickup request received; waiting for staff assignment.",
-        },
-        {
-          stage: "Completed Delivery",
-          description: "Delivered and payment confirmed.",
-          status_date: "2024-10-15 05:00 PM",
-          completed: false,
-          falseDescription: "Delivery has not been completed.",
-        },
-      ],
-    },
-  ]);
+  // const [orders, setOrders] = useState([track]);
+
+  const storeId = 1;
+
+  const fetchTrackOrder = useCallback(async () => {
+    const response = await getLaundryTrackOrder(storeId);
+    return response.data;
+  }, [storeId]);
+
+  const {
+    data: orders,
+    loading,
+    error,
+    setIsPolling,
+  } = usePolling(fetchTrackOrder, 10000);
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsPolling(true);
+
+      return () => {
+        setIsPolling(false);
+      };
+    }, [])
+  );
 
   const renderOrderItem = ({ item, index }) => (
     <OrderItem item={item} index={index} />
@@ -78,13 +67,24 @@ export default function Track() {
         {/* FlatList to display multiple orders */}
         <View style={styles.bottomContainer}>
           <View style={styles.listContainer}>
-            <FlatList
-              data={orders}
-              renderItem={renderOrderItem}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 40 }}
-              showsVerticalScrollIndicator={false}
-            />
+            {orders.length === 0 ? (
+              <View style={styles.noOrdersContainer}>
+                <Image
+                  source={noOrdersImage}
+                  style={styles.noOrdersImage}
+                  resizeMode="contain"
+                />
+                <Text style={styles.noOrdersText}>No laundry orders yet.</Text>
+              </View>
+            ) : (
+              <FlatList
+                data={orders}
+                renderItem={renderOrderItem}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={{ paddingBottom: 40 }}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
           </View>
         </View>
       </SafeAreaView>
@@ -114,5 +114,22 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     marginBottom: 40,
+  },
+  noOrdersContainer: {
+    flex: 1,
+    justifyContent: "center", // Center vertically
+    alignItems: "center", // Center horizontally
+    padding: 20, // Optional padding
+  },
+  noOrdersImage: {
+    width: 150, // Set width of the image
+    height: 150, // Set height of the image
+    marginBottom: 20, // Space between the image and text
+  },
+  noOrdersText: {
+    fontFamily: fonts.Bold,
+    fontSize: 18,
+    color: COLORS.primary,
+    textAlign: "center",
   },
 });

@@ -4,15 +4,17 @@ import Collapsible from "react-native-collapsible";
 import { Portal } from "@gorhom/portal";
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
-import qrcode from "../../assets/images/qrcode.png";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
+import { format } from "date-fns";
+import QRCode from "react-native-qrcode-svg";
 
 export default function OrderItem({ item, index }) {
   const navigaton = useNavigation();
   const [collapsedStates, setCollapsedStates] = useState(
     item.progress.map(() => true)
   );
+
   const toggleCollapsible = (index) => {
     const newStates = [...collapsedStates];
     newStates[index] = !newStates[index];
@@ -46,24 +48,40 @@ export default function OrderItem({ item, index }) {
     setModalVisible(false);
     setSelectedQRCode(null);
   };
+
+  const {
+    id,
+    user_id,
+    tracking_code,
+    service_name,
+    service_default_price,
+    request_status,
+    user_name,
+    qr_code,
+  } = item.service_request;
+
+  const { stage } = item.progress;
+
+  console.log(item);
+
   return (
     <View style={styles.orderContainer}>
       <View style={styles.orderDetailsContainer}>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }}>
             <Text style={styles.orderTrackTitle}>Tracking Number:</Text>
-            <Text style={styles.orderTrackNumber}>{item.tracking_code}</Text>
+            <Text style={styles.orderTrackNumber}>{tracking_code}</Text>
             <Text style={styles.orderInfo}>
               Status:{" "}
               <Text
                 style={{
                   fontFamily: fonts.Bold,
                   color:
-                    item.request_status === "Pending Pickup"
+                    request_status === "Pending Pickup"
                       ? COLORS.accent
-                      : item.request_status === "Ongoing Pickup"
+                      : request_status === "Ongoing Pickup"
                       ? COLORS.success
-                      : item.request_status === "Completed Pickup"
+                      : request_status === "Completed Pickup"
                       ? COLORS.secondary
                       : "#6C757D",
                   paddingHorizontal: 10,
@@ -71,7 +89,7 @@ export default function OrderItem({ item, index }) {
                   borderRadius: 5,
                 }}
               >
-                {item.request_status}
+                {request_status}
               </Text>
             </Text>
             <Text style={styles.orderInfo}>
@@ -82,7 +100,7 @@ export default function OrderItem({ item, index }) {
                   color: COLORS.secondary,
                 }}
               >
-                {item.service_name}
+                {service_name}
               </Text>
             </Text>
             <Text style={styles.orderInfo}>
@@ -93,20 +111,16 @@ export default function OrderItem({ item, index }) {
                   color: COLORS.secondary,
                 }}
               >
-                {item.service_default_price}
+                {service_default_price}
               </Text>
             </Text>
           </View>
           <View>
             <TouchableOpacity
               style={styles.qrCodeContainer}
-              onPress={() => enlargeQRCode(qrcode)}
+              onPress={() => enlargeQRCode(qr_code)}
             >
-              <Image
-                source={qrcode}
-                style={styles.qrCodeImage}
-                resizeMode="contain"
-              />
+              <QRCode value={qr_code} size={60} style={styles.qrCodeImage} />
               <Text style={styles.tapToEnlarge}>Tap to Enlarge</Text>
             </TouchableOpacity>
           </View>
@@ -124,7 +138,7 @@ export default function OrderItem({ item, index }) {
                   color: COLORS.secondary,
                 }}
               >
-                {item.user_name}
+                {user_name}
               </Text>
             </Text>
             <Text style={styles.orderInfo}>
@@ -135,7 +149,7 @@ export default function OrderItem({ item, index }) {
                   color: COLORS.secondary,
                 }}
               >
-                ₱{item.totalPrice}
+                ₱{1000}
               </Text>
             </Text>
           </View>
@@ -148,7 +162,7 @@ export default function OrderItem({ item, index }) {
           >
             <TouchableOpacity
               style={styles.compeletePaymentButton}
-              onPress={() => handleGoToPayNow(item.id)}
+              onPress={() => handleGoToPayNow(id)}
             >
               <Text style={styles.paymentText}>Pay Now</Text>
             </TouchableOpacity>
@@ -157,7 +171,7 @@ export default function OrderItem({ item, index }) {
             <View style={styles.iconWithBadge}>
               <TouchableOpacity
                 style={styles.messageButton}
-                onPress={() => handleGoToMessage(item.user_id, item.user_name)}
+                onPress={() => handleGoToMessage(user_id, user_name)}
               >
                 <Ionicons
                   name="chatbubble-ellipses-outline"
@@ -192,7 +206,6 @@ export default function OrderItem({ item, index }) {
           <View style={styles.progressContainer}>
             {item.progress.map((stage, stageIndex) => (
               <View key={stageIndex} style={styles.progressStep}>
-                {/* The circle icon with the connecting line */}
                 <View style={styles.iconContainer}>
                   <AntDesign
                     name={stage.completed ? "checkcircle" : "closecircle"}
@@ -212,20 +225,28 @@ export default function OrderItem({ item, index }) {
                     />
                   )}
                 </View>
-
-                {/* Progress details */}
                 <View style={styles.progressItem}>
                   <Text style={styles.stageTitle}>{stage.stage}</Text>
+                  {stage.status_date && (
+                    <Text style={styles.dateText}>
+                      {format(
+                        new Date(stage.status_date),
+                        "MMMM d, yyyy, h:mm a"
+                      )}
+                    </Text>
+                  )}
                   <Text style={styles.description}>
                     {stage.completed
                       ? stage.description
-                      : stage.falseDescription}
+                      : stage.false_description}
                   </Text>
+
+                  {/*                   
                   {stage.completed && stage.status_date && (
                     <Text style={styles.dateText}>
                       Completed on: {stage.status_date}
                     </Text>
-                  )}
+                  )} */}
                 </View>
               </View>
             ))}
@@ -240,8 +261,9 @@ export default function OrderItem({ item, index }) {
               onPress={closeModal}
               style={styles.overlayBackground}
             >
-              <Image
-                source={qrcode}
+              <QRCode
+                value={selectedQRCode}
+                size={250}
                 style={styles.enlargedQRCode}
                 resizeMode="contain"
               />
@@ -387,9 +409,9 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
   dateText: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: fonts.Regular,
-    color: "#6C757D",
+    color: COLORS.secondary,
   },
 
   // qr image

@@ -11,6 +11,14 @@ export const getLaundryServices = async (storeId) => {
 };
 
 // #TRACK ORDER
+export const getLaundryTrackOrder = async (userId) => {
+  try {
+    const response = await api.get(`/customers/${userId}/get-track-order`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // #PAYMENT HISTORY
 
