@@ -25,7 +25,7 @@ import { useFocusEffect } from "expo-router";
 export default function Chat() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { customerId, customerName, userId } = route.params;
+  const { customerId, fullname, userId } = route.params;
   const [newMessage, setNewMessage] = useState("");
   const scrollViewRef = useRef();
 
@@ -74,29 +74,6 @@ export default function Chat() {
     }
   };
 
-  // const handleSendMessage = async () => {
-  //   if (newMessage.trim()) {
-  //     const messageData = {
-  //       sender_id: userId,
-  //       receiver_id: customerId,
-  //       message: newMessage,
-  //     };
-
-  //     try {
-  //       const response = await createMessageSenderStaff(messageData);
-  //       if (response) {
-  //         setNewMessage("");
-  //       } else {
-  //         console.error("Message failed to send", response);
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to send message:", error);
-  //     }
-  //   } else {
-  //     console.log("Cannot send an empty message.");
-  //   }
-  // };
-
   useEffect(() => {
     // Scroll to the bottom when messages update
     if (messages.length > 0) {
@@ -119,7 +96,7 @@ export default function Chat() {
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{customerName}</Text>
+        <Text style={styles.headerTitle}>{fullname}</Text>
         <View style={styles.placeholder} />
       </LinearGradient>
 

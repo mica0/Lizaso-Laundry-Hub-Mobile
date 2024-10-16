@@ -1,94 +1,10 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Image,
-  Modal,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, StyleSheet } from "react-native";
 import React, { useState } from "react";
-import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
-import { LinearGradient } from "expo-linear-gradient";
-import Collapsible from "react-native-collapsible";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
-import qrcode from "../../assets/images/qrcode.png";
-import { Portal } from "@gorhom/portal";
-import { useNavigation } from "expo-router";
-import OrderItem from "../../components/customer/OrderItem";
+import COLORS from "../../constants/colors";
 
-// Sample data with multiple orders
-const orders = [
-  {
-    id: 63,
-    tracking_code: "#293BFDFF6FE14FF2AE41",
-    customerName: "Jane Smith",
-    pickupDate: "2024-10-14",
-    deliveryDate: "2024-10-15",
-    totalPrice: "40.00",
-    request_status: "Pending Pickup",
-    service_name: "Wash",
-    service_default_price: "60:00",
-    user_id: 6,
-    user_name: "Juan Tamad",
-    progress: [
-      {
-        stage: "Pending Pickup",
-        description: "Pickup requested; staff on the way.",
-        status_date: "2024-10-14 09:00 AM",
-        completed: true,
-        falseDescription:
-          "Pickup request received; waiting for staff assignment.",
-      },
-      {
-        stage: "Ongoing Pickup",
-        description: "Pickup requested; staff on the way.",
-        status_date: "2024-10-14 09:00 AM",
-        completed: false,
-        falseDescription:
-          "Pickup request received; waiting for staff assignment.",
-      },
-      {
-        stage: "Completed Delivery",
-        description: "Delivered and payment confirmed.",
-        status_date: "2024-10-15 05:00 PM",
-        completed: false,
-        falseDescription: "Delivery has not been completed.",
-      },
-    ],
-  },
-];
-
-export default function Track() {
-  const navigaton = useNavigation();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedQRCode, setSelectedQRCode] = useState(null);
-  const [expandedItems, setExpandedItems] = useState({});
-
-  const toggleExpanded = (id) => {
-    setExpandedItems((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
-  // Method to handle QR code enlargement
-  const enlargeQRCode = (qrCode) => {
-    setSelectedQRCode(qrCode); // Store the selected QR code
-    setModalVisible(true); // Show the modal
-  };
-
-  // Method to close the modal
-  const closeModal = () => {
-    setModalVisible(false); // Hide the modal
-    setSelectedQRCode(null); // Reset the selected QR code
-  };
-
-  const [collapsedStates, setCollapsedStates] = useState(
-    orders.map(() => true)
-  );
+export default function OrderItem({ item, isExpanded, onToggle }) {
+  const [collapsedStates, setCollapsedStates] = useState(item.map(() => true));
 
   // Toggle collapsibility for each order's progress
   const toggleCollapsible = (index) => {
@@ -96,8 +12,7 @@ export default function Track() {
     newStates[index] = !newStates[index];
     setCollapsedStates(newStates);
   };
-
-  const renderOrderItem = ({ item, index }) => (
+  return (
     <View style={styles.orderContainer}>
       <View style={styles.orderDetailsContainer}>
         <View style={{ flexDirection: "row" }}>
@@ -281,67 +196,6 @@ export default function Track() {
         </Collapsible>
       </View>
     </View>
-    // <OrderItem
-    //   item={item}
-    //   isExpanded={!!expandedItems[item.id]} // Check if this item's ID is in the expanded state
-    //   onToggle={() => toggleExpanded(item.id)} // Pass the toggle function
-    // />
-  );
-
-  // Going to another screen
-  const handleGoToMessage = async (id, name) => {
-    navigaton.navigate("message/chat", {
-      customerId: id,
-      fullname: name,
-    });
-  };
-
-  return (
-    <LinearGradient
-      colors={["#5787C8", "#71C7DA"]}
-      locations={[0, 0.8]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1.5, y: 0 }}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={styles.container}>
-        {/* Title for Laundry Items */}
-        <View style={styles.carouselContainer}>
-          <Text style={styles.carouselTitle}>Track Your Laundry Order</Text>
-        </View>
-
-        {/* FlatList to display multiple orders */}
-        <View style={styles.bottomContainer}>
-          <View style={styles.listContainer}>
-            <FlatList
-              data={orders}
-              renderItem={renderOrderItem}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 40 }}
-              showsVerticalScrollIndicator={false}
-            />
-          </View>
-        </View>
-
-        {/* Modal for Enlarged QR Code */}
-        {selectedQRCode && (
-          <Portal>
-            <View style={styles.overlayContainer}>
-              <TouchableOpacity
-                onPress={closeModal}
-                style={styles.overlayBackground}
-              >
-                <Image
-                  source={qrcode}
-                  style={styles.enlargedQRCode}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
-          </Portal>
-        )}
-      </SafeAreaView>
-    </LinearGradient>
   );
 }
 

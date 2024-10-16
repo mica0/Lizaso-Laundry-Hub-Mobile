@@ -214,7 +214,7 @@ export default function Pickup() {
   const handleGoToMessage = async (id, name) => {
     navigaton.navigate("message/chat", {
       customerId: id,
-      customerName: name,
+      fullname: name,
       userId: userDetails.userId,
     });
   };

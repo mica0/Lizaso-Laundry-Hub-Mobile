@@ -18,41 +18,6 @@ import { ServiceItem } from "../../components/customer/ServiceItem";
 import usePolling from "../../hooks/usePolling";
 import { getLaundryServices } from "../../data/api/getApi";
 
-const sampleServices = [
-  {
-    id: "1",
-    name: "Wash & Fold",
-    description: "Basic wash and fold service.",
-    price: "$15",
-    promo: true, // Added promo flag
-    image: "https://via.placeholder.com/150", // Replace with actual image URL
-  },
-  {
-    id: "2",
-    name: "Dry Cleaning",
-    description: "Professional dry cleaning service.",
-    price: "$25",
-    promo: true,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: "3",
-    name: "Ironing",
-    description: "Expert ironing service.",
-    price: "$10",
-    promo: true, // Added promo flag
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: "4",
-    name: "Laundry Pickup",
-    description: "Convenient laundry pickup service.",
-    price: "$5",
-    promo: true,
-    image: "https://via.placeholder.com/150",
-  },
-];
-
 const laundryItems = [
   { id: "1", name: "Downy" },
   { id: "2", name: "Tide Detergent" },
