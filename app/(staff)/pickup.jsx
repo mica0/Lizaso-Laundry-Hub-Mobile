@@ -193,8 +193,7 @@ export default function Pickup() {
 
   //#PICKUP PENDING TO CANCEL
   const handleCancelRequest = async (id) => {
-    startLoading();
-
+    // startLoading();
     try {
       const response = await updateServiceRequestCancel(id, userData);
       if (response) {
@@ -205,7 +204,7 @@ export default function Pickup() {
     } catch (error) {
       console.error("Error cancelling request:", error);
     } finally {
-      stopLoading();
+      // stopLoading();
       bottomPendingSheet.current?.close();
     }
   };
