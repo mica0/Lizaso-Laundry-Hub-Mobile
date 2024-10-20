@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
           setUserDetails(user);
         } else {
           const sampleUser = {
-            userId: 6,
+            userId: 1,
             storeId: 1,
             firstname: "Juan",
             middlename: "Dela",

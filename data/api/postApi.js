@@ -41,8 +41,8 @@ export const createMessageSenderStaff = async (messageData) => {
       messageData
     );
 
-    console.log("Response from API:", response);
-    return response.data; // Ensure this is correct
+    // console.log("Response from API:", response);
+    return response.data;
   } catch (error) {
     console.error("Error in API function:", error);
     throw error; // This will be caught in the calling function
