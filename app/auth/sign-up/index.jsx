@@ -171,7 +171,10 @@ export default function SignUp() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
         <View style={{ flex: 1, marginHorizontal: 22 }}>
           <View style={{ marginVertical: 10 }}>
             <Text
@@ -248,6 +251,7 @@ export default function SignUp() {
               <Text
                 style={{
                   color: COLORS.error,
+                  fontFamily: fonts.Regular,
                   fontSize: 12,
                   marginTop: 4,
                   marginStart: 10,
@@ -294,6 +298,7 @@ export default function SignUp() {
             {errors.firstname && (
               <Text
                 style={{
+                  fontFamily: fonts.Regular,
                   color: COLORS.error,
                   fontSize: 12,
                   marginTop: 4,
@@ -376,6 +381,7 @@ export default function SignUp() {
             {errors.lastname && (
               <Text
                 style={{
+                  fontFamily: fonts.Regular,
                   color: COLORS.error,
                   fontSize: 12,
                   marginTop: 4,
@@ -423,6 +429,7 @@ export default function SignUp() {
             {errors.username && (
               <Text
                 style={{
+                  fontFamily: fonts.Regular,
                   color: COLORS.error,
                   fontSize: 12,
                   marginTop: 4,
@@ -481,6 +488,7 @@ export default function SignUp() {
             {errors.password && (
               <Text
                 style={{
+                  fontFamily: fonts.Regular,
                   color: COLORS.error,
                   fontSize: 12,
                   marginTop: 4,

@@ -1,11 +1,4 @@
-import axios from "axios";
-
-const BASE_URL = "http://192.168.254.162:3002/api";
-
-const api = axios.create({
-  baseURL: BASE_URL,
-  timeout: 5000,
-});
+import { api } from "../axios";
 
 export const register = async (data) => {
   try {
@@ -18,7 +11,7 @@ export const register = async (data) => {
 
 export const login = async (data) => {
   try {
-    const response = await api.post("/login", data);
+    const response = await api.post("/login-mobile", data);
     return response.data;
   } catch (error) {
     throw error;

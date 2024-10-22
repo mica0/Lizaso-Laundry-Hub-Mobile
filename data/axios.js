@@ -1,24 +1,7 @@
-// import axios from "axios";
-// const API_URL = "http://localhost:3002/api";
-
-// export const axiosPrivate = axios.create({
-//   baseURL: API_URL,
-// });
-
-// import axios from "axios";
-
-// const BASE_URL = "http://192.168.254.162:3002/api";
-
-// export const api = axios.create({
-//   baseURL: BASE_URL,
-//   timeout: 5000,
-// });
-
 import axios from "axios";
 
-// Base URL of your server
-const BASE_URL = "http://192.168.254.162:3002/api";
-// const BASE_URL = "http://192.168.254.139:3002/api";
+// const BASE_URL = "http://192.168.254.162:3002/api";
+const BASE_URL = "http://192.168.254.139:3002/api";
 
 // Create an instance of axios
 export const api = axios.create({
@@ -58,3 +41,19 @@ api.interceptors.response.use(
     return Promise.reject(error); // Pass error to the calling function
   }
 );
+
+// import axios from "axios";
+// const API_URL = "http://localhost:3002/api";
+
+// export const axiosPrivate = axios.create({
+//   baseURL: API_URL,
+// });
+
+// import axios from "axios";
+
+// const BASE_URL = "http://192.168.254.162:3002/api";
+
+// export const api = axios.create({
+//   baseURL: BASE_URL,
+//   timeout: 5000,
+// });
