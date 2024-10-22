@@ -96,13 +96,12 @@ export default function SignIn() {
       }
     }
   };
-
   const handleGoogleSignIn = () => {
-    navigation.navigate("term/term", {});
+    navigation.navigate("auth/google/google", {});
   };
 
   const handleForgetPassword = () => {
-    navigation.navigate("term/term", {});
+    navigation.navigate("auth/forget/forget", {});
   };
 
   return (
@@ -110,10 +109,10 @@ export default function SignIn() {
       colors={["#5787C8", "#71C7DA"]}
       locations={[0, 0.8]}
       start={{ x: 0, y: 0 }}
-      end={{ x: 1.5, y: 0 }}
+      end={{ x: 1.8, y: 0 }}
       style={{ flex: 1 }}
     >
-      <SafeAreaView>
+      <SafeAreaView style={{ flex: 1 }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flexGrow: 1 }}
@@ -124,6 +123,9 @@ export default function SignIn() {
                 source={require("../../../assets/images/lizaso_logo.png")}
                 style={styles.logo}
               />
+              <Text style={styles.welcomeText}>
+                Welcome to Lizaso Laundry Hub!
+              </Text>
             </View>
             <View style={styles.formContainer}>
               {/* Username Field */}
@@ -235,7 +237,7 @@ export default function SignIn() {
                 )}
               </View>
 
-              <TouchableOpacity>
+              <TouchableOpacity onPress={handleForgetPassword}>
                 <Text
                   style={{
                     textAlign: "right",
@@ -291,6 +293,7 @@ export default function SignIn() {
 
               {/* Google Login Button */}
               <TouchableOpacity
+                onPress={handleGoogleSignIn}
                 style={{
                   flexDirection: "row",
                   borderWidth: 2,
@@ -356,15 +359,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
   logoContainer: {
-    flexDirection: "row",
+    flex: 1,
     justifyContent: "center",
-    marginVertical: 5,
+    alignItems: "center",
+    padding: 20,
   },
   logo: {
-    width: 200,
-    height: 200,
+    backgroundColor: COLORS.white,
+    borderRadius: 100,
+    width: 100,
+    height: 100,
+    resizeMode: "contain",
+    shadowColor: "#000", // Shadow color
+    shadowOffset: {
+      width: 0, // Horizontal shadow offset
+      height: 2, // Vertical shadow offset
+    },
+    shadowOpacity: 0.3, // Shadow opacity
+    shadowRadius: 4, // Shadow radius
+    elevation: 5, // For Android shadow
+  },
+  welcomeText: {
+    marginTop: 10,
+    fontSize: 18,
+    fontFamily: fonts.Bold,
+    color: COLORS.white,
   },
   formContainer: {
     flex: 1,

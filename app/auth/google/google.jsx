@@ -1,27 +1,18 @@
-// import { View, Text } from 'react-native'
-// import React from 'react'
-
-// export default function google() {
-//   return (
-//     <View>
-//       <Text>google</Text>
-//     </View>
-//   )
-// }
-
-// Google.jsx
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import COLORS from "../../../constants/colors";
+import { SafeAreaView } from "react-native-safe-area-context";
 // import * as Google from "expo-auth-session/providers/google";
 // import * as WebBrowser from "expo-web-browser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons"; // Icon for back button
+import { fonts } from "../../../constants/fonts";
 
 // Ensure that the WebBrowser session is complete
 // WebBrowser.maybeCompleteAuthSession();
 
-export default function GoogleSignIn() {
+export default function Google() {
   const navigation = useNavigation();
   const [userInfo, setUserInfo] = useState(null);
 
@@ -53,30 +44,30 @@ export default function GoogleSignIn() {
   // };
 
   return (
-    <View style={styles.container}>
-      {/* Back button at the top left */}
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.secondary }}>
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
-        <Ionicons name="arrow-back" size={24} color="black" />
+        <Ionicons name="chevron-back" size={24} color={COLORS.white} />
       </TouchableOpacity>
-
-      {/* Google Sign-In content */}
-      <View style={styles.content}>
-        {userInfo ? (
-          <Text style={styles.text}>Welcome, {userInfo.name}!</Text>
-        ) : (
-          <TouchableOpacity
-            style={styles.signInButton}
-            disabled={!request}
-            onPress={() => promptAsync()}
-          >
-            <Text style={styles.buttonText}>Continue with Google</Text>
-          </TouchableOpacity>
-        )}
+      <View style={styles.container}>
+        {/* Google Sign-In content */}
+        <View style={styles.content}>
+          {userInfo ? (
+            <Text style={styles.text}>Welcome, {userInfo.name}!</Text>
+          ) : (
+            <TouchableOpacity
+              style={styles.signInButton}
+              // disabled={!request}
+              onPress={() => promptAsync()}
+            >
+              <Text style={styles.buttonText}>Continue with Google</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -86,13 +77,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 50,
     paddingHorizontal: 20,
+    backgroundColor: COLORS.background,
   },
-  backButton: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    zIndex: 1,
-  },
+
   content: {
     flex: 1,
     justifyContent: "center",
@@ -103,14 +90,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   signInButton: {
-    backgroundColor: "#4285F4", // Google blue color
+    backgroundColor: COLORS.secondary,
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 5,
   },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 10,
+    marginVertical: 10,
+    marginBottom: 15,
+  },
   buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
+    color: COLORS.white,
+    fontFamily: fonts.Bold,
   },
 });

@@ -166,7 +166,7 @@ export default function SignUp() {
   };
 
   const handleTermAndConditons = () => {
-    navigation.navigate("term/term", {});
+    navigation.navigate("auth/term/term", {});
   };
 
   return (
