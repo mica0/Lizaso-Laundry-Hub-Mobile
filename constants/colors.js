@@ -6,9 +6,12 @@ const COLORS = {
   divider: "#ddd",
 
   // Text Colors
+  text: "#393939",
   text1: "#161616",
   text2: "#2C2C2C",
   text3: "#393939",
+
+  subtitle: "#666666",
 
   // Primary and Secondary colors
   primary: "#595959",

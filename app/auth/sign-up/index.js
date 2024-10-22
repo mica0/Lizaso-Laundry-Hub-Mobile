@@ -165,6 +165,10 @@ export default function SignUp() {
     }
   };
 
+  const handleTermAndConditons = () => {
+    navigation.navigate("term/term", {});
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -506,7 +510,7 @@ export default function SignUp() {
               >
                 I agree with terms the{" "}
               </Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={handleTermAndConditons}>
                 <Text
                   style={{
                     color: COLORS.secondary,
