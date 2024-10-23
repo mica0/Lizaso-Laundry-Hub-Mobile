@@ -71,6 +71,8 @@ export default function Home() {
     );
   };
 
+  console.log(servicesData);
+
   return (
     <LinearGradient
       colors={["#5787C8", "#71C7DA"]}
@@ -85,7 +87,10 @@ export default function Home() {
           <View style={styles.header}>
             <View>
               <Text style={styles.staffName}>{userDetails.fullname}</Text>
-              <Text style={styles.storeName}>{userDetails.username}</Text>
+              <Text style={styles.storeName}>
+                {userDetails.header_address}, {userDetails.sub_province},{" "}
+                {userDetails.sub_city}{" "}
+              </Text>
             </View>
 
             <TouchableOpacity
@@ -117,7 +122,7 @@ export default function Home() {
           <Text style={styles.carouselTitle}>Available Laundry Items</Text>
         </View>
         {/* Carousel for Laundry Items */}
-        <View style={styles.carouselContainer}>
+        {/* <View style={styles.carouselContainer}>
           <FlatList
             data={laundryItems}
             renderItem={({ item }) => (
@@ -130,7 +135,7 @@ export default function Home() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.carouselContent}
           />
-        </View>
+        </View> */}
 
         {/* Services List */}
         <View style={styles.listContainer}>
@@ -167,7 +172,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Medium,
     fontSize: 14,
     color: COLORS.white,
-    marginTop: 2,
+  },
+  sub_add: {
+    fontFamily: fonts.Medium,
+    fontSize: 12,
+    color: COLORS.white,
   },
   notificationIcon: {
     borderWidth: 1,
