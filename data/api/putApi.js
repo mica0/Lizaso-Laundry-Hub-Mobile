@@ -1,6 +1,17 @@
 import { api } from "../axios";
 
 // CUSTOMER SECTION API REQUEST
+export const updateCustomerDetails = async (userId, data) => {
+  try {
+    const response = await api.put(
+      `/customers/${userId}/update-customer-details`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // STAFF SECTION API REQUEST
 // For pending cancel request

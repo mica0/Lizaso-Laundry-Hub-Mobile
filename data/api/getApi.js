@@ -11,6 +11,15 @@ export const getCheckCustomerDetails = async (userId) => {
   }
 };
 
+export const getStoreList = async () => {
+  try {
+    const response = await api.get(`/customers/get-store-list`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // export const getUserDetails = async () => {
 //   try {
 //     const response = await api.get(`/mobile-users/me`);

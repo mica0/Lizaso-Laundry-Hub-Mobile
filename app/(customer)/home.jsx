@@ -10,6 +10,7 @@ import { fonts } from "../../constants/fonts";
 import { ServiceItem } from "../../components/customer/ServiceItem";
 import usePolling from "../../hooks/usePolling";
 import { getLaundryServices } from "../../data/api/getApi";
+import useAuth from "../context/AuthContext";
 
 const laundryItems = [
   { id: "1", name: "Downy" },
@@ -21,14 +22,13 @@ const laundryItems = [
 
 export default function Home() {
   const navigation = useNavigation();
+  const { userDetails } = useAuth();
   const [notiCount, setNotiCount] = useState({ count: 1 });
 
-  const storeId = 1;
-
   const fetchLaundryServices = useCallback(async () => {
-    const response = await getLaundryServices(storeId);
+    const response = await getLaundryServices(userDetails.storeId);
     return response.data;
-  }, [storeId]);
+  }, [userDetails.storeId]);
 
   const {
     data: servicesData,
@@ -61,6 +61,8 @@ export default function Home() {
     }));
   };
 
+  console.log(servicesData);
+
   const renderServiceItem = ({ item }) => {
     return (
       <ServiceItem
@@ -84,8 +86,8 @@ export default function Home() {
         <View style={{ marginBottom: 1, marginStart: 20, marginTop: 10 }}>
           <View style={styles.header}>
             <View>
-              <Text style={styles.staffName}>John Doe</Text>
-              <Text style={styles.storeName}>123 Main St, Springfield</Text>
+              <Text style={styles.staffName}>{userDetails.fullname}</Text>
+              <Text style={styles.storeName}>{userDetails.username}</Text>
             </View>
 
             <TouchableOpacity

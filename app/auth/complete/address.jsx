@@ -137,6 +137,7 @@ export default function Address() {
         country: country,
         province: province,
         city: city,
+        postal_code: postalCode,
         latitude: location.latitude,
         longitude: location.longitude,
       };

@@ -73,15 +73,27 @@ api.interceptors.response.use(
 //   baseURL: BASE_URL,
 //   timeout: 5000,
 // });
-
 [
   {
-    addressLine: "Jaja",
-    city: "Bulakan",
+    address_id: 1,
+    address_line1: "Balagtas",
+    address_line2: "Bulacan",
+    address_updated_at: "2024-10-19T13:15:27.000Z",
+    city: "Balagtas",
     country: "Philippines",
-    latitude: "",
-    longitude: "",
+    date_created: "2024-10-19T13:15:27.000Z",
+    id: 1,
+    isArchive: 0,
+    isStatus: 0,
+    is_main_store: 1,
+    latitude: "14.814821",
+    longitude: "120.911270",
+    postal_code: "3016",
     province: "Bulacan",
-    region: "Region III - Central Luzon",
+    store_contact: "Main Contact",
+    store_email: "",
+    store_name: "Lizaso Laundry Hub",
+    store_no: "LIZASO-1729343727423",
+    store_updated_at: null,
   },
 ];
