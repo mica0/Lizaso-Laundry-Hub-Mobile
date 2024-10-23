@@ -84,12 +84,25 @@ export default function Home() {
       <SafeAreaView style={styles.container}>
         {/* Upper Design */}
         <View style={{ marginBottom: 1, marginStart: 20, marginTop: 10 }}>
-          <View style={styles.header}>
-            <View>
+          <View
+            style={[
+              styles.header,
+              {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              },
+            ]}
+          >
+            <View style={{ flex: 1, paddingRight: 20 }}>
               <Text style={styles.staffName}>{userDetails.fullname}</Text>
-              <Text style={styles.storeName}>
+              <Text
+                style={styles.address}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 {userDetails.header_address}, {userDetails.sub_province},{" "}
-                {userDetails.sub_city}{" "}
+                {userDetails.sub_city}
               </Text>
             </View>
 
@@ -117,6 +130,7 @@ export default function Home() {
             </TouchableOpacity>
           </View>
         </View>
+
         {/* Title for Laundry Items */}
         <View style={styles.carouselTitleContainer}>
           <Text style={styles.carouselTitle}>Available Laundry Items</Text>
@@ -168,9 +182,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: COLORS.white,
   },
-  storeName: {
+  address: {
     fontFamily: fonts.Medium,
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.white,
   },
   sub_add: {

@@ -97,7 +97,7 @@ export default function Store_Selection() {
 
     const customerData = {
       store_id: selectedStoreId,
-      address_line1: data.addressLine,
+      address_line: data.addressLine,
       country: data.country,
       province: data.province,
       city: data.city,

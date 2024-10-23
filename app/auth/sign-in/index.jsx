@@ -125,6 +125,8 @@ export default function SignIn() {
             } else {
               router.push("/(customer)/home");
             }
+          } else {
+            console.log(details);
           }
         };
         fetchDetails();
