@@ -73,3 +73,15 @@ api.interceptors.response.use(
 //   baseURL: BASE_URL,
 //   timeout: 5000,
 // });
+
+[
+  {
+    addressLine: "Jaja",
+    city: "Bulakan",
+    country: "Philippines",
+    latitude: "",
+    longitude: "",
+    province: "Bulacan",
+    region: "Region III - Central Luzon",
+  },
+];

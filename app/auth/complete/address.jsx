@@ -6,27 +6,21 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import COLORS from "../../../constants/colors";
-import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../../constants/fonts";
 import { useNavigation, useRouter } from "expo-router";
-import Checkbox from "expo-checkbox";
-import { login, register } from "../../../data/api/authApi";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../../context/AuthContext";
-import { getCheckCustomerDetails } from "../../../data/api/getApi";
 import { Picker } from "@react-native-picker/picker";
 import { cities, provinces, regions } from "../../../data/countrySelection";
+import * as Location from "expo-location";
 
 export default function Address() {
   const { userDetails } = useAuth();
   const router = useRouter();
   const navigation = useNavigation();
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
 
   const [addressLine, setAddressLine] = useState("");
   const [country, setCountry] = useState("Philippines");
@@ -34,8 +28,8 @@ export default function Address() {
   const [province, setProvince] = useState("");
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -60,7 +54,7 @@ export default function Address() {
     }
 
     if (!city) {
-      newErrors.province = "City is required";
+      newErrors.city = "City is required";
     }
 
     if (!postalCode) {
@@ -90,7 +84,7 @@ export default function Address() {
       case "city":
         setCity(value);
         break;
-      case "postal":
+      case "postalCode":
         setPostalCode(value);
         break;
       default:
@@ -104,34 +98,57 @@ export default function Address() {
     }));
   };
 
+  const requestLocationPermission = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      console.log("Permission to access location was denied");
+      return false;
+    }
+    return true;
+  };
+
+  const getCurrentLocation = async () => {
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) return null;
+
+    const location = await Location.getCurrentPositionAsync({});
+    return {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+  };
+
   const handleCompleteAddressAndGotoSelectionStore = async () => {
     const newErrors = validateFields();
     setErrors(newErrors);
 
-    // If there are no validation errors
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
+
+      const location = await getCurrentLocation();
+
+      if (!location) {
+        setLoading(false);
+        return;
+      }
 
       const data = {
         addressLine: addressLine,
         country: country,
-        region: region,
         province: province,
         city: city,
+        latitude: location.latitude,
+        longitude: location.longitude,
       };
 
       try {
-        navigation.navigate("auth/complete/store_selection", {});
+        navigation.navigate("auth/complete/store_selection", { data });
       } catch (error) {
         setLoading(false);
       } finally {
         setLoading(false);
       }
     }
-  };
-
-  const handleTermAndConditons = () => {
-    navigation.navigate("auth/term/term", {});
   };
 
   return (
@@ -317,7 +334,6 @@ export default function Address() {
           </View>
 
           {/* Province Selection */}
-          {/* Province Selection */}
           {region && (
             <View style={{ marginBottom: 12 }}>
               <Text
@@ -458,9 +474,9 @@ export default function Address() {
               <TextInput
                 placeholder="Enter the postal code"
                 placeholderTextColor={COLORS.grey}
-                keyboardType="default"
-                value={addressLine}
-                onChangeText={handleInputChange("postal")}
+                keyboardType="numeric"
+                value={postalCode}
+                onChangeText={handleInputChange("postalCode")}
                 style={{ width: "100%", fontFamily: fonts.Regular }}
               />
             </View>

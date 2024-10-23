@@ -49,6 +49,7 @@ export default function RootLayout() {
               <Stack.Screen name="index" />
               <Stack.Screen name="message/chat" />
               <Stack.Screen name="notification/list" />
+              <Stack.Screen name="auth/complete/store_selection" />
             </Stack>
           </AuthProvider>
         </BottomSheetModalProvider>
