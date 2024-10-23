@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
@@ -18,11 +17,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../../constants/fonts";
 import { login } from "../../../data/api/authApi";
 import useAuth from "../../context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getCheckCustomerDetails } from "../../../data/api/getApi";
 
 export default function SignIn() {
   const { userDetails } = useAuth();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("velarde16");
+  const [password, setPassword] = useState("secret123");
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -77,22 +78,20 @@ export default function SignIn() {
       try {
         const response = await login(data);
         if (response.success) {
-          await AsyncStorage.setItem("@accessToken", response.accessToken);
+          await AsyncStorage.setItem("accessToken", response.accessToken);
 
           if (userDetails.user_type === "Customer") {
             const details = await getCheckCustomerDetails(userDetails.userId);
 
             if (details.success !== false) {
-              const { storeIdIsNull, addressIdIsNull } = details;
-
+              const { storeIdIsNull, addressIdIsNull } = details.data;
               if (storeIdIsNull || addressIdIsNull) {
-                router.push("/auth/complete/complete");
+                router.push("/auth/complete/address");
               } else {
                 router.push("/(customer)/home");
               }
             }
           } else {
-            router.push("/(staff)/pickup");
           }
         } else {
           setErrors((prevErrors) => ({
