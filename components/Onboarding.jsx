@@ -129,16 +129,18 @@ export default function Onboarding() {
   };
 
   const skipOnboarding = async () => {
-    console.log("Skip");
-    // await AsyncStorage.setItem("@onboarding_complete", "true");
-    // router.replace("auth/sign-in");
+    await AsyncStorage.setItem("@onboarding_complete", "true");
+    router.replace("auth/sign-in");
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.skipButton} onPress={completeOnboarding}>
-        <Text style={styles.skipText}>Skip</Text>
-      </TouchableOpacity>
+      <View>
+        <TouchableOpacity style={styles.skipButton} onPress={skipOnboarding}>
+          <Text style={styles.skipText}>Skip</Text>
+        </TouchableOpacity>
+      </View>
+
       <Swiper
         style={styles.wrapper}
         showsButtons={false}
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     position: "absolute",
-    top: 20,
+    top: 50,
     right: 20,
     padding: 10,
     backgroundColor: COLORS.secondary, // Optional: add background color

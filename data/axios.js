@@ -14,9 +14,9 @@ export const api = axios.create({
 
 // Request Interceptor
 api.interceptors.request.use(
-  (config) => {
-    // Example: Add a token to every request
-    const token = "your-token-here"; // Replace with actual token logic
+  async (config) => {
+    // Retrieve the token from AsyncStorage
+    const token = await AsyncStorage.getItem("accessToken"); // Ensure the key matches what you use
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -26,6 +26,21 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// Request Interceptor
+// api.interceptors.request.use(
+//   (config) => {
+//     // Example: Add a token to every request
+//     const token = "your-token-here"; // Replace with actual token logic
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 // Response Interceptor
 api.interceptors.response.use(

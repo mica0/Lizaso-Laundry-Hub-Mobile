@@ -2,7 +2,7 @@ import { api } from "../axios";
 
 export const register = async (data) => {
   try {
-    const response = await api.post("/register", data); // Corrected parameter name to 'data'
+    const response = await api.post("/register-mobile", data);
     return response.data;
   } catch (error) {
     throw error;

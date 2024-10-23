@@ -7,8 +7,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
-  ToastAndroid,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import COLORS from "../../../constants/colors";
@@ -16,15 +16,17 @@ import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../../constants/fonts";
 import { useNavigation, useRouter } from "expo-router";
 import Checkbox from "expo-checkbox";
-import { register } from "../../../data/api/authApi";
-// import { initializeApi } from "../../../data/api/authApi";
-import Toast from "../../../components/Toast";
+import { login, register } from "../../../data/api/authApi";
+import { useAuth } from "../../context/AuthContext";
+import { getCheckCustomerDetails } from "../../../data/api/getApi";
 
 export default function SignUp() {
+  const { userDetails } = useAuth();
   const router = useRouter();
   const navigation = useNavigation();
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [firstname, setFirstName] = useState("");
   const [middlename, setMiddleName] = useState("");
@@ -50,6 +52,10 @@ export default function SignUp() {
       newErrors.phoneNumber = "Phone number is required";
     }
 
+    if (!email) {
+      newErrors.email = "Email is required";
+    }
+
     if (!username) {
       newErrors.username = "Username is required";
     }
@@ -72,6 +78,9 @@ export default function SignUp() {
     switch (field) {
       case "phoneNumber":
         setPhoneNumber(value);
+        break;
+      case "email":
+        setEmail(value);
         break;
       case "firstname":
         setFirstName(value);
@@ -113,37 +122,54 @@ export default function SignUp() {
         );
         return;
       }
+      // const data = {
+      //   c_number: phoneNumber,
+      //   c_username: username,
+      //   c_firstname: firstname,
+      //   c_middlename: middlename,
+      //   c_lastname: lastname,
+      //   c_password: password,
+      //   isAgreement: isChecked,
+      // };
+
       const data = {
-        c_number: phoneNumber,
-        c_username: username,
-        c_firstname: firstname,
-        c_middlename: middlename,
-        c_lastname: lastname,
-        c_password: password,
+        mobile_number: phoneNumber,
+        email: email,
+        username: username,
+        firstname: firstname,
+        middlename: middlename,
+        lastname: lastname,
+        password: password,
         isAgreement: isChecked,
       };
 
-      // Set loading state to true
       setLoading(true);
 
       try {
-        // Simulate a delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
         const response = await register(data);
         if (response.success) {
-          Alert.alert(
-            "Success",
-            response.message || "Registration successful",
-            [
-              {
-                text: "OK",
-                onPress: () => {
-                  navigation.goBack();
-                },
-              },
-            ]
-          );
+          const login_response = await login({
+            username: username,
+            password: password,
+          });
+
+          await AsyncStorage.setItem("accessToken", login_response.accessToken);
+
+          if (userDetails.user_type === "Customer") {
+            const details = await getCheckCustomerDetails(userDetails.userId);
+
+            if (details.success !== false) {
+              const { storeIdIsNull, addressIdIsNull } = details;
+
+              if (storeIdIsNull || addressIdIsNull) {
+                router.push("/auth/complete/complete");
+              } else {
+                router.push("/(customer)/home");
+              }
+            }
+          } else {
+            router.push("/(staff)/pickup");
+          }
         } else {
           setErrors((prevErrors) => ({
             ...prevErrors,
@@ -151,13 +177,6 @@ export default function SignUp() {
           }));
         }
       } catch (error) {
-        if (error.response && error.response.data) {
-          console.log(error.response.data.message);
-        } else {
-          console.log(
-            "An unexpected error occurred while creating the service type."
-          );
-        }
         setLoading(false);
       } finally {
         setLoading(false);
@@ -258,6 +277,54 @@ export default function SignUp() {
                 }}
               >
                 {errors.phoneNumber}
+              </Text>
+            )}
+          </View>
+
+          {/* Email */}
+          <View style={{ marginBottom: 12 }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontFamily: fonts.Medium,
+                marginVertical: 8,
+                color: COLORS.primary,
+              }}
+            >
+              Email
+            </Text>
+            <View
+              style={{
+                width: "100%",
+                height: 48,
+                borderColor: errors.email ? COLORS.error : COLORS.primary,
+                borderWidth: 1,
+                borderRadius: 8,
+                alignItems: "center",
+                justifyContent: "center",
+                paddingLeft: 22,
+              }}
+            >
+              <TextInput
+                placeholder="Enter your email address"
+                placeholderTextColor={COLORS.grey}
+                keyboardType="default"
+                value={email}
+                onChangeText={handleInputChange("email")}
+                style={{ width: "100%", fontFamily: fonts.Regular }}
+              />
+            </View>
+            {errors.email && (
+              <Text
+                style={{
+                  fontFamily: fonts.Regular,
+                  color: COLORS.error,
+                  fontSize: 12,
+                  marginTop: 4,
+                  marginStart: 10,
+                }}
+              >
+                {errors.email}
               </Text>
             )}
           </View>

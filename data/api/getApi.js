@@ -1,5 +1,25 @@
 import { api } from "../axios";
 // CUSTOMER SECTION API REQUEST
+export const getCheckCustomerDetails = async (userId) => {
+  try {
+    const response = await api.get(
+      `/customers/${userId}/check-customer-details`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// export const getUserDetails = async () => {
+//   try {
+//     const response = await api.get(`/mobile-users/me`);
+//     return response.data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
 // #SERVICE REQUEST
 export const getLaundryServices = async (storeId) => {
   try {

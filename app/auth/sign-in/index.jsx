@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
@@ -16,8 +17,10 @@ import COLORS from "../../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../../constants/fonts";
 import { login } from "../../../data/api/authApi";
+import useAuth from "../../context/AuthContext";
 
 export default function SignIn() {
+  const { userDetails } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordShown, setIsPasswordShown] = useState(false);
@@ -71,18 +74,26 @@ export default function SignIn() {
         password: password,
       };
 
-      // router.push("/(customer)/home");
-      // router.push("/(staff)/pickup");
-
       try {
-        // await new Promise((resolve) => setTimeout(resolve, 500));
-
         const response = await login(data);
-
         if (response.success) {
-          console.log(response);
-          // router.push("/(staff)/pickup");
-          // router.push("/(customer)/home");
+          await AsyncStorage.setItem("@accessToken", response.accessToken);
+
+          if (userDetails.user_type === "Customer") {
+            const details = await getCheckCustomerDetails(userDetails.userId);
+
+            if (details.success !== false) {
+              const { storeIdIsNull, addressIdIsNull } = details;
+
+              if (storeIdIsNull || addressIdIsNull) {
+                router.push("/auth/complete/complete");
+              } else {
+                router.push("/(customer)/home");
+              }
+            }
+          } else {
+            router.push("/(staff)/pickup");
+          }
         } else {
           setErrors((prevErrors) => ({
             ...prevErrors,
