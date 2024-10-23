@@ -17,6 +17,7 @@ import {
   Keyboard,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -35,6 +36,9 @@ import d_profile1 from "../../assets/images/d_profile1.png";
 import d_profile2 from "../../assets/images/d_profile2.png";
 import d_profile3 from "../../assets/images/d_profile3.png";
 import d_profile4 from "../../assets/images/d_profile4.png";
+import useAuth from "../context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "expo-router";
 
 // Randomize Default Image
 const defaultProfileImages = [d_profile1, d_profile2, d_profile3, d_profile4];
@@ -45,6 +49,8 @@ const getRandomDefaultImage = () => {
 };
 
 export default function Profile() {
+  const { userDetails, logout } = useAuth();
+  const navigation = useNavigation();
   // const snapPoints = useMemo(() => ["40%"], []);
   const [randomProfileImage, setRandomProfileImage] = useState(null);
   const [snapPoints, setSnapPoints] = useState(["10%"]);
@@ -170,6 +176,12 @@ export default function Profile() {
     console.log("Success Update Notifications");
   };
 
+  const handleLogout = async () => {
+    setLoading(true);
+    await logout();
+    setLoading(false);
+    navigation.navigate("auth/sign-in/index");
+  };
   return (
     <LinearGradient
       colors={["#5787C8", "#71C7DA"]}
@@ -260,23 +272,25 @@ export default function Profile() {
             </View>
           </TouchableOpacity>
 
-          <View style={styles.outlineBox}>
-            <View style={styles.rowContainer}>
-              <MaterialCommunityIcons
-                name="logout"
-                size={24}
-                color={COLORS.secondary}
-                style={styles.icon}
-              />
-              <Text style={styles.boxText}>Logout</Text>
-              <Ionicons
-                name="chevron-forward"
-                size={24}
-                color={COLORS.secondary}
-                style={styles.arrow}
-              />
+          <TouchableOpacity activeOpacity={1} onPress={handleLogout}>
+            <View style={styles.outlineBox}>
+              <View style={styles.rowContainer}>
+                <MaterialCommunityIcons
+                  name="logout"
+                  size={24}
+                  color={COLORS.secondary}
+                  style={styles.icon}
+                />
+                <Text style={styles.boxText}>Logout</Text>
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color={COLORS.secondary}
+                  style={styles.arrow}
+                />
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/*BottomSheetModal*/}

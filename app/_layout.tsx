@@ -46,6 +46,7 @@ export default function RootLayout() {
         <BottomSheetModalProvider>
           <AuthProvider>
             <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="auth/sign-in/index" />
               <Stack.Screen name="index" />
               <Stack.Screen name="message/chat" />
               <Stack.Screen name="notification/list" />

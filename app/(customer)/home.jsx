@@ -61,8 +61,6 @@ export default function Home() {
     }));
   };
 
-  console.log(servicesData);
-
   const renderServiceItem = ({ item }) => {
     return (
       <ServiceItem

@@ -147,6 +147,7 @@ export default function SignUp() {
 
       try {
         const response = await register(data);
+
         if (response.success) {
           const login_response = await login({
             username: username,

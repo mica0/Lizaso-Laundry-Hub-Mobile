@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Pressable,
   ActivityIndicator,
   Alert,
 } from "react-native";
@@ -19,7 +18,6 @@ import useAuth from "../../context/AuthContext";
 import { getStoreList } from "../../../data/api/getApi";
 import { updateCustomerDetails } from "../../../data/api/putApi";
 import { calculateDistance } from "../../../constants/method";
-import { id } from "date-fns/locale";
 
 export default function Store_Selection() {
   const route = useRoute();
@@ -115,7 +113,7 @@ export default function Store_Selection() {
       );
 
       if (response.success) {
-        router.push("/(customer)/home");
+        router.push("/auth/sign-in");
       }
     } catch (error) {
       setLoading(false);

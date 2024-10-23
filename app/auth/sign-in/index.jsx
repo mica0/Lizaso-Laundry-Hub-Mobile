@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
@@ -21,9 +21,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getCheckCustomerDetails } from "../../../data/api/getApi";
 
 export default function SignIn() {
-  const { userDetails } = useAuth();
-  const [username, setUsername] = useState("velarde16");
-  const [password, setPassword] = useState("secret123");
+  const { userDetails, fetchUserDetails } = useAuth();
+  const [username, setUsername] = useState(userDetails.username);
+  const [password, setPassword] = useState("");
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -76,23 +76,29 @@ export default function SignIn() {
       };
 
       try {
+        console.log("Before login API call");
         const response = await login(data);
+        console.log("Login response:", response);
+
         if (response.success) {
           await AsyncStorage.setItem("accessToken", response.accessToken);
 
-          if (userDetails.user_type === "Customer") {
-            const details = await getCheckCustomerDetails(userDetails.userId);
+          await fetchUserDetails(response.accessToken);
 
-            if (details.success !== false) {
-              const { storeIdIsNull, addressIdIsNull } = details.data;
-              if (storeIdIsNull || addressIdIsNull) {
-                router.push("/auth/complete/address");
-              } else {
-                router.push("/(customer)/home");
-              }
-            }
-          } else {
-          }
+          // if (userDetails.user_type === "Customer") {
+          //   const details = await getCheckCustomerDetails(userDetails.userId);
+
+          //   if (details.success !== false) {
+          //     const { storeIdIsNull, addressIdIsNull } = details.data;
+          //     if (storeIdIsNull || addressIdIsNull) {
+          //       router.push("/auth/complete/address");
+          //     } else {
+          //       router.push("/(customer)/home");
+          //     }
+          //   }
+          // } else {
+          //   console.log(1);
+          // }
         } else {
           setErrors((prevErrors) => ({
             ...prevErrors,
@@ -106,6 +112,28 @@ export default function SignIn() {
       }
     }
   };
+
+  useEffect(() => {
+    if (userDetails.user_type) {
+      if (userDetails.user_type === "Customer") {
+        const fetchDetails = async () => {
+          const details = await getCheckCustomerDetails(userDetails.userId);
+          if (details.success !== false) {
+            const { storeIdIsNull, addressIdIsNull } = details.data;
+            if (storeIdIsNull || addressIdIsNull) {
+              router.push("/auth/complete/address");
+            } else {
+              router.push("/(customer)/home");
+            }
+          }
+        };
+        fetchDetails();
+      } else {
+        router.push("/(staff)/pickup");
+      }
+    }
+  }, [userDetails]);
+
   const handleGoogleSignIn = () => {
     navigation.navigate("auth/google/google", {});
   };
