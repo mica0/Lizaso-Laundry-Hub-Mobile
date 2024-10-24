@@ -68,6 +68,7 @@ export default function OrderItem({ item, index }) {
     user_name,
     qr_code,
     payment_method,
+    unread_messages,
   } = item.service_request;
 
   return (
@@ -201,6 +202,41 @@ export default function OrderItem({ item, index }) {
 
             {/* Message Button with Icon and Badge */}
             <View style={styles.iconWithBadge}>
+              {user_id > 0 ? (
+                <>
+                  <TouchableOpacity
+                    style={styles.messageButton}
+                    onPress={() => handleGoToMessage(user_id, user_name)}
+                  >
+                    <Ionicons
+                      name="chatbubble-ellipses-outline"
+                      size={24}
+                      color={COLORS.secondary}
+                    />
+                  </TouchableOpacity>
+
+                  {/* Badge element */}
+                  {unread_messages > 0 && (
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>{unread_messages}</Text>
+                    </View>
+                  )}
+                </>
+              ) : (
+                <TouchableOpacity
+                  disabled
+                  style={[styles.messageButton, { opacity: 0.5 }]}
+                >
+                  <Ionicons
+                    name="chatbubble-ellipses-outline"
+                    size={24}
+                    color={COLORS.secondary}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* <View style={styles.iconWithBadge}>
               <TouchableOpacity
                 style={styles.messageButton}
                 onPress={() => handleGoToMessage(user_id, user_name)}
@@ -212,9 +248,9 @@ export default function OrderItem({ item, index }) {
                 />
               </TouchableOpacity>
               <View style={styles.badge}>
-                <Text style={styles.badgeText}>3</Text>
+                <Text style={styles.badgeText}>{unread_messages}</Text>
               </View>
-            </View>
+            </View> */}
           </View>
         </View>
 
