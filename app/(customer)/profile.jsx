@@ -274,20 +274,31 @@ export default function Profile() {
 
           <TouchableOpacity activeOpacity={1} onPress={handleLogout}>
             <View style={styles.outlineBox}>
-              <View style={styles.rowContainer}>
-                <MaterialCommunityIcons
-                  name="logout"
-                  size={24}
-                  color={COLORS.secondary}
-                  style={styles.icon}
-                />
-                <Text style={styles.boxText}>Logout</Text>
-                <Ionicons
-                  name="chevron-forward"
-                  size={24}
-                  color={COLORS.secondary}
-                  style={styles.arrow}
-                />
+              <View
+                style={[
+                  styles.rowContainer,
+                  loading && styles.loadingContainer,
+                ]}
+              >
+                {loading ? (
+                  <ActivityIndicator size="large" color={COLORS.secondary} />
+                ) : (
+                  <>
+                    <MaterialCommunityIcons
+                      name="logout"
+                      size={24}
+                      color={COLORS.secondary}
+                      style={styles.icon}
+                    />
+                    <Text style={styles.boxText}>Logout</Text>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={24}
+                      color={COLORS.secondary}
+                      style={styles.arrow}
+                    />
+                  </>
+                )}
               </View>
             </View>
           </TouchableOpacity>
@@ -724,13 +735,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.secondary,
     borderRadius: 5,
-    // borderTopLeftRadius: 10,
-    // borderBottomLeftRadius: 10,
     padding: 15,
+    height: 60,
     alignItems: "center",
     marginVertical: 10,
     backgroundColor: COLORS.white,
-    // Shadow properties for iOS
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -738,8 +747,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
-
-    // Elevation for Android
     elevation: 1,
   },
   boxText: {
@@ -753,6 +760,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between", // Space out elements
     width: "100%", // Ensure it takes the full width
+  },
+  loadingContainer: {
+    justifyContent: "center", // Center content horizontally
+    alignItems: "center", // Center content vertically
   },
   icon: {
     marginRight: 10, // Space between icon and text

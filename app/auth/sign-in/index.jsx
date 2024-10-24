@@ -76,9 +76,7 @@ export default function SignIn() {
       };
 
       try {
-        console.log("Before login API call");
         const response = await login(data);
-        console.log("Login response:", response);
 
         if (response.success) {
           await AsyncStorage.setItem("accessToken", response.accessToken);

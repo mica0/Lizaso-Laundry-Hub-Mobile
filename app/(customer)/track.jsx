@@ -11,23 +11,21 @@ import React, { useCallback, useState } from "react";
 import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
 import { LinearGradient } from "expo-linear-gradient";
-import qrcode from "../../assets/images/qrcode.png";
 
 import OrderItem from "../../components/customer/OrderItem";
 import { getLaundryTrackOrder } from "../../data/api/getApi";
 import usePolling from "../../hooks/usePolling";
 import { useFocusEffect } from "expo-router";
 import noOrdersImage from "../../assets/images/no_data.png";
+import useAuth from "../context/AuthContext";
 
 export default function Track() {
-  // const [orders, setOrders] = useState([track]);
-
-  const storeId = 1;
+  const { userDetails } = useAuth();
 
   const fetchTrackOrder = useCallback(async () => {
-    const response = await getLaundryTrackOrder(storeId);
+    const response = await getLaundryTrackOrder(userDetails.userId);
     return response.data;
-  }, [storeId]);
+  }, [userDetails.userId]);
 
   const {
     data: orders,

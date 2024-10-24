@@ -14,7 +14,7 @@ import {
   Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { fonts } from "../../constants/fonts";
@@ -327,7 +327,7 @@ export default function Pickup() {
             <View style={{ flex: 1 }}>
               <Text style={styles.customerText}>{item.customer_fullname}</Text>
               <Text style={styles.itemText}>{item.service_name}</Text>
-              <Text style={styles.locationText}>{item.address_line1}</Text>
+              <Text style={styles.locationText}>{item.address_line}</Text>
             </View>
             <View
               style={{ flexDirection: "row", alignItems: "flex-start", gap: 2 }}
@@ -444,19 +444,27 @@ export default function Pickup() {
                   color: COLORS.white,
                 }}
               >
-                Staff Name
+                {userDetails.fullname}
               </Text>
-              <Text
-                style={{
-                  fontFamily: fonts.Medium,
-                  fontSize: 14,
-                  color: COLORS.white,
-                  marginTop: 2,
-                }}
-              >
-                Laundry Store Name
-              </Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <FontAwesome5
+                  name="store"
+                  size={15}
+                  color={COLORS.white}
+                  style={{ marginRight: 5 }} // space between icon and text
+                />
+                <Text
+                  style={{
+                    fontFamily: fonts.Medium,
+                    fontSize: 15,
+                    color: COLORS.white,
+                  }}
+                >
+                  {userDetails.storeName}
+                </Text>
+              </View>
             </View>
+
             {/* Notification Bell Icon */}
             <View style={{ position: "relative" }}>
               <TouchableOpacity
