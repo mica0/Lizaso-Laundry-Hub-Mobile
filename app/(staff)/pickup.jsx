@@ -212,9 +212,8 @@ export default function Pickup() {
   // Going to another screen
   const handleGoToMessage = async (id, name) => {
     navigaton.navigate("message/chat", {
-      customerId: id,
-      fullname: name,
-      userId: userDetails.userId,
+      user_id: id,
+      name: name,
     });
   };
 

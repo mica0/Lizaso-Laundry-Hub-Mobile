@@ -5,7 +5,7 @@ import { api } from "../axios";
 export const getMessages = async (user_one_id, user_two_id) => {
   try {
     const response = await api.get(
-      `/mobile-customer-staff/${user_one_id}-${user_two_id}/get-messages`
+      `/mobile-customer-staff/${user_one_id}/${user_two_id}/get-messages`
     );
     return response.data;
   } catch (error) {

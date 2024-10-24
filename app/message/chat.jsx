@@ -23,7 +23,7 @@ import { getMessages } from "../../data/api/getApi";
 import usePolling from "../../hooks/usePolling";
 import { useFocusEffect } from "expo-router";
 import useAuth from "../context/AuthContext";
-import { encryptMessage } from "../../constants/method";
+import { decryptMessage, encryptMessage } from "../../constants/method";
 
 export default function Chat() {
   const route = useRoute();
@@ -32,10 +32,10 @@ export default function Chat() {
   const { user_id, name } = route.params;
   const [newMessage, setNewMessage] = useState("");
   const scrollViewRef = useRef();
+  const [decryptedMessages, setDecryptedMessages] = useState([]);
 
   const fetchMessages = useCallback(async () => {
     const response = await getMessages(userDetails.userId, user_id);
-    console.log(response);
     return response.data;
   }, [userDetails.userId, user_id]);
 
@@ -44,7 +44,7 @@ export default function Chat() {
     loading,
     error,
     setIsPolling,
-  } = usePolling(fetchMessages, 200000);
+  } = usePolling(fetchMessages, 5000);
 
   useFocusEffect(
     useCallback(() => {
@@ -58,34 +58,50 @@ export default function Chat() {
 
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      const encryptedMessage = encryptMessage(newMessage);
+      try {
+        const encryptedMessage = await encryptMessage(newMessage);
 
-      const messageData = {
-        sender_id: userDetails.userId,
-        receiver_id: user_id,
-        message: encryptedMessage,
-      };
-      console.log(messageData);
-      // try {
-      //   const response = await createNewMessage(messageData);
-      //   if (response && response.success) {
-      //     setNewMessage("");
-      //   } else {
-      //     console.error("Message failed to send", response);
-      //   }
-      // } catch (error) {
-      //   console.error("Failed to send message:", error);
-      // }
+        const messageData = {
+          sender_id: userDetails.userId,
+          recipient_id: user_id,
+          message: encryptedMessage,
+        };
+
+        const response = await createNewMessage(messageData);
+        if (response && response.success) {
+          setNewMessage("");
+        } else {
+          console.error("Message failed to send", response);
+        }
+      } catch (error) {
+        console.error("Failed to send message:", error);
+      }
     } else {
       console.log("Cannot send an empty message.");
     }
   };
 
   useEffect(() => {
-    // Scroll to the bottom when messages update
     if (messages.length > 0) {
       scrollViewRef.current.scrollToEnd({ animated: true });
     }
+  }, [messages]);
+
+  useEffect(() => {
+    const decryptMessages = async () => {
+      const decrypted = await Promise.all(
+        messages.map(async (message) => {
+          const decryptedMessage = await decryptMessage(message.message);
+          return {
+            ...message,
+            message: decryptedMessage,
+          };
+        })
+      );
+      setDecryptedMessages(decrypted);
+    };
+
+    decryptMessages();
   }, [messages]);
 
   return (
@@ -118,7 +134,29 @@ export default function Chat() {
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
       >
-        {messages.length === 0 ? (
+        {decryptedMessages.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Image source={noconvo} style={styles.noConversationImage} />
+            <Text style={styles.startConversationText}>
+              Start a conversation now!
+            </Text>
+          </View>
+        ) : (
+          decryptedMessages.map((message) => (
+            <View
+              key={message.message_id}
+              style={[
+                styles.messageContainer,
+                message.sender_id === userDetails.userId
+                  ? styles.sent
+                  : styles.received,
+              ]}
+            >
+              <Text style={styles.messageText}>{message.message}</Text>
+            </View>
+          ))
+        )}
+        {/* {messages.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Image source={noconvo} style={styles.noConversationImage} />
             <Text style={styles.startConversationText}>
@@ -131,13 +169,17 @@ export default function Chat() {
               key={message.message_id}
               style={[
                 styles.messageContainer,
-                message.sender_type === "User" ? styles.sent : styles.received,
+                message.sender_id === userDetails.userId
+                  ? styles.sent
+                  : styles.received,
               ]}
             >
-              <Text style={styles.messageText}>{message.message}</Text>
+              <Text style={styles.messageText}>
+                {decryptMessage(message.message)}
+              </Text>
             </View>
           ))
-        )}
+        )} */}
       </ScrollView>
 
       {/* Message input field */}

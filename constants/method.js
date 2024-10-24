@@ -70,13 +70,18 @@ export const formatDateNow = () => {
 };
 
 export const encryptMessage = async (message) => {
-  if (!SECRET_KEY) {
-    console.error("Secret key not found!");
-  }
-  console.log(SECRET_KEY);
   const encryptedMessage = await Crypto.digestStringAsync(
     Crypto.CryptoDigestAlgorithm.SHA256,
     message + SECRET_KEY
   );
   return encryptedMessage;
+};
+
+export const decryptMessage = async (encryptedMessage) => {
+  const decrypted = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    encryptedMessage + SECRET_KEY
+  );
+
+  return decrypted;
 };

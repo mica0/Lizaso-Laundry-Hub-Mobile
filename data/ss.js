@@ -589,3 +589,36 @@
     total_amount: 325,
   },
 ];
+
+[
+  {
+    conversation_id: 9,
+    date_read: null,
+    date_sent: "2024-10-24T12:34:29.000Z",
+    id: 4,
+    is_read: 0,
+    message: "195498494a84e452a76d4cd47e36e9fd7baa50cea346f177f104010345d4dc9d",
+    recipient_id: 4,
+    sender_id: 3,
+  },
+  {
+    conversation_id: 9,
+    date_read: null,
+    date_sent: "2024-10-24T12:34:32.000Z",
+    id: 5,
+    is_read: 0,
+    message: "d78fa3899b9d7bd6fc78d9f1163650c3c5c9d5515ccd080386992c8e373e0dbe",
+    recipient_id: 4,
+    sender_id: 3,
+  },
+  {
+    conversation_id: 9,
+    date_read: null,
+    date_sent: "2024-10-24T12:40:59.000Z",
+    id: 6,
+    is_read: 0,
+    message: "b26c051bf4114cf6fd8245d69d9f66d49d4b2ddab019562f62881e5d6fab310d",
+    recipient_id: 4,
+    sender_id: 3,
+  },
+];
