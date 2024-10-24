@@ -13,6 +13,17 @@ export const getMessages = async (user_one_id, user_two_id) => {
   }
 };
 
+export const getInbox = async (userId) => {
+  try {
+    const response = await api.get(
+      `/mobile-customer-staff/${userId}/get-inbox`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // CUSTOMER SECTION API REQUEST
 export const getCheckCustomerDetails = async (userId) => {
   try {

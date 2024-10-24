@@ -66,7 +66,7 @@ const AnimatedIcon = () => {
 
 export default function Pickup() {
   const { userDetails } = useAuth();
-  const navigaton = useNavigation();
+  const navigation = useNavigation();
   const userData = { user_id: userDetails.userId };
   const [notiCount, setNotiCount] = useState({ count: 1 });
   const [filter, setFilter] = useState("All");
@@ -211,7 +211,7 @@ export default function Pickup() {
 
   // Going to another screen
   const handleGoToMessage = async (id, name) => {
-    navigaton.navigate("message/chat", {
+    navigation.navigate("message/chat", {
       user_id: id,
       name: name,
     });

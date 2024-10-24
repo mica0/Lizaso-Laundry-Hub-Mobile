@@ -46,7 +46,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="d_messages"
+          name="inbox"
           options={{
             tabBarLabel: "Message",
             lazy: true,

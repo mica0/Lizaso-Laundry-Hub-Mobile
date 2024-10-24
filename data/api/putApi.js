@@ -1,5 +1,17 @@
 import { api } from "../axios";
 
+// ALL API
+export const updateMessageisRead = async (userId) => {
+  try {
+    const response = await api.put(
+      `/mobile-customer-staff/${userId}/update-message-read`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // CUSTOMER SECTION API REQUEST
 export const updateCustomerDetails = async (userId, data) => {
   try {
