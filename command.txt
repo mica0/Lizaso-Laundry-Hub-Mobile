@@ -40,4 +40,8 @@ npx expo install lottie-react-native
 npx expo install react-native-svg
 npm install date-fns
 npm install --save react-native-collapsible
+npx expo install expo-crypto
+npx expo install expo-constants
+
+
 

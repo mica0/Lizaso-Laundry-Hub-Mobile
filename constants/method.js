@@ -1,3 +1,8 @@
+import * as Crypto from "expo-crypto";
+import Constants from "expo-constants";
+
+const SECRET_KEY = Constants.expoConfig.extra.secretKey;
+
 import { format, isToday, isYesterday, parseISO } from "date-fns";
 export const haversineDistance = (lat1, lon1, lat2, lon2) => {
   const toRadians = (degrees) => (degrees * Math.PI) / 180;
@@ -62,4 +67,16 @@ export const formatDateNow = () => {
     minute: "numeric",
     hour12: true,
   });
+};
+
+export const encryptMessage = async (message) => {
+  if (!SECRET_KEY) {
+    console.error("Secret key not found!");
+  }
+  console.log(SECRET_KEY);
+  const encryptedMessage = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    message + SECRET_KEY
+  );
+  return encryptedMessage;
 };

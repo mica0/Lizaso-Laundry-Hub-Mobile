@@ -68,10 +68,10 @@ export const AuthProvider = ({ children }) => {
           user_type: user.user_type,
         });
       } else {
-        console.error("Error fetching user details:", response.data.message);
+        // console.error("Error fetching user details:", response.data.message);
       }
     } catch (error) {
-      console.error("Error fetching user details:", error);
+      // console.error("Error fetching user details:", error);
     } finally {
       isFetchingRef.current = false;
       setIsLoading(false);

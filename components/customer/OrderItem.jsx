@@ -24,8 +24,8 @@ export default function OrderItem({ item, index }) {
   // Going to message page
   const handleGoToMessage = async (id, name) => {
     navigaton.navigate("message/chat", {
-      customerId: id,
-      fullname: name,
+      user_id: id,
+      name: name,
     });
   };
 

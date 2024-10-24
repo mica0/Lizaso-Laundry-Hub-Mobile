@@ -1,4 +1,18 @@
 import { api } from "../axios";
+
+// ALL AROUND API
+// #MESSAGE MODULE
+export const getMessages = async (user_one_id, user_two_id) => {
+  try {
+    const response = await api.get(
+      `/mobile-customer-staff/${user_one_id}-${user_two_id}/get-messages`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // CUSTOMER SECTION API REQUEST
 export const getCheckCustomerDetails = async (userId) => {
   try {
@@ -64,19 +78,6 @@ export const getReceipt = async (assignmentId) => {
 
 // #PROFILE MANAGEMENT
 
-// #MESSAGE MODULE
-export const getCustomerMessage = async (id, data) => {
-  try {
-    const response = await api.get(
-      `/customer/${id}/get-customer-list-convo`,
-      data
-    );
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
 // STAFF SECTION API REQUEST
 
 // # LAUNDRY PICKUP MODULE
@@ -104,15 +105,5 @@ export const getLaundryDelivery = async (data) => {
 };
 
 //#LAUNDRY DELIVERY MODULE
-
-// #MESSAGE MODULE
-export const getStaffMessage = async (id) => {
-  try {
-    const response = await api.get(`/staff/${id}/get-staff-convo`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
 
 // #PROFILE MANAGEMENT

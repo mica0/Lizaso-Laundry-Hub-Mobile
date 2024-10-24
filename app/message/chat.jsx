@@ -16,30 +16,35 @@ import noconvo from "../../assets/images/start_convo.png";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   createMessageSenderStaff,
+  createNewMessage,
   setPostNewMessage,
 } from "../../data/api/postApi";
-import { getStaffMessage } from "../../data/api/getApi";
+import { getMessages } from "../../data/api/getApi";
 import usePolling from "../../hooks/usePolling";
 import { useFocusEffect } from "expo-router";
+import useAuth from "../context/AuthContext";
+import { encryptMessage } from "../../constants/method";
 
 export default function Chat() {
   const route = useRoute();
+  const { userDetails } = useAuth();
   const navigation = useNavigation();
-  const { customerId, fullname, userId } = route.params;
+  const { user_id, name } = route.params;
   const [newMessage, setNewMessage] = useState("");
   const scrollViewRef = useRef();
 
-  const fetchStaffConvo = useCallback(async () => {
-    const response = await getStaffMessage(customerId);
+  const fetchMessages = useCallback(async () => {
+    const response = await getMessages(userDetails.userId, user_id);
+    console.log(response);
     return response.data;
-  }, [customerId]);
+  }, [userDetails.userId, user_id]);
 
   const {
     data: messages,
     loading,
     error,
     setIsPolling,
-  } = usePolling(fetchStaffConvo, 2000);
+  } = usePolling(fetchMessages, 200000);
 
   useFocusEffect(
     useCallback(() => {
@@ -53,22 +58,24 @@ export default function Chat() {
 
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      const messageData = {
-        sender_id: userId,
-        receiver_id: customerId,
-        message: newMessage,
-      };
+      const encryptedMessage = encryptMessage(newMessage);
 
-      try {
-        const response = await createMessageSenderStaff(messageData);
-        if (response && response.success) {
-          setNewMessage("");
-        } else {
-          console.error("Message failed to send", response);
-        }
-      } catch (error) {
-        console.error("Failed to send message:", error);
-      }
+      const messageData = {
+        sender_id: userDetails.userId,
+        receiver_id: user_id,
+        message: encryptedMessage,
+      };
+      console.log(messageData);
+      // try {
+      //   const response = await createNewMessage(messageData);
+      //   if (response && response.success) {
+      //     setNewMessage("");
+      //   } else {
+      //     console.error("Message failed to send", response);
+      //   }
+      // } catch (error) {
+      //   console.error("Failed to send message:", error);
+      // }
     } else {
       console.log("Cannot send an empty message.");
     }
@@ -96,7 +103,7 @@ export default function Chat() {
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{fullname}</Text>
+        <Text style={styles.headerTitle}>{name}</Text>
         <View style={styles.placeholder} />
       </LinearGradient>
 

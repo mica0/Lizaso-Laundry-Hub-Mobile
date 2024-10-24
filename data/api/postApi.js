@@ -1,4 +1,18 @@
 import { api } from "../axios";
+
+// ALL AROUND API
+export const createNewMessage = async (messageData) => {
+  try {
+    const response = await api.post(
+      `/mobile-customer-staff/set-new-messsages`,
+      messageData
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // CUSTOMER SECTION API REQUEST
 
 // STAFF SECTION API REQUEST
