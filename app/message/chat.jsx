@@ -34,6 +34,8 @@ export default function Chat() {
   const scrollViewRef = useRef();
   const [decryptedMessages, setDecryptedMessages] = useState([]);
 
+  console.log(user_id);
+
   const fetchMessages = useCallback(async () => {
     const response = await getMessages(userDetails.userId, user_id);
     return response.data;
