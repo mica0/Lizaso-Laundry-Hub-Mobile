@@ -30,9 +30,17 @@ export default function OrderItem({ item, index }) {
   };
 
   // Going to message page
-  const handleViewRecipt = async (id) => {
+  const handleViewRecipt = async (
+    id,
+    payment_method,
+    service_default_price,
+    service_name
+  ) => {
     navigaton.navigate("receipt/receipt", {
       assignment_id: id,
+      payment_method: payment_method,
+      base_price: service_default_price,
+      service_name: service_name,
     });
   };
 
@@ -59,6 +67,7 @@ export default function OrderItem({ item, index }) {
     request_status,
     user_name,
     qr_code,
+    payment_method,
   } = item.service_request;
 
   return (
@@ -177,7 +186,14 @@ export default function OrderItem({ item, index }) {
                   opacity: 0.5,
                 },
               ]}
-              onPress={() => handleViewRecipt(assignment_id)}
+              onPress={() =>
+                handleViewRecipt(
+                  assignment_id,
+                  payment_method,
+                  service_default_price,
+                  service_name
+                )
+              }
               disabled={assignment_id === "Waiting for total amount..."}
             >
               <Text style={styles.paymentText}>View Receipt</Text>

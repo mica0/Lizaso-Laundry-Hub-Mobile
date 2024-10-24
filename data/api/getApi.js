@@ -49,6 +49,17 @@ export const getLaundryTrackOrder = async (userId) => {
   }
 };
 
+export const getReceipt = async (assignmentId) => {
+  try {
+    const response = await api.get(
+      `/customers/${assignmentId}/get-calculated-transaction`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // #PAYMENT HISTORY
 
 // #PROFILE MANAGEMENT

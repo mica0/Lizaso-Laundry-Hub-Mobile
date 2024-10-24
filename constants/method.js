@@ -53,13 +53,13 @@ export const calculateDistance = (lat1, lon1, lat2, lon2) => {
   return distance.toFixed(1);
 };
 
-[
-  {
-    addressLine: "Hhh",
-    city: "Bulakan",
-    country: "Philippines",
-    latitude: 14.7634551,
-    longitude: 120.8976699,
-    province: "Bulacan",
-  },
-];
+export const formatDateNow = () => {
+  return new Date().toLocaleString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+};

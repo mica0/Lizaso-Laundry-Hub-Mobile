@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -9,17 +9,48 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute } from "@react-navigation/native";
-import { useNavigation } from "expo-router";
+import { useFocusEffect, useNavigation } from "expo-router";
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import logo from "../../assets/images/logo_small.png";
+import useAuth from "../context/AuthContext";
+import usePolling from "../../hooks/usePolling";
+import { getReceipt } from "../../data/api/getApi";
+import { formatDateNow } from "../../constants/method";
 
 export default function Receipt() {
   const route = useRoute();
+  const { userDetails } = useAuth();
   const navigation = useNavigation();
-  const { assignment_id } = route.params;
+  const { assignment_id, base_price, payment_method, service_name } =
+    route.params;
+
+  const fetchReceipt = useCallback(async () => {
+    const response = await getReceipt(assignment_id);
+    return response.data;
+  }, [assignment_id]);
+
+  const {
+    data: receipt,
+    loading,
+    error,
+    setIsPolling,
+  } = usePolling(fetchReceipt, 50000);
+
+  const { item_ids, item_names, item_prices, quantities, related_item_totals } =
+    receipt.related_items;
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsPolling(true);
+
+      return () => {
+        setIsPolling(false);
+      };
+    }, [])
+  );
 
   const relatedItems = [
     { itemName: "Laundry Detergent", quantity: 1, amount: "₱50" },
@@ -64,15 +95,15 @@ export default function Receipt() {
               <View style={styles.detailsContainer}>
                 <Text style={styles.detailText}>
                   <Text style={styles.boldText}>Customer Name: </Text>
-                  John Reynald Velarde
+                  {userDetails.fullname}
                 </Text>
                 <Text style={styles.detailText}>
                   <Text style={styles.boldText}>Payment Method: </Text>
-                  Cash on Delivery
+                  {payment_method}
                 </Text>
                 <Text style={styles.detailText}>
                   <Text style={styles.boldText}>Date: </Text>
-                  October 24, 2024, 1:09 PM
+                  {formatDateNow()}
                 </Text>
               </View>
 
@@ -84,11 +115,21 @@ export default function Receipt() {
                   <Text style={styles.serviceHeader}>Amount</Text>
                 </View>
                 <View style={styles.serviceRow}>
-                  <Text style={styles.serviceText}>Wash/Dry/Fold</Text>
-                  <Text style={styles.serviceText}>1kg</Text>
-                  <Text style={styles.serviceText}>₱155</Text>
+                  <View>
+                    <Text style={styles.serviceText}>{service_name}</Text>
+                    <Text style={styles.basePrice}>
+                      Base Price: ₱{base_price}
+                    </Text>
+                  </View>
+
+                  <View>
+                    <Text style={styles.serviceText}>{receipt.weight}kg</Text>
+                  </View>
+
+                  <Text style={styles.serviceText}>
+                    ₱{receipt.base_total_amount}
+                  </Text>
                 </View>
-                <Text style={styles.basePrice}>Base Price: ₱155.00</Text>
               </View>
 
               {/* Related Items */}
@@ -99,16 +140,18 @@ export default function Receipt() {
                   <Text style={styles.relatedItemsHeader}>Quantity</Text>
                   <Text style={styles.relatedItemsHeader}>Amount</Text>
                 </View>
-                {relatedItems.length > 0 ? (
-                  relatedItems.map((item, index) => (
+
+                {/* Extract related items data */}
+                {receipt.related_items.length > 0 ? (
+                  item_names.map((name, index) => (
                     <View style={styles.relatedItemsRow} key={index}>
+                      <Text style={styles.relatedItemsText}>{name}</Text>
                       <Text style={styles.relatedItemsText}>
-                        {item.itemName}
+                        {quantities[index]}
                       </Text>
                       <Text style={styles.relatedItemsText}>
-                        {item.quantity}
+                        {item_prices[index]}
                       </Text>
-                      <Text style={styles.relatedItemsText}>{item.amount}</Text>
                     </View>
                   ))
                 ) : (
@@ -116,15 +159,12 @@ export default function Receipt() {
                     No related items available
                   </Text>
                 )}
-                {/* <Text style={styles.noItemsText}>
-                  No related items available
-                </Text> */}
               </View>
 
               {/* Total Amount */}
               <View style={styles.totalAmountContainer}>
                 <Text style={styles.totalAmountText}>
-                  Total Amount: ₱155.00
+                  Total Amount: ₱{receipt.final_total}
                 </Text>
                 <Text style={styles.thankYouText}>
                   Thank you for your business!
@@ -241,19 +281,18 @@ const styles = StyleSheet.create({
   serviceHeader: {
     fontFamily: fonts.Bold,
     fontSize: 14,
-    color: COLORS.textDark,
+    color: COLORS.text,
   },
   serviceText: {
     fontFamily: fonts.Regular,
     fontSize: 14,
-    color: COLORS.textDark,
+    color: COLORS.primary,
   },
   basePrice: {
     fontFamily: fonts.Regular,
-    fontSize: 12,
-    color: COLORS.gray,
+    fontSize: 10,
+    color: COLORS.primary,
     textAlign: "center",
-    marginTop: 5,
   },
   relatedItemsContainer: {
     marginVertical: 10,
@@ -276,9 +315,10 @@ const styles = StyleSheet.create({
     color: COLORS.textDark,
   },
   noItemsText: {
+    marginTop: 10,
     fontFamily: fonts.Regular,
     fontSize: 14,
-    color: COLORS.gray,
+    color: COLORS.primary,
     textAlign: "center",
   },
   totalAmountContainer: {
