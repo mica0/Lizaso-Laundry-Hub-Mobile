@@ -622,3 +622,18 @@
     sender_id: 3,
   },
 ];
+
+[
+  {
+    conversation_id: 11,
+    last_message: {
+      date_sent: "2024-10-24T14:45:07.000Z",
+      is_read: 0,
+      message: "U2FsdGVkX18xDzECqXPzIaHlpUnzhH+vZw3GhuZAq3I=",
+      recipient_id: 5,
+      sender_id: 4,
+    },
+    user_one: { full_name: "Alexia  Midgar", id: 5 },
+    user_two: { full_name: "Juan T Tamad", id: 4 },
+  },
+];

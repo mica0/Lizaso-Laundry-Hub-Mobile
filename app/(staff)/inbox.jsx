@@ -227,7 +227,7 @@
 //   );
 // }
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -290,7 +290,6 @@ export default function Inbox() {
   const { userDetails } = useAuth();
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredCustomers, setFilteredCustomers] = useState(customers);
 
   const fetchInbox = useCallback(async () => {
     try {
@@ -317,6 +316,36 @@ export default function Inbox() {
       };
     }, [])
   );
+
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
+
+  const filterInbox = useCallback(() => {
+    // Example filtering by user name or only showing conversations with unread messages
+    const filtered = inbox.filter((conversation) => {
+      const userOneName = conversation.user_one.full_name.toLowerCase();
+      const userTwoName = conversation.user_two.full_name.toLowerCase();
+
+      // Example filter criteria:
+      // 1. Filter based on whether the user's name contains a search term (optional)
+      // 2. Or filter conversations with unread messages
+      const searchTerm = ""; // Define your search term here, if needed
+      const hasUnreadMessages = conversation.last_message.is_read === 0;
+
+      return (
+        userOneName.includes(searchTerm.toLowerCase()) ||
+        userTwoName.includes(searchTerm.toLowerCase()) ||
+        hasUnreadMessages
+      );
+    });
+
+    setFilteredCustomers(filtered);
+  }, [inbox]);
+
+  useEffect(() => {
+    if (inbox) {
+      filterInbox();
+    }
+  }, [inbox, filterInbox]);
 
   const handleSearch = (text) => {
     setSearchQuery(text);
