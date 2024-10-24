@@ -44,7 +44,7 @@ export default function Chat() {
     loading,
     error,
     setIsPolling,
-  } = usePolling(fetchMessages, 5000);
+  } = usePolling(fetchMessages, 1000);
 
   useFocusEffect(
     useCallback(() => {

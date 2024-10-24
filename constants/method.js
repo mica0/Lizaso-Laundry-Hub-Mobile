@@ -1,4 +1,5 @@
 import * as Crypto from "expo-crypto";
+import CryptoJS from "crypto-js";
 import Constants from "expo-constants";
 
 const SECRET_KEY = Constants.expoConfig.extra.secretKey;
@@ -69,19 +70,30 @@ export const formatDateNow = () => {
   });
 };
 
-export const encryptMessage = async (message) => {
-  const encryptedMessage = await Crypto.digestStringAsync(
-    Crypto.CryptoDigestAlgorithm.SHA256,
-    message + SECRET_KEY
-  );
+export const encryptMessage = (message) => {
+  const encryptedMessage = CryptoJS.AES.encrypt(message, SECRET_KEY).toString();
   return encryptedMessage;
 };
 
-export const decryptMessage = async (encryptedMessage) => {
-  const decrypted = await Crypto.digestStringAsync(
-    Crypto.CryptoDigestAlgorithm.SHA256,
-    encryptedMessage + SECRET_KEY
-  );
-
-  return decrypted;
+export const decryptMessage = (encryptedMessage) => {
+  const bytes = CryptoJS.AES.decrypt(encryptedMessage, SECRET_KEY);
+  const decryptedMessage = bytes.toString(CryptoJS.enc.Utf8);
+  return decryptedMessage;
 };
+
+// export const encryptMessage = async (message) => {
+//   const encryptedMessage = await Crypto.digestStringAsync(
+//     Crypto.CryptoDigestAlgorithm.SHA256,
+//     message + SECRET_KEY
+//   );
+//   return encryptedMessage;
+// };
+
+// export const decryptMessage = async (encryptedMessage) => {
+//   const decrypted = await Crypto.digestStringAsync(
+//     Crypto.CryptoDigestAlgorithm.SHA256,
+//     encryptedMessage + SECRET_KEY
+//   );
+
+//   return decrypted;
+// };
