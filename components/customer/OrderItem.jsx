@@ -30,9 +30,9 @@ export default function OrderItem({ item, index }) {
   };
 
   // Going to message page
-  const handleGoToPayNow = async (id) => {
-    navigaton.navigate("pay/payment", {
-      service_id: id,
+  const handleViewRecipt = async (id) => {
+    navigaton.navigate("receipt/receipt", {
+      assignment_id: id,
     });
   };
 
@@ -51,6 +51,7 @@ export default function OrderItem({ item, index }) {
 
   const {
     id,
+    assignment_id,
     user_id,
     tracking_code,
     service_name,
@@ -59,10 +60,6 @@ export default function OrderItem({ item, index }) {
     user_name,
     qr_code,
   } = item.service_request;
-
-  const { stage } = item.progress;
-
-  console.log(item);
 
   return (
     <View style={styles.orderContainer}>
@@ -83,6 +80,8 @@ export default function OrderItem({ item, index }) {
                       ? COLORS.success
                       : request_status === "Completed Pickup"
                       ? COLORS.secondary
+                      : request_status === "In Laundry"
+                      ? COLORS.third
                       : "#6C757D",
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -143,14 +142,25 @@ export default function OrderItem({ item, index }) {
             </Text>
             <Text style={styles.orderInfo}>
               Total Amount:{" "}
-              <Text
-                style={{
-                  fontFamily: fonts.Bold,
-                  color: COLORS.secondary,
-                }}
-              >
-                ₱{1000}
-              </Text>
+              {assignment_id === "Waiting for total amount..." ? (
+                <Text
+                  style={{
+                    fontFamily: fonts.Regular,
+                    color: COLORS.primary,
+                  }}
+                >
+                  Waiting for total amount
+                </Text>
+              ) : (
+                <Text
+                  style={{
+                    fontFamily: fonts.Bold,
+                    color: COLORS.secondary,
+                  }}
+                >
+                  ₱{item.total_amount}
+                </Text>
+              )}
             </Text>
           </View>
           <View
@@ -161,10 +171,16 @@ export default function OrderItem({ item, index }) {
             }}
           >
             <TouchableOpacity
-              style={styles.compeletePaymentButton}
-              onPress={() => handleGoToPayNow(id)}
+              style={[
+                styles.compeletePaymentButton,
+                assignment_id === "Waiting for total amount..." && {
+                  opacity: 0.5,
+                },
+              ]}
+              onPress={() => handleViewRecipt(assignment_id)}
+              disabled={assignment_id === "Waiting for total amount..."}
             >
-              <Text style={styles.paymentText}>Pay Now</Text>
+              <Text style={styles.paymentText}>View Receipt</Text>
             </TouchableOpacity>
 
             {/* Message Button with Icon and Badge */}

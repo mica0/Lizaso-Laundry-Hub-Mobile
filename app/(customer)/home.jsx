@@ -71,8 +71,6 @@ export default function Home() {
     );
   };
 
-  console.log(servicesData);
-
   return (
     <LinearGradient
       colors={["#5787C8", "#71C7DA"]}
