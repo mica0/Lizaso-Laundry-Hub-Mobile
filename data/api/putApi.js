@@ -1,10 +1,10 @@
 import { api } from "../axios";
 
 // ALL API
-export const updateMessageisRead = async (userId) => {
+export const updateMessageisRead = async (user_one_id, user_two_id) => {
   try {
     const response = await api.put(
-      `/mobile-customer-staff/${userId}/update-message-read`
+      `/mobile-customer-staff/${user_one_id}/${user_two_id}/put-update-message`
     );
     return response.data;
   } catch (error) {

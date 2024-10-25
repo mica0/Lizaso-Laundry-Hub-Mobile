@@ -24,6 +24,7 @@ import usePolling from "../../hooks/usePolling";
 import { useFocusEffect } from "expo-router";
 import useAuth from "../context/AuthContext";
 import { decryptMessage, encryptMessage } from "../../constants/method";
+import { updateMessageisRead } from "../../data/api/putApi";
 
 export default function Chat() {
   const route = useRoute();
@@ -34,11 +35,15 @@ export default function Chat() {
   const scrollViewRef = useRef();
   const [decryptedMessages, setDecryptedMessages] = useState([]);
 
-  console.log(user_id);
-
   const fetchMessages = useCallback(async () => {
     const response = await getMessages(userDetails.userId, user_id);
     return response.data;
+  }, [userDetails.userId, user_id]);
+
+  const fetchupdateMessageRead = useCallback(async () => {
+    const response = await updateMessageisRead(userDetails.userId, user_id);
+    console.log(response.message);
+    return response.message;
   }, [userDetails.userId, user_id]);
 
   const {
@@ -48,12 +53,19 @@ export default function Chat() {
     setIsPolling,
   } = usePolling(fetchMessages, 1000);
 
+  const { setIsPolling: setUpdatePolling } = usePolling(
+    fetchupdateMessageRead,
+    1000
+  );
+
   useFocusEffect(
     useCallback(() => {
       setIsPolling(true);
+      setUpdatePolling(true);
 
       return () => {
         setIsPolling(false);
+        setUpdatePolling(false);
       };
     }, [])
   );
@@ -146,7 +158,7 @@ export default function Chat() {
         ) : (
           decryptedMessages.map((message) => (
             <View
-              key={message.message_id}
+              key={message.id}
               style={[
                 styles.messageContainer,
                 message.sender_id === userDetails.userId
@@ -158,30 +170,6 @@ export default function Chat() {
             </View>
           ))
         )}
-        {/* {messages.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Image source={noconvo} style={styles.noConversationImage} />
-            <Text style={styles.startConversationText}>
-              Start a conversation now!
-            </Text>
-          </View>
-        ) : (
-          messages.map((message) => (
-            <View
-              key={message.message_id}
-              style={[
-                styles.messageContainer,
-                message.sender_id === userDetails.userId
-                  ? styles.sent
-                  : styles.received,
-              ]}
-            >
-              <Text style={styles.messageText}>
-                {decryptMessage(message.message)}
-              </Text>
-            </View>
-          ))
-        )} */}
       </ScrollView>
 
       {/* Message input field */}
