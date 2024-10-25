@@ -17,49 +17,11 @@ import {
   formatDate,
   truncateMessage,
 } from "../../constants/method";
-import d_profile from "../../assets/images/d_profile1.png";
+import d_profile from "../../assets/images/d_profile4.png";
 import { useFocusEffect, useNavigation } from "expo-router";
 import { getInbox } from "../../data/api/getApi";
 import useAuth from "../context/AuthContext";
 import usePolling from "../../hooks/usePolling";
-
-// const customers = [
-//   {
-//     id: "1",
-//     name: "John Doe",
-//     latestMessage: "Hello, I have a question about my order.",
-//     avatar: "",
-//     timestamp: "11:30 AM",
-//   },
-//   {
-//     id: "2",
-//     name: "Jane Smith",
-//     latestMessage: "When will my laundry be delivered?",
-//     avatar: "",
-//     timestamp: "09:32 AM",
-//   },
-//   {
-//     id: "3",
-//     name: "Alice Johnson",
-//     latestMessage: "Thank you for the quick delivery!",
-//     avatar: "",
-//     timestamp: "10:35 AM",
-//   },
-//   {
-//     id: "4",
-//     name: "John Doe",
-//     latestMessage: "Hello, I have a question about my order.",
-//     avatar: "",
-//     timestamp: "10:30 AM",
-//   },
-//   {
-//     id: "5",
-//     name: "Jane Smith",
-//     latestMessage: "When will my laundry be delivered?",
-//     avatar: "",
-//     timestamp: "10:32 AM",
-//   },
-// ];
 
 export default function Inbox() {
   const { userDetails } = useAuth();
@@ -128,7 +90,9 @@ export default function Inbox() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ padding: 16 }}>
-        <Text style={styles.header}>Messages</Text>
+        <View style={{ alignItems: "center" }}>
+          <Text style={styles.header}>Messages</Text>
+        </View>
         <TextInput
           style={styles.searchInput}
           placeholder="Search name..."
@@ -173,14 +137,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   header: {
-    fontSize: 24,
-    fontFamily: fonts.SemiBold,
+    fontSize: 25,
+    fontFamily: fonts.Bold,
     marginBottom: 15,
-    color: COLORS.primary,
+    color: COLORS.secondary,
   },
   searchInput: {
-    height: 40,
-    borderColor: COLORS.grey,
+    height: 50,
+    borderColor: COLORS.border,
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
@@ -208,6 +172,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 30,
     marginRight: 10,
+    backgroundColor: COLORS.background,
   },
   messageContainer: {
     flex: 1,

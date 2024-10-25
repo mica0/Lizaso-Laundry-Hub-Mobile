@@ -20,6 +20,7 @@ const COLORS = {
 
   // Status Colors
   success: "#28a745", // For success messages or indicators
+  pale_sucess: "#E8F5E9",
   error: "#dc3545", // For error messages or alerts
   warning: "#ffc107", // For warning alerts
   info: "#17a2b8", // For informational messages
@@ -32,6 +33,7 @@ const COLORS = {
 
   // Accent Colors
   accent: "#ff7f50",
+  pale_accent: "#ffebd6",
 
   // Background and Border Colors
   background: "#f4f4f4",

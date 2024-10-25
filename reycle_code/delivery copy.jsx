@@ -5,7 +5,16 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { View, Text, TouchableOpacity, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Pressable,
+  Alert,
+  ScrollView,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -15,8 +24,10 @@ import COLORS from "../../constants/colors";
 import { FlashList } from "@shopify/flash-list";
 import { Portal } from "@gorhom/portal";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+import { LinearGradient } from "expo-linear-gradient";
 import { timeAgo } from "../../constants/datetime";
-import { useFocusEffect } from "expo-router";
+import { Link, useFocusEffect, useNavigation } from "expo-router";
+import { useCameraPermissions } from "expo-camera";
 import { getLaundryDelivery } from "../../data/api/getApi";
 import usePolling from "../../hooks/usePolling";
 import useAuth from "../context/AuthContext";
@@ -24,8 +35,10 @@ import { useHandleGoToMessage } from "../../components/method/useHandleGoToMessa
 import { Styles } from "../style/deliveryStyle";
 
 export default function Delivery() {
+  const navigation = useNavigation();
   const { userDetails } = useAuth();
   const handleGoToMessage = useHandleGoToMessage();
+  const [services, setServices] = useState([]);
   const [filter, setFilter] = useState("All");
   const bottomSheetRef = useRef(null);
   const bottomPendingSheet = useRef(null);
@@ -100,6 +113,15 @@ export default function Delivery() {
   const closePendingModal = (service) => {
     setSelectedService(service);
     bottomPendingSheet.current?.close();
+  };
+
+  // On delivery
+  const handleScanCode = async (id) => {
+    bottomSheetRef.current?.close();
+
+    setTimeout(() => {
+      navigation.navigate("scanner/qrscan", { customerId: id });
+    }, 300);
   };
 
   const handleReturnToPending = async (id) => {
@@ -352,6 +374,195 @@ export default function Delivery() {
     );
   };
 
+  // const renderItem = ({ item }) => {
+  //   let iconName;
+  //   let backgroundColor;
+  //   let iconComponent;
+
+  //   if (item.request_status === "Ready for Delivery") {
+  //     iconName = "time-outline";
+  //     backgroundColor = COLORS.accent;
+  //     iconComponent = (
+  //       <Ionicons name={iconName} size={24} color={COLORS.white} />
+  //     );
+  //   } else if (item.request_status === "Out for Delivery") {
+  //     backgroundColor = COLORS.success;
+  //     iconComponent = (
+  //       <MaterialCommunityIcons
+  //         name="truck-delivery-outline"
+  //         size={24}
+  //         color={COLORS.white}
+  //       />
+  //     ); // comment for now
+  //     statusText = "On Delivery";
+  //   } else if (item.request_status === "Cancel") {
+  //     iconName = "book-cancel-outline";
+  //     iconComponent = (
+  //       <MaterialCommunityIcons
+  //         name={iconName}
+  //         size={24}
+  //         color={COLORS.white}
+  //       />
+  //     );
+  //     backgroundColor = COLORS.error;
+  //   }
+
+  //   return (
+  //     <TouchableOpacity
+  //       style={Styles.itemContainer}
+  //       onPress={() => {
+  //         if (item.request_status === "Ready for Delivery") {
+  //           openPendingModal(item);
+  //         } else if (item.request_status === "Out for Delivery") {
+  //           openOngoingModal(item);
+  //         } else {
+  //         }
+  //       }}
+  //       activeOpacity={
+  //         item.request_status === "Ready for Delivery" ||
+  //         item.request_status === "Out for Delivery"
+  //           ? 0.2
+  //           : 1
+  //       }
+  //     >
+  //       <View style={Styles.itemDetails}>
+  //         <View
+  //           style={{
+  //             flexDirection: "row",
+  //             justifyContent: "space-between",
+  //             alignItems: "center",
+  //             flex: 1,
+  //           }}
+  //         >
+  //           <View style={{ flex: 1 }}>
+  //             <Text style={Styles.customerText}>{item.customer_fullname}</Text>
+  //             <Text style={Styles.itemText}>{item.payment_method}</Text>
+  //             <Text style={Styles.locationText}>{item.address_line}</Text>
+  //           </View>
+  //           <View
+  //             style={{ flexDirection: "row", alignItems: "flex-start", gap: 2 }}
+  //           >
+  //             {item.request_status !== "Cancel" && (
+  //               <View style={{ position: "relative" }}>
+  //                 <TouchableOpacity
+  //                   onPress={() =>
+  //                     handleGoToMessage(item.id, item.customer_fullname)
+  //                   }
+  //                   style={[Styles.button, Styles.messageButton]}
+  //                 >
+  //                   <Ionicons
+  //                     name="chatbubble-ellipses"
+  //                     size={24}
+  //                     color={COLORS.primary}
+  //                   />
+  //                   {item.messageCount > 0 && (
+  //                     <View style={Styles.badge}>
+  //                       <Text
+  //                         style={[
+  //                           Styles.badgeText,
+  //                           { fontSize: item.messageCount > 99 ? 10 : 12 },
+  //                         ]}
+  //                       >
+  //                         {item.messageCount > 99 ? "99+" : item.messageCount}
+  //                       </Text>
+  //                     </View>
+  //                   )}
+  //                 </TouchableOpacity>
+  //               </View>
+  //             )}
+  //             <View style={{ alignItems: "center" }}>
+  //               <View style={[Styles.button, { backgroundColor }]}>
+  //                 {iconComponent}
+  //               </View>
+  //               <View style={{ alignItems: "center" }}>
+  //                 {item.status === "Ready for Delivery" && (
+  //                   <View style={{ alignItems: "center" }}>
+  //                     <Text
+  //                       style={{
+  //                         fontFamily: fonts.Regular,
+  //                         fontSize: 12,
+  //                         color: COLORS.primary,
+  //                       }}
+  //                     >
+  //                       Ready for
+  //                     </Text>
+  //                     <Text
+  //                       style={{
+  //                         fontFamily: fonts.Regular,
+  //                         fontSize: 12,
+  //                         color: COLORS.primary,
+  //                         marginTop: -6, // Adjust this value to reduce the gap
+  //                       }}
+  //                     >
+  //                       delivery
+  //                     </Text>
+  //                   </View>
+  //                 )}
+  //                 {item.status === "Out for Delivery" && (
+  //                   <View style={{ alignItems: "center" }}>
+  //                     <Text
+  //                       style={{
+  //                         fontFamily: fonts.Regular,
+  //                         fontSize: 12,
+  //                         color: COLORS.primary,
+  //                       }}
+  //                     >
+  //                       On
+  //                     </Text>
+  //                     <Text
+  //                       style={{
+  //                         fontFamily: fonts.Regular,
+  //                         fontSize: 12,
+  //                         color: COLORS.primary,
+  //                         marginTop: -6, // Adjust this value to reduce the gap
+  //                       }}
+  //                     >
+  //                       delivery
+  //                     </Text>
+  //                   </View>
+  //                 )}
+  //               </View>
+  //             </View>
+  //           </View>
+  //         </View>
+  //         <View style={Styles.divider} />
+  //         <View style={Styles.rowBetween}>
+  //           <View style={Styles.requestStatusContainer}>
+  //             <Text style={Styles.labelText}>Request Date</Text>
+  //             <View style={Styles.dateContainer}>
+  //               <Ionicons
+  //                 name="calendar-outline"
+  //                 size={18}
+  //                 color={COLORS.secondary}
+  //                 style={{ paddingRight: 5 }}
+  //               />
+  //               <Text style={Styles.dateText}>
+  //                 {new Date(item.request_date).toLocaleString()}
+  //               </Text>
+  //             </View>
+  //           </View>
+  //           <View style={Styles.requestStatusContainer}>
+  //             <Text style={Styles.labelText}>Distance</Text>
+  //             <View style={Styles.statusContainer}>
+  //               <Ionicons
+  //                 name="location-outline"
+  //                 size={18}
+  //                 color={COLORS.success}
+  //                 style={{ paddingRight: 2 }}
+  //               />
+  //               <Text style={Styles.statusText}>{item.distance}</Text>
+  //             </View>
+  //           </View>
+  //         </View>
+  //       </View>
+  //     </TouchableOpacity>
+  //   );
+  // };
+
+  // QR CODE SECTIOn
+  const [permission, requestPermission] = useCameraPermissions();
+  const isPermissionGranted = Boolean(permission?.granted);
+
   return (
     <SafeAreaView style={Styles.container}>
       {/* Upper Design */}
@@ -422,6 +633,19 @@ export default function Delivery() {
               Nearest
             </Text>
           </TouchableOpacity>
+          {/* <TouchableOpacity
+            style={[Styles.tab, filter === "Cancel" && Styles.activeTab]}
+            onPress={() => setFilter("Cancel")}
+          >
+            <Text
+              style={[
+                Styles.tabText,
+                filter === "Cancel" && Styles.activeTabText,
+              ]}
+            >
+              Finish
+            </Text>
+          </TouchableOpacity> */}
         </View>
         <FlashList
           data={sortedServices}
@@ -432,6 +656,313 @@ export default function Delivery() {
           estimatedItemSize={100}
         />
       </View>
+      {/* For On Delivery */}
+      <Portal>
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={snapPointsOnDelivery}
+          enablePanDownToClose={true}
+          backgroundStyle={{
+            backgroundColor: COLORS.white,
+            borderRadius: 20,
+          }}
+          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
+          backdropComponent={renderBackdrop}
+        >
+          <View style={Styles.headerContainer}>
+            <Text style={Styles.headerTitle}>On Delivery</Text>
+            <TouchableOpacity
+              onPress={closeOngoingModal}
+              style={Styles.closeButton}
+            >
+              <MaterialIcons name="close" size={24} color={COLORS.secondary} />
+            </TouchableOpacity>
+          </View>
+          <View style={Styles.divider} />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginStart: 20,
+              marginEnd: 20,
+              marginTop: 20,
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: fonts.SemiBold,
+                fontSize: 16,
+                color: COLORS.text3,
+              }}
+            >
+              Customer Details
+            </Text>
+
+            <View style={{ alignItems: "center" }}>
+              <Text
+                style={{
+                  fontFamily: fonts.SemiBold,
+                  fontSize: 13,
+                  color: "white",
+                  backgroundColor: COLORS.error,
+                  borderRadius: 15,
+                  paddingHorizontal: 20,
+                  paddingVertical: 2,
+                }}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {"Pending" || "No Service Selected"}
+              </Text>
+              <Text
+                style={{
+                  fontFamily: fonts.Medium,
+                  color: COLORS.primary,
+                  fontSize: 10,
+                  marginTop: 2,
+                  textAlign: "center",
+                }}
+              >
+                Payment Status
+              </Text>
+            </View>
+          </View>
+          <View style={Styles.contentContainer}>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: COLORS.divider,
+                borderRadius: 10,
+                paddingTop: 10,
+              }}
+            >
+              <View>
+                {selectedService && (
+                  <>
+                    <View style={{ paddingStart: 20, marginBottom: 10 }}>
+                      <View style={{ flexDirection: "row", gap: 5 }}>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Bold,
+                            fontSize: 14,
+                            color: COLORS.text3,
+                          }}
+                        >
+                          Customer:
+                        </Text>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Medium,
+                            fontSize: 14,
+                            color: COLORS.primary,
+                          }}
+                        >
+                          {selectedService.customerName}
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: "row", gap: 5 }}>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Bold,
+                            fontSize: 14,
+                            color: COLORS.text3,
+                          }}
+                        >
+                          Total Amount:
+                        </Text>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Medium,
+                            fontSize: 14,
+                            color: COLORS.primary,
+                          }}
+                        >
+                          PHP 240
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: "row", gap: 5 }}>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Bold,
+                            fontSize: 14,
+                            color: COLORS.text3,
+                          }}
+                        >
+                          Payment Method:
+                        </Text>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Medium,
+                            fontSize: 14,
+                            color: COLORS.primary,
+                          }}
+                        >
+                          Cash on delivery
+                        </Text>
+                      </View>
+
+                      <View style={{ flexDirection: "row", gap: 5 }}>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Bold,
+                            fontSize: 14,
+                            color: COLORS.text3,
+                          }}
+                        >
+                          Location:
+                        </Text>
+                        <Text
+                          style={{
+                            fontFamily: fonts.Medium,
+                            fontSize: 14,
+                            color: COLORS.secondary,
+                            flexShrink: 1,
+                            flexWrap: "wrap",
+                            maxWidth: "80%",
+                          }}
+                        >
+                          {selectedService.location}
+                        </Text>
+                      </View>
+                    </View>
+                    {/* Divider */}
+                    <View
+                      style={{
+                        height: 1,
+                        backgroundColor: "#ddd",
+                        width: "100%",
+                      }}
+                    />
+                    <View
+                      style={{
+                        alignSelf: "center",
+                        marginBottom: 10,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingVertical: 20,
+                      }}
+                    >
+                      {/* {isPermissionGranted ? (
+                      <View
+                        style={{
+                          backgroundColor: "lightgrey",
+                          height: 50,
+                          width: 50,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          borderRadius: 10,
+                        }}
+                      >
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-around",
+                            width: "100%", // Full width
+                            paddingHorizontal: 20,
+                          }}
+                        ></View>
+                      </View>
+                    ) : (
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: COLORS.primary,
+                          padding: 10,
+                          borderRadius: 10,
+                        }}
+                        onPress={requestPermission}
+                      >
+                        <Text
+                          style={{
+                            color: COLORS.white,
+                            fontFamily: fonts.SemiBold,
+                            fontSize: 15,
+                            textAlign: "center",
+                          }}
+                        >
+                          Request Camera Permission
+                        </Text>
+                      </TouchableOpacity>
+                    )} */}
+                    </View>
+                  </>
+                )}
+              </View>
+            </View>
+            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  marginBottom: 10,
+                  gap: 10,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    backgroundColor: COLORS.light,
+                    borderRadius: 10,
+                    alignItems: "center",
+                  }}
+                  onPress={() => handleReturnToPending(selectedService.id)}
+                >
+                  <Text
+                    style={{
+                      fontFamily: fonts.SemiBold,
+                      fontSize: 16,
+                      color: COLORS.black,
+                    }}
+                  >
+                    Return to pending
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    Styles.finishButton,
+                    {
+                      backgroundColor: isPermissionGranted
+                        ? COLORS.secondary
+                        : COLORS.disableButtonBg,
+                    },
+                  ]}
+                  onPress={
+                    isPermissionGranted
+                      ? () => handleScanCode(selectedService.id)
+                      : null
+                  }
+                  disabled={!isPermissionGranted}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text
+                      style={{
+                        fontFamily: fonts.SemiBold,
+                        fontSize: 16,
+                        color: isPermissionGranted
+                          ? COLORS.white
+                          : COLORS.disableButtonTxt,
+                      }}
+                    >
+                      Scan Code
+                    </Text>
+                    <MaterialCommunityIcons
+                      name="qrcode-scan" // Use the appropriate icon name
+                      size={24} // Adjust size as needed
+                      color={
+                        isPermissionGranted
+                          ? COLORS.white
+                          : COLORS.disableButtonTxt
+                      } // Set icon color
+                      style={{ marginLeft: 8 }} // Add some space between text and icon
+                    />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </BottomSheet>
+      </Portal>
       {/* For Ready for delivery */}
       <Portal>
         <BottomSheet
@@ -660,315 +1191,4 @@ export default function Delivery() {
       </Portal>
     </SafeAreaView>
   );
-}
-
-{
-  /* For On Delivery */
-}
-{
-  /* <Portal>
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={-1}
-          snapPoints={snapPointsOnDelivery}
-          enablePanDownToClose={true}
-          backgroundStyle={{
-            backgroundColor: COLORS.white,
-            borderRadius: 20,
-          }}
-          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
-          backdropComponent={renderBackdrop}
-        >
-          <View style={Styles.headerContainer}>
-            <Text style={Styles.headerTitle}>On Delivery</Text>
-            <TouchableOpacity
-              onPress={closeOngoingModal}
-              style={Styles.closeButton}
-            >
-              <MaterialIcons name="close" size={24} color={COLORS.secondary} />
-            </TouchableOpacity>
-          </View>
-          <View style={Styles.divider} />
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginStart: 20,
-              marginEnd: 20,
-              marginTop: 20,
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: fonts.SemiBold,
-                fontSize: 16,
-                color: COLORS.text3,
-              }}
-            >
-              Customer Details
-            </Text>
-
-            <View style={{ alignItems: "center" }}>
-              <Text
-                style={{
-                  fontFamily: fonts.SemiBold,
-                  fontSize: 13,
-                  color: "white",
-                  backgroundColor: COLORS.error,
-                  borderRadius: 15,
-                  paddingHorizontal: 20,
-                  paddingVertical: 2,
-                }}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {"Pending" || "No Service Selected"}
-              </Text>
-              <Text
-                style={{
-                  fontFamily: fonts.Medium,
-                  color: COLORS.primary,
-                  fontSize: 10,
-                  marginTop: 2,
-                  textAlign: "center",
-                }}
-              >
-                Payment Status
-              </Text>
-            </View>
-          </View>
-          <View style={Styles.contentContainer}>
-            <View
-              style={{
-                borderWidth: 1,
-                borderColor: COLORS.divider,
-                borderRadius: 10,
-                paddingTop: 10,
-              }}
-            >
-              <View>
-                {selectedService && (
-                  <>
-                    <View style={{ paddingStart: 20, marginBottom: 10 }}>
-                      <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Bold,
-                            fontSize: 14,
-                            color: COLORS.text3,
-                          }}
-                        >
-                          Customer:
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            fontSize: 14,
-                            color: COLORS.primary,
-                          }}
-                        >
-                          {selectedService.customerName}
-                        </Text>
-                      </View>
-                      <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Bold,
-                            fontSize: 14,
-                            color: COLORS.text3,
-                          }}
-                        >
-                          Total Amount:
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            fontSize: 14,
-                            color: COLORS.primary,
-                          }}
-                        >
-                          PHP 240
-                        </Text>
-                      </View>
-                      <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Bold,
-                            fontSize: 14,
-                            color: COLORS.text3,
-                          }}
-                        >
-                          Payment Method:
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            fontSize: 14,
-                            color: COLORS.primary,
-                          }}
-                        >
-                          Cash on delivery
-                        </Text>
-                      </View>
-
-                      <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Bold,
-                            fontSize: 14,
-                            color: COLORS.text3,
-                          }}
-                        >
-                          Location:
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: fonts.Medium,
-                            fontSize: 14,
-                            color: COLORS.secondary,
-                            flexShrink: 1,
-                            flexWrap: "wrap",
-                            maxWidth: "80%",
-                          }}
-                        >
-                          {selectedService.location}
-                        </Text>
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        height: 1,
-                        backgroundColor: "#ddd",
-                        width: "100%",
-                      }}
-                    />
-                    <View
-                      style={{
-                        alignSelf: "center",
-                        marginBottom: 10,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingVertical: 20,
-                      }}
-                    >
-                      {isPermissionGranted ? (
-                      <View
-                        style={{
-                          backgroundColor: "lightgrey",
-                          height: 50,
-                          width: 50,
-                          justifyContent: "center",
-                          alignItems: "center",
-                          borderRadius: 10,
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            justifyContent: "space-around",
-                            width: "100%", // Full width
-                            paddingHorizontal: 20,
-                          }}
-                        ></View>
-                      </View>
-                    ) : (
-                      <TouchableOpacity
-                        style={{
-                          backgroundColor: COLORS.primary,
-                          padding: 10,
-                          borderRadius: 10,
-                        }}
-                        onPress={requestPermission}
-                      >
-                        <Text
-                          style={{
-                            color: COLORS.white,
-                            fontFamily: fonts.SemiBold,
-                            fontSize: 15,
-                            textAlign: "center",
-                          }}
-                        >
-                          Request Camera Permission
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                    </View>
-                  </>
-                )}
-              </View>
-            </View>
-            <View style={{ flex: 1, justifyContent: "flex-end" }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  marginBottom: 10,
-                  gap: 10,
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    padding: 10,
-                    backgroundColor: COLORS.light,
-                    borderRadius: 10,
-                    alignItems: "center",
-                  }}
-                  onPress={() => handleReturnToPending(selectedService.id)}
-                >
-                  <Text
-                    style={{
-                      fontFamily: fonts.SemiBold,
-                      fontSize: 16,
-                      color: COLORS.black,
-                    }}
-                  >
-                    Return to pending
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    Styles.finishButton,
-                    {
-                      backgroundColor: isPermissionGranted
-                        ? COLORS.secondary
-                        : COLORS.disableButtonBg,
-                    },
-                  ]}
-                  onPress={
-                    isPermissionGranted
-                      ? () => handleScanCode(selectedService.id)
-                      : null
-                  }
-                  disabled={!isPermissionGranted}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text
-                      style={{
-                        fontFamily: fonts.SemiBold,
-                        fontSize: 16,
-                        color: isPermissionGranted
-                          ? COLORS.white
-                          : COLORS.disableButtonTxt,
-                      }}
-                    >
-                      Scan Code
-                    </Text>
-                    <MaterialCommunityIcons
-                      name="qrcode-scan" // Use the appropriate icon name
-                      size={24} // Adjust size as needed
-                      color={
-                        isPermissionGranted
-                          ? COLORS.white
-                          : COLORS.disableButtonTxt
-                      } // Set icon color
-                      style={{ marginLeft: 8 }} // Add some space between text and icon
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </BottomSheet>
-      </Portal> */
 }
