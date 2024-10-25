@@ -11,13 +11,10 @@ import { Ionicons } from "@expo/vector-icons"; // or wherever you are importing 
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
 
-export const ServiceItem = ({ item, isExpanded, onToggle }) => {
+export const ServiceItem = ({ item, select, isExpanded, onToggle }) => {
   return (
     <View style={styles.serviceItem}>
-      <Image
-        source={{ uri: "https://via.placeholder.com/150" }}
-        style={styles.serviceImage}
-      />
+      <Image style={styles.serviceImage} />
 
       <View style={styles.serviceInfo}>
         <View
@@ -28,7 +25,9 @@ export const ServiceItem = ({ item, isExpanded, onToggle }) => {
         >
           <View style={{ flex: 1 }}>
             <Text style={styles.serviceName}>{item.service_name}</Text>
-            <Text style={styles.serviceDescription}>{item.description}</Text>
+            {item.description ? (
+              <Text style={styles.serviceDescription}>{item.description}</Text>
+            ) : null}
             <Text style={styles.servicePrice}>PHP {item.default_price}</Text>
             {item.isActive &&
               isExpanded && ( // Show promo details if expanded
@@ -77,8 +76,8 @@ export const ServiceItem = ({ item, isExpanded, onToggle }) => {
             )}
           </View>
         </View>
-        <Pressable style={styles.serviceButton}>
-          <Text style={styles.buttonText}>Select</Text>
+        <Pressable style={styles.serviceButton} onPress={select}>
+          <Text style={styles.buttonText}>Choose This Service</Text>
         </Pressable>
       </View>
     </View>
@@ -90,37 +89,40 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: COLORS.border2,
+    borderColor: COLORS.border,
     borderRadius: 10,
     padding: 10,
     marginVertical: 5,
     alignItems: "center",
     position: "relative",
   },
+
   serviceImage: {
     width: 60,
     height: 60,
     borderRadius: 10,
     marginRight: 10,
+    backgroundColor: COLORS.background,
   },
   serviceInfo: {
     flex: 1,
     flexDirection: "column",
     justifyContent: "space-between",
+    gap: 10,
   },
   serviceName: {
     fontFamily: fonts.Bold,
     color: COLORS.primary,
-    fontSize: 16,
+    fontSize: 18,
   },
   serviceDescription: {
-    fontFamily: fonts.Medium,
-    fontSize: 11,
-    color: COLORS.grayMedium,
+    fontFamily: fonts.Regular,
+    fontSize: 12,
+    color: COLORS.subtitle,
   },
   servicePrice: {
     fontFamily: fonts.Bold,
-    fontSize: 18,
+    fontSize: 15,
     color: COLORS.secondary,
   },
   promoBadge: {
@@ -136,7 +138,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   serviceButton: {
-    backgroundColor: COLORS.grayMedium,
+    borderWidth: 1,
+    borderColor: COLORS.secondary,
+    backgroundColor: COLORS.secondary_light,
     borderRadius: 5,
     paddingVertical: 5,
     paddingHorizontal: 10,
@@ -144,7 +148,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   buttonText: {
-    color: COLORS.white,
+    color: COLORS.secondary,
     fontFamily: fonts.SemiBold,
   },
   carouselTitleContainer: {

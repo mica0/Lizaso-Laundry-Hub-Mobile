@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useFocusEffect, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -11,19 +11,17 @@ import { ServiceItem } from "../../components/customer/ServiceItem";
 import usePolling from "../../hooks/usePolling";
 import { getLaundryServices } from "../../data/api/getApi";
 import useAuth from "../context/AuthContext";
-
-const laundryItems = [
-  { id: "1", name: "Downy" },
-  { id: "2", name: "Tide Detergent" },
-  { id: "3", name: "Arm & Hammer" },
-  { id: "4", name: "Purex" },
-  { id: "5", name: "Bounce" },
-];
+import { SelectServiceBottomSheet } from "../../components/customer/SelectServiceBottomSheet";
+import { center } from "@shopify/react-native-skia";
 
 export default function Home() {
   const navigation = useNavigation();
   const { userDetails } = useAuth();
   const [notiCount, setNotiCount] = useState({ count: 1 });
+  const [expandedItems, setExpandedItems] = useState({});
+  const [selectedService, setSelectedService] = useState(null);
+  const bottomSelectedSheet = useRef(null);
+  const snapSelectedPoints = useMemo(() => ["50%", "60%"], []);
 
   const fetchLaundryServices = useCallback(async () => {
     const response = await getLaundryServices(userDetails.storeId);
@@ -47,12 +45,23 @@ export default function Home() {
     }, [])
   );
 
+  const openSelectedModal = (service) => {
+    setSelectedService(service);
+    bottomSelectedSheet.current?.expand();
+  };
+
+  const closeSelectModal = () => {
+    bottomSelectedSheet.current?.close();
+  };
+
   const handleGoToNotification = () => {
     console.log("Navigating to notifications");
     navigation.navigate("notification/list", {});
   };
 
-  const [expandedItems, setExpandedItems] = useState({});
+  const handleSubmit = () => {
+    console.log("Submit data");
+  };
 
   const toggleExpanded = (id) => {
     setExpandedItems((prev) => ({
@@ -64,6 +73,7 @@ export default function Home() {
   const renderServiceItem = ({ item }) => {
     return (
       <ServiceItem
+        select={openSelectedModal}
         item={item}
         isExpanded={!!expandedItems[item.service_id]}
         onToggle={() => toggleExpanded(item.service_id)}
@@ -129,36 +139,31 @@ export default function Home() {
           </View>
         </View>
 
-        {/* Title for Laundry Items */}
-        <View style={styles.carouselTitleContainer}>
-          <Text style={styles.carouselTitle}>Available Laundry Items</Text>
-        </View>
-        {/* Carousel for Laundry Items */}
-        {/* <View style={styles.carouselContainer}>
-          <FlatList
-            data={laundryItems}
-            renderItem={({ item }) => (
-              <View style={styles.carouselItem}>
-                <Text style={styles.itemText}>{item.name}</Text>
-              </View>
-            )}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.carouselContent}
-          />
-        </View> */}
-
-        {/* Services List */}
+        {/* Bottom */}
         <View style={styles.listContainer}>
-          <FlatList
-            data={servicesData}
-            renderItem={renderServiceItem}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={{ paddingBottom: 60 }}
-            showsVerticalScrollIndicator={false}
-          />
+          <View style={styles.carouselTitleContainer}>
+            <Text style={styles.carouselTitle}>
+              Choose Your Laundry Service
+            </Text>
+          </View>
+          <View style={{ marginTop: 10, marginBottom: 60 }}>
+            <FlatList
+              data={servicesData}
+              renderItem={renderServiceItem}
+              keyExtractor={(item) => item.service_id}
+              contentContainerStyle={{ paddingBottom: 50, gap: 2 }}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
         </View>
+
+        <SelectServiceBottomSheet
+          ref={bottomSelectedSheet}
+          snapPoints={snapSelectedPoints}
+          selectedService={selectedService}
+          closeSelectModal={closeSelectModal}
+          handleGetLaundry={handleSubmit}
+        />
       </SafeAreaView>
     </LinearGradient>
   );
@@ -217,10 +222,10 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingBottom: 30,
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.white,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop: 20,
+    marginTop: 30,
     // Shadow Section
     shadowColor: "#000",
     shadowOffset: {
@@ -236,9 +241,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   carouselTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: fonts.Bold,
-    color: COLORS.white,
+    color: COLORS.secondary,
+    textAlign: "center",
   },
   carouselContainer: {
     paddingVertical: 5,
@@ -262,4 +268,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  divider: {
+    height: 1,
+    backgroundColor: "#ddd",
+    marginBottom: 5,
+    width: "100%",
+  },
 });
+
+{
+  /* Title for Laundry Items */
+}
+{
+  /* <View style={styles.carouselTitleContainer}>
+          <Text style={styles.carouselTitle}>Available Laundry Items</Text>
+        </View> */
+}
+{
+  /* Carousel for Laundry Items */
+}
+{
+  /* <View style={styles.carouselContainer}>
+          <FlatList
+            data={laundryItems}
+            renderItem={({ item }) => (
+              <View style={styles.carouselItem}>
+                <Text style={styles.itemText}>{item.name}</Text>
+              </View>
+            )}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.carouselContent}
+          />
+        </View> */
+}

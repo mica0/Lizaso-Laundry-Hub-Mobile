@@ -16,6 +16,7 @@ const COLORS = {
   // Primary and Secondary colors
   primary: "#595959",
   secondary: "#5787C8",
+  secondary_light: "#E0ECF8",
   third: "#447F8C",
 
   // Status Colors
