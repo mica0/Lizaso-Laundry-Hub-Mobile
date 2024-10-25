@@ -97,3 +97,15 @@ export const updateServiceRequestUsingQRCode = async (code, id) => {
     throw error;
   }
 };
+
+export const updateStaffDetails = async (userId, data) => {
+  try {
+    const response = await api.put(
+      `/staff/${userId}/update-staff-details`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

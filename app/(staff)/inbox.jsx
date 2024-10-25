@@ -131,7 +131,7 @@ export default function Inbox() {
         <Text style={styles.header}>Messages</Text>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search customers..."
+          placeholder="Search name..."
           value={searchQuery}
           onChangeText={handleSearch}
         />

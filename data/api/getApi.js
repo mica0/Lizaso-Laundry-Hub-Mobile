@@ -24,6 +24,39 @@ export const getInbox = async (userId) => {
   }
 };
 
+export const getCountForBottomNavigationBar = async (userId) => {
+  try {
+    const response = await api.get(
+      `/mobile-customer-staff/${userId}/get-navigation-count`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getNotification = async (userId) => {
+  try {
+    const response = await api.get(
+      `/mobile-customer-staff/${userId}/get-notification`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getNotificationCount = async (userId) => {
+  try {
+    const response = await api.get(
+      `/mobile-customer-staff/${userId}/get-notification-count`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // CUSTOMER SECTION API REQUEST
 export const getCheckCustomerDetails = async (userId) => {
   try {
@@ -86,14 +119,19 @@ export const getReceipt = async (assignmentId) => {
 };
 
 // #PAYMENT HISTORY
-
-// #PROFILE MANAGEMENT
+export const getTransactionHistory = async (userId) => {
+  try {
+    const response = await api.get(
+      `/customers/${userId}/get-transaction-history`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // STAFF SECTION API REQUEST
-
 // # LAUNDRY PICKUP MODULE
-
-// Get Customer request services for laundry pickup module
 export const getLaundryPickup = async (storeId, user_id) => {
   try {
     const response = await api.get(`/staff/${storeId}/get-laundry-pickup`, {
@@ -105,16 +143,14 @@ export const getLaundryPickup = async (storeId, user_id) => {
   }
 };
 
-// Get Customer request services for laundry delivery module
-export const getLaundryDelivery = async (data) => {
+//#LAUNDRY DELIVERY MODULE
+export const getLaundryDelivery = async (storeId, user_id) => {
   try {
-    const response = await api.get("/login", data);
+    const response = await api.get(`/staff/${storeId}/get-laundry-delivery`, {
+      params: { user_id },
+    });
     return response.data;
   } catch (error) {
     throw error;
   }
 };
-
-//#LAUNDRY DELIVERY MODULE
-
-// #PROFILE MANAGEMENT
