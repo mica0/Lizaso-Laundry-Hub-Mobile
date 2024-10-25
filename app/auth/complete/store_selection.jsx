@@ -113,7 +113,7 @@ export default function Store_Selection() {
       );
 
       if (response.success) {
-        router.push("/auth/sign-in");
+        // router.push("/auth/sign-in");
       }
     } catch (error) {
       setLoading(false);

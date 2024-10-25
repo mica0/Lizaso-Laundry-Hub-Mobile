@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import COLORS from "../../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { fonts } from "../../../constants/fonts";
@@ -21,7 +21,7 @@ import { useAuth } from "../../context/AuthContext";
 import { getCheckCustomerDetails } from "../../../data/api/getApi";
 
 export default function SignUp() {
-  const { userDetails } = useAuth();
+  const { userDetails, fetchUserDetails } = useAuth();
   const router = useRouter();
   const navigation = useNavigation();
   const [isPasswordShown, setIsPasswordShown] = useState(false);
@@ -113,7 +113,6 @@ export default function SignUp() {
     const newErrors = validateFields();
     setErrors(newErrors);
 
-    // If there are no validation errors
     if (Object.keys(newErrors).length === 0) {
       if (!isChecked) {
         Alert.alert(
@@ -122,15 +121,6 @@ export default function SignUp() {
         );
         return;
       }
-      // const data = {
-      //   c_number: phoneNumber,
-      //   c_username: username,
-      //   c_firstname: firstname,
-      //   c_middlename: middlename,
-      //   c_lastname: lastname,
-      //   c_password: password,
-      //   isAgreement: isChecked,
-      // };
 
       const data = {
         mobile_number: phoneNumber,
@@ -156,21 +146,30 @@ export default function SignUp() {
 
           await AsyncStorage.setItem("accessToken", login_response.accessToken);
 
-          if (userDetails.user_type === "Customer") {
-            const details = await getCheckCustomerDetails(userDetails.userId);
+          await fetchUserDetails(login_response.accessToken);
 
-            if (details.success !== false) {
-              const { storeIdIsNull, addressIdIsNull } = details;
+          // console.log(login_response.accessToken);
 
-              if (storeIdIsNull || addressIdIsNull) {
-                router.push("/auth/complete/complete");
-              } else {
-                router.push("/(customer)/home");
-              }
-            }
-          } else {
-            router.push("/(staff)/pickup");
-          }
+          // if (userDetails.user_type === "Customer") {
+          //   const details = await getCheckCustomerDetails(userDetails.userId);
+
+          //   console.log(details);
+
+          //   if (details.success !== false) {
+          //     const { storeIdIsNull, addressIdIsNull } = details;
+
+          //     if (storeIdIsNull || addressIdIsNull) {
+          //       console.log(1);
+          //       // router.push("/auth/complete/complete");
+          //     } else {
+          //       console.log(2);
+          //       // router.push("/(customer)/home");
+          //     }
+          //   }
+          // } else {
+          //   console.log(3);
+          //   // router.push("/(staff)/pickup");
+          // }
         } else {
           setErrors((prevErrors) => ({
             ...prevErrors,
@@ -184,6 +183,29 @@ export default function SignUp() {
       }
     }
   };
+
+  // useEffect(() => {
+  //   if (userDetails.user_type) {
+  //     if (userDetails.user_type === "Customer") {
+  //       const fetchDetails = async () => {
+  //         const details = await getCheckCustomerDetails(userDetails.userId);
+  //         if (details.success !== false) {
+  //           const { storeIdIsNull, addressIdIsNull } = details.data;
+  //           if (storeIdIsNull || addressIdIsNull) {
+  //             router.push("/auth/complete/address");
+  //           } else {
+  //             router.push("/(customer)/home");
+  //           }
+  //         } else {
+  //           console.log(details);
+  //         }
+  //       };
+  //       fetchDetails();
+  //     } else {
+  //       router.push("/(staff)/pickup");
+  //     }
+  //   }
+  // }, [userDetails]);
 
   const handleTermAndConditons = () => {
     navigation.navigate("auth/term/term", {});
