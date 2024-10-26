@@ -31,17 +31,9 @@ export const Styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    padding: 20,
   },
   modalTitle: {
     fontSize: 24,
-  },
-  finishButton: {
-    padding: 10,
-    backgroundColor: COLORS.secondary,
-    borderRadius: 10,
-    alignItems: "center",
-    width: "55%",
   },
   container: {
     flex: 1,
@@ -238,5 +230,46 @@ export const Styles = StyleSheet.create({
   cardCount: {
     fontSize: 28,
     fontFamily: fonts.Bold,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    margin: 20,
+    marginBottom: 30,
+  },
+  finishButton: {
+    backgroundColor: COLORS.secondary,
+    borderRadius: 10,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 55,
+  },
+  finishButtonText: {
+    fontFamily: fonts.SemiBold,
+    fontSize: 15,
+    color: COLORS.white,
+  },
+  detailsCard: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 10,
+    padding: 10,
+    marginHorizontal: 20,
+    marginVertical: 25,
+  },
+  detailsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  label: { fontFamily: fonts.Bold, fontSize: 14, color: COLORS.text3 },
+  value: { fontFamily: fonts.Medium, fontSize: 14, color: COLORS.primary },
+  success: { fontFamily: fonts.Medium, fontSize: 14, color: COLORS.success },
+  submitButtonText: {
+    color: COLORS.white,
+    fontFamily: fonts.Bold,
+    fontSize: 16,
   },
 });

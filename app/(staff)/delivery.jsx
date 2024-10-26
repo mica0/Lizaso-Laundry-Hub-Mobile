@@ -5,7 +5,13 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { View, Text, TouchableOpacity, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -28,14 +34,10 @@ export default function Delivery() {
   const { userDetails } = useAuth();
   const handleGoToMessage = useHandleGoToMessage();
   const [filter, setFilter] = useState("All");
-  const bottomSheetRef = useRef(null);
   const bottomReadyDeliverySheet = useRef(null);
-  const bottomPendingSheet = useRef(null);
   const snapPoints = useMemo(() => ["60%"], []);
-  const snapPointsOnDelivery = useMemo(() => ["80%"], []);
-  const [selectedService, setSelectedService] = useState(null);
-  const [isReadyBottomSheetVisible, setReadyBottomSheetVisible] =
-    useState(false);
+  const [selectedService, setSelectedService] = useState([]);
+  const [isloading, setisLoading] = useState(false);
 
   const renderBackdrop = useCallback(
     (props) => (
@@ -141,39 +143,13 @@ export default function Delivery() {
     bottomReadyDeliverySheet.current?.close();
   };
 
-  const openOngoingModal = (service) => {
+  const handleGotoFinishDelivery = (service) => {
     setSelectedService(service);
-    bottomSheetRef.current?.expand();
   };
 
-  const closeOngoingModal = (service) => {
-    setSelectedService(service);
-    bottomSheetRef.current?.close();
-  };
-
-  const closePendingModal = (service) => {
-    setSelectedService(service);
-    bottomPendingSheet.current?.close();
-  };
-
-  const handleReturnToPending = async (id) => {
-    console.log(id);
-    bottomSheetRef.current?.close();
-  };
-
-  // Ready for delivery
   const handleGetReadyDelivery = async (id) => {
+    setisLoading(true);
     console.log(id);
-  };
-
-  const handleCancelRequest = async (id) => {
-    console.log(id);
-    bottomPendingSheet.current?.close();
-  };
-
-  const openPendingModal = (service) => {
-    setSelectedService(service);
-    bottomPendingSheet.current?.expand();
   };
 
   const renderItem = ({ item }) => {
@@ -213,7 +189,7 @@ export default function Delivery() {
           if (item.request_status === "Ready for Delivery") {
             openReadyDeliveryModal(item);
           } else if (item.request_status === "Out for Delivery") {
-            openOngoingModal(item);
+            // openOngoingModal(item);
           } else {
           }
         }}
@@ -447,12 +423,103 @@ export default function Delivery() {
       </View>
 
       {/* For Ready for delivery */}
-      <ReadyBottomSheet
+      <Portal>
+        <BottomSheet
+          ref={bottomReadyDeliverySheet}
+          index={-1}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          backgroundStyle={{ backgroundColor: COLORS.white }}
+          handleIndicatorStyle={{ backgroundColor: COLORS.primary }}
+          backdropComponent={renderBackdrop}
+        >
+          {/* Header */}
+          <View style={Styles.headerContainer}>
+            <Text style={Styles.headerTitle}>Ready for Delivery</Text>
+
+            <TouchableOpacity
+              style={Styles.closeButton}
+              onPress={closeReadyDeliveryModal}
+            >
+              <MaterialIcons name="close" size={24} color={COLORS.secondary} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Divider */}
+          <View style={Styles.divider} />
+
+          {/* Content */}
+          <View style={Styles.contentContainer}>
+            <View style={Styles.detailsCard}>
+              {/* Customer Details */}
+              <View style={Styles.detailsContainer}>
+                <Text style={Styles.label}>Customer Name:</Text>
+                <Text style={Styles.value}>
+                  {selectedService.customer_fullname}
+                </Text>
+              </View>
+              <View style={Styles.detailsContainer}>
+                <Text style={Styles.label}>Address:</Text>
+                <Text style={Styles.value}>{selectedService.address_line}</Text>
+              </View>
+              <View style={Styles.detailsContainer}>
+                <Text style={Styles.label}>Service Name:</Text>
+                <Text style={Styles.value}>{selectedService.service_name}</Text>
+              </View>
+              <View style={Styles.detailsContainer}>
+                <Text style={Styles.label}>Pickup Date:</Text>
+                <Text style={Styles.value}>
+                  {new Date(selectedService.pickup_date).toLocaleString()}
+                </Text>
+              </View>
+              <View style={Styles.detailsContainer}>
+                <Text style={Styles.label}>Request Date:</Text>
+                <Text style={Styles.value}>
+                  {new Date(selectedService.request_date).toLocaleString()}
+                </Text>
+              </View>
+              <View style={Styles.detailsContainer}>
+                <Text style={Styles.label}>Payment Method:</Text>
+                <Text style={Styles.value}>
+                  {selectedService.payment_method}
+                </Text>
+              </View>
+              <View style={Styles.detailsContainer}>
+                <Text style={Styles.label}>Distance:</Text>
+                <Text style={Styles.value}>{selectedService.distance}</Text>
+              </View>
+              <View style={Styles.detailsContainer}>
+                <Text style={Styles.label}>Total Price:</Text>
+                <Text style={Styles.success}>
+                  ₱{selectedService.default_price}
+                </Text>
+              </View>
+            </View>
+          </View>
+          {/* Button Bottom */}
+          <View style={Styles.buttonContainer}>
+            <TouchableOpacity
+              style={Styles.finishButton}
+              onPress={handleGetReadyDelivery}
+            >
+              {isloading ? (
+                <ActivityIndicator size="large" color={COLORS.white} />
+              ) : (
+                <Text style={Styles.submitButtonText}>Proceed to delivery</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </BottomSheet>
+      </Portal>
+    </SafeAreaView>
+  );
+}
+
+{
+  /* <ReadyBottomSheet
         ref={bottomReadyDeliverySheet}
         selectedService={selectedService}
         closePendingModal={closeReadyDeliveryModal}
         handleGetLaundry={handleGetReadyDelivery}
-      />
-    </SafeAreaView>
-  );
+      /> */
 }
