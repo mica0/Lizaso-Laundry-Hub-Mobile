@@ -43,5 +43,6 @@ npm install --save react-native-collapsible
 npx expo install expo-crypto
 npx expo install expo-constants
 npm install crypto-js@3.3.0 --save
+npm install @react-navigation/stack
 
 

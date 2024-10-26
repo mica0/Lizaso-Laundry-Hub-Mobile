@@ -13,10 +13,12 @@ import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { timeAgo } from "../../constants/datetime";
 import useAuth from "../../app/context/AuthContext";
+import { useNavigation } from "expo-router";
 
 export const SelectServiceBottomSheet = React.forwardRef(
   ({ selectedService, snapPoints, closeSelectModal, handleSubmit }, ref) => {
     const { userDetails } = useAuth();
+    const navigation = useNavigation();
     const [name, setName] = useState(userDetails.fullname);
     const [notes, setNotes] = useState(null);
     const [selectedPayment, setSelectedPayment] = useState("COD");

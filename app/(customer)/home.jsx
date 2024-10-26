@@ -59,10 +59,6 @@ export default function Home() {
     navigation.navigate("notification/list", {});
   };
 
-  const handleSubmit = () => {
-    console.log("Submit data");
-  };
-
   const toggleExpanded = (id) => {
     setExpandedItems((prev) => ({
       ...prev,
@@ -156,24 +152,24 @@ export default function Home() {
               Choose Your Laundry Service
             </Text>
           </View>
-          <View style={{ marginTop: 10, marginBottom: 60 }}>
+          <View style={{ marginTop: 10, marginBottom: 100 }}>
             <FlatList
               data={servicesData}
               renderItem={renderServiceItem}
               keyExtractor={(item) => item.service_id}
-              contentContainerStyle={{ paddingBottom: 50, gap: 2 }}
+              contentContainerStyle={{ paddingBottom: 40, gap: 2 }}
               showsVerticalScrollIndicator={false}
             />
           </View>
         </View>
 
-        <SelectServiceBottomSheet
+        {/* <SelectServiceBottomSheet
           ref={bottomSelectedSheet}
           snapPoints={snapSelectedPoints}
           selectedService={selectedService}
           closeSelectModal={closeSelectModal}
           handleGetLaundry={handleSubmit}
-        />
+        /> */}
       </SafeAreaView>
     </LinearGradient>
   );

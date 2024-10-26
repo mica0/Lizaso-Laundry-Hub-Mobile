@@ -874,3 +874,20 @@ LOG[
     status_date: null,
   },
 ];
+
+[
+  {
+    base_total_amount: 325,
+    discount_applied: null,
+    final_total: "325.00",
+    related_items: {
+      item_ids: [],
+      item_names: [],
+      item_prices: [],
+      quantities: [],
+      related_item_totals: [],
+    },
+    total_related_items: 0,
+    weight: "5",
+  },
+];

@@ -10,8 +10,17 @@ import {
 import { Ionicons } from "@expo/vector-icons"; // or wherever you are importing this from
 import { fonts } from "../../constants/fonts";
 import COLORS from "../../constants/colors";
+import { useNavigation } from "expo-router";
 
-export const ServiceItem = ({ item, select, isExpanded, onToggle }) => {
+export const ServiceItem = ({ item, isExpanded, onToggle }) => {
+  const navigation = useNavigation();
+  const handleGoToSelectService = async (id, name) => {
+    navigation.navigate("select/select", {
+      service_id: id,
+      service_name: name,
+    });
+  };
+
   return (
     <View style={styles.serviceItem}>
       <Image style={styles.serviceImage} />
@@ -76,7 +85,12 @@ export const ServiceItem = ({ item, select, isExpanded, onToggle }) => {
             )}
           </View>
         </View>
-        <Pressable style={styles.serviceButton} onPress={select}>
+        <Pressable
+          style={styles.serviceButton}
+          onPress={() =>
+            handleGoToSelectService(item.service_id, item.service_name)
+          }
+        >
           <Text style={styles.buttonText}>Choose This Service</Text>
         </Pressable>
       </View>

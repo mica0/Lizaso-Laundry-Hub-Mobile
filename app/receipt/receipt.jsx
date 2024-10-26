@@ -39,9 +39,6 @@ export default function Receipt() {
     setIsPolling,
   } = usePolling(fetchReceipt, 50000);
 
-  const { item_ids, item_names, item_prices, quantities, related_item_totals } =
-    receipt.related_items;
-
   useFocusEffect(
     useCallback(() => {
       setIsPolling(true);
@@ -52,10 +49,22 @@ export default function Receipt() {
     }, [])
   );
 
-  const relatedItems = [
-    { itemName: "Laundry Detergent", quantity: 1, amount: "₱50" },
-    { itemName: "Fabric Softener", quantity: 1, amount: "₱30" },
-  ];
+  const relatedItems = receipt?.related_items || {
+    item_ids: [],
+    item_names: [],
+    item_prices: [],
+    quantities: [],
+    related_item_totals: [],
+  };
+
+  // Example usage:
+  const { item_ids, item_names, item_prices, quantities, related_item_totals } =
+    relatedItems;
+
+  // const relatedItems = [
+  //   { itemName: "Laundry Detergent", quantity: 1, amount: "₱50" },
+  //   { itemName: "Fabric Softener", quantity: 1, amount: "₱30" },
+  // ];
 
   return (
     <LinearGradient
@@ -142,7 +151,25 @@ export default function Receipt() {
                 </View>
 
                 {/* Extract related items data */}
-                {receipt.related_items.length > 0 ? (
+                {receipt?.related_items?.item_names?.length > 0 ? (
+                  receipt.related_items.item_names.map((name, index) => (
+                    <View style={styles.relatedItemsRow} key={index}>
+                      <Text style={styles.relatedItemsText}>{name}</Text>
+                      <Text style={styles.relatedItemsText}>
+                        {receipt.related_items.quantities[index]}
+                      </Text>
+                      <Text style={styles.relatedItemsText}>
+                        {receipt.related_items.item_prices[index]}
+                      </Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.noItemsText}>
+                    No related items available
+                  </Text>
+                )}
+
+                {/* {receipt.related_items.length > 0 ? (
                   item_names.map((name, index) => (
                     <View style={styles.relatedItemsRow} key={index}>
                       <Text style={styles.relatedItemsText}>{name}</Text>
@@ -158,7 +185,7 @@ export default function Receipt() {
                   <Text style={styles.noItemsText}>
                     No related items available
                   </Text>
-                )}
+                )} */}
               </View>
 
               {/* Total Amount */}
