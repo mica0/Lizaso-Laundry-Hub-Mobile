@@ -1,5 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import React, { useRef, useMemo, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+} from "react-native";
+import React, { useRef, useMemo, useEffect, useState } from "react";
 import COLORS from "../../constants/colors";
 import { fonts } from "../../constants/fonts";
 import { Portal } from "@gorhom/portal";
@@ -9,6 +15,7 @@ import { timeAgo } from "../../constants/datetime";
 
 export const SelectServiceBottomSheet = React.forwardRef(
   ({ selectedService, snapPoints, closeSelectModal, handleSubmit }, ref) => {
+    const [selectedPayment, setSelectedPayment] = useState(null);
     // const snapPoints = useMemo(() => ["50%", "60%"], []);
     const renderBackdrop = (props) => (
       <BottomSheetBackdrop {...props} opacity={0.5} />
@@ -30,7 +37,12 @@ export const SelectServiceBottomSheet = React.forwardRef(
             backdropComponent={renderBackdrop}
           >
             <View style={styles.headerContainer}>
-              <Text style={styles.headerTitle}>Select a service</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.headerTitle}>Service Details</Text>
+                <Text style={styles.subTitle}>
+                  Complete the service request below
+                </Text>
+              </View>
 
               <TouchableOpacity
                 style={styles.closeButton}
@@ -44,6 +56,73 @@ export const SelectServiceBottomSheet = React.forwardRef(
               </TouchableOpacity>
             </View>
             <View style={styles.divider} />
+
+            <View style={styles.contentContainer}>
+              {/* Selected Service */}
+              {/* <Text style={styles.serviceTitle}>{selectedService.title}</Text> */}
+              <Text style={styles.serviceTitle}>Wash</Text>
+              <Text style={styles.serviceDescription}>
+                {/* {selectedService.description} */}
+              </Text>
+
+              {/* Customer Name Input */}
+              <TextInput
+                style={styles.input}
+                placeholder="Enter Customer Name"
+              />
+              {/* Payment Options */}
+              <Text style={styles.paymentTitle}>Payment Method:</Text>
+              <View style={styles.paymentOptions}>
+                <TouchableOpacity
+                  style={[
+                    styles.paymentButton,
+                    selectedPayment === "COD" && styles.selectedPaymentButton,
+                  ]}
+                  onPress={() => setSelectedPayment("COD")}
+                >
+                  <Text
+                    style={[
+                      styles.paymentText,
+                      selectedPayment === "COD" && styles.selectedPaymentText,
+                    ]}
+                  >
+                    Cash on Delivery
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.paymentButton,
+                    selectedPayment === "GCash" && styles.selectedPaymentButton,
+                  ]}
+                  onPress={() => setSelectedPayment("GCash")}
+                >
+                  <Text
+                    style={[
+                      styles.paymentText,
+                      selectedPayment === "GCash" && styles.selectedPaymentText,
+                    ]}
+                  >
+                    GCash
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Additional Notes Input */}
+              <Text style={styles.notesLabel}>Additional Notes:</Text>
+              <TextInput
+                style={styles.notesInput}
+                placeholder="Enter any special requests or notes here..."
+                multiline
+              />
+
+              {/* Submit Button */}
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleSubmit}
+              >
+                <Text style={styles.submitButtonText}>Submit Request</Text>
+              </TouchableOpacity>
+            </View>
           </BottomSheet>
         </Portal>
       </>
@@ -64,6 +143,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: COLORS.primary,
   },
+  subTitle: {
+    fontFamily: fonts.Regular,
+    fontSize: 12,
+    color: COLORS.subtitle,
+  },
   closeButton: {
     backgroundColor: COLORS.light,
     borderRadius: 15,
@@ -77,6 +161,86 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
     marginBottom: 5,
     width: "100%",
+  },
+  contentContainer: {
+    padding: 20,
+  },
+  serviceTitle: {
+    fontFamily: fonts.Bold,
+    fontSize: 16,
+    color: COLORS.primary,
+    marginBottom: 5,
+  },
+  serviceDescription: {
+    fontFamily: fonts.Regular,
+    fontSize: 14,
+    color: COLORS.subtitle,
+    marginBottom: 15,
+  },
+  input: {
+    borderColor: COLORS.light,
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 15,
+  },
+  paymentTitle: {
+    fontFamily: fonts.SemiBold,
+    fontSize: 14,
+    color: COLORS.primary,
+    marginBottom: 5,
+  },
+  paymentOptions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
+  paymentButton: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.background,
+    borderRadius: 10,
+    flex: 1,
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
+  selectedPaymentButton: {
+    backgroundColor: COLORS.secondary,
+    borderColor: COLORS.secondary,
+  },
+  paymentText: {
+    fontFamily: fonts.SemiBold,
+    fontSize: 14,
+    color: COLORS.primary,
+  },
+  selectedPaymentText: {
+    color: COLORS.white,
+  },
+  notesLabel: {
+    fontFamily: fonts.SemiBold,
+    fontSize: 14,
+    color: COLORS.primary,
+    marginBottom: 5,
+  },
+  notesInput: {
+    borderColor: COLORS.light,
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    minHeight: 60,
+    marginBottom: 15,
+  },
+  submitButton: {
+    backgroundColor: COLORS.secondary,
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  submitButtonText: {
+    color: COLORS.white,
+    fontFamily: fonts.Bold,
+    fontSize: 16,
   },
 });
 

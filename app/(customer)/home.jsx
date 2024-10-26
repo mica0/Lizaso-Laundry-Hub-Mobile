@@ -21,7 +21,7 @@ export default function Home() {
   const [expandedItems, setExpandedItems] = useState({});
   const [selectedService, setSelectedService] = useState(null);
   const bottomSelectedSheet = useRef(null);
-  const snapSelectedPoints = useMemo(() => ["50%", "60%"], []);
+  const snapSelectedPoints = useMemo(() => ["50%", "70%"], []);
 
   const fetchLaundryServices = useCallback(async () => {
     const response = await getLaundryServices(userDetails.storeId);
@@ -104,14 +104,24 @@ export default function Home() {
           >
             <View style={{ flex: 1, paddingRight: 20 }}>
               <Text style={styles.staffName}>{userDetails.fullname}</Text>
-              <Text
-                style={styles.address}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {userDetails.header_address}, {userDetails.sub_province},{" "}
-                {userDetails.sub_city}
-              </Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons
+                  name="location-outline"
+                  size={16}
+                  color={COLORS.white}
+                  style={{ marginRight: 1 }}
+                />
+                <View style={{ marginTop: 1 }}>
+                  <Text
+                    style={styles.address}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {userDetails.header_address}, {userDetails.sub_province},{" "}
+                    {userDetails.sub_city}
+                  </Text>
+                </View>
+              </View>
             </View>
 
             <TouchableOpacity
@@ -187,7 +197,7 @@ const styles = StyleSheet.create({
   },
   address: {
     fontFamily: fonts.Medium,
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.white,
   },
   sub_add: {
