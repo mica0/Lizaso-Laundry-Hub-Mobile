@@ -29,13 +29,14 @@ import useAuth from "../context/AuthContext";
 import { useHandleGoToMessage } from "../../components/method/useHandleGoToMessage";
 import { Styles } from "../style/deliveryStyle";
 import { ReadyBottomSheet } from "../../components/staff/ReadyBottomSheet";
+import { updateServiceRequestReadyDelivery } from "../../data/api/putApi";
 
 export default function Delivery() {
   const { userDetails } = useAuth();
   const handleGoToMessage = useHandleGoToMessage();
   const [filter, setFilter] = useState("All");
   const bottomReadyDeliverySheet = useRef(null);
-  const snapPoints = useMemo(() => ["60%"], []);
+  const snapPoints = useMemo(() => ["70%"], []);
   const [selectedService, setSelectedService] = useState([]);
   const [isloading, setisLoading] = useState(false);
 
@@ -149,14 +150,24 @@ export default function Delivery() {
 
   const handleGetReadyDelivery = async (id) => {
     setisLoading(true);
-    console.log(id);
+    try {
+      const response = await updateServiceRequestReadyDelivery(id);
+      if (response) {
+        bottomReadyDeliverySheet.current?.close();
+      } else {
+        console.error("Failed to get request:", response.message);
+      }
+    } catch (error) {
+      console.error("Error getting request:", error);
+    } finally {
+      bottomReadyDeliverySheet.current?.close();
+    }
   };
 
   const renderItem = ({ item }) => {
     let iconName;
     let backgroundColor;
     let iconComponent;
-    let statusText;
 
     if (item.request_status === "Ready for Delivery") {
       iconName = "time-outline";
@@ -165,7 +176,15 @@ export default function Delivery() {
         <Ionicons name={iconName} size={24} color={COLORS.white} />
       );
       statusText = "Ready for delivery";
-    } else if (item.request_status === "Ongoing Pickup") {
+    } else if (item.request_status === "Out for Delivery") {
+      iconName = "truck-delivery-outline";
+      iconComponent = (
+        <MaterialCommunityIcons
+          name={iconName}
+          size={24}
+          color={COLORS.white}
+        />
+      );
       backgroundColor = COLORS.success;
       // iconComponent = <AnimatedIcon />;
       statusText = "Ongoing";
@@ -179,7 +198,6 @@ export default function Delivery() {
         />
       );
       backgroundColor = COLORS.error;
-      statusText = "Cancel";
     }
 
     return (
@@ -279,7 +297,7 @@ export default function Delivery() {
                       </Text>
                     </View>
                   )}
-                  {item.status === "Out for Delivery" && (
+                  {item.request_status === "Out for Delivery" && (
                     <View style={{ alignItems: "center" }}>
                       <Text
                         style={{
@@ -295,7 +313,7 @@ export default function Delivery() {
                           fontFamily: fonts.Regular,
                           fontSize: 12,
                           color: COLORS.primary,
-                          marginTop: -6, // Adjust this value to reduce the gap
+                          marginTop: -6,
                         }}
                       >
                         delivery
@@ -500,7 +518,7 @@ export default function Delivery() {
           <View style={Styles.buttonContainer}>
             <TouchableOpacity
               style={Styles.finishButton}
-              onPress={handleGetReadyDelivery}
+              onPress={() => handleGetReadyDelivery(selectedService.request_id)}
             >
               {isloading ? (
                 <ActivityIndicator size="large" color={COLORS.white} />

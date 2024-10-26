@@ -77,6 +77,29 @@ export const updateServiceRequestFinishiPickup = async (requestId) => {
   }
 };
 
+// For ready delivery and ongoing delivery
+export const updateServiceRequestReadyDelivery = async (requestId) => {
+  try {
+    const response = await api.put(
+      `/staff/${requestId}/update-request-proceed-delivery`
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateServiceRequestOngoingDelivery = async (requestId) => {
+  try {
+    const response = await api.put(
+      `/staff/${requestId}/update-request-finish-delivery`
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // For ongoing request it use QR CODE
 export const updateServiceRequestUsingQRCode = async (code, id) => {
   try {
