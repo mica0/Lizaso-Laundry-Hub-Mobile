@@ -12,14 +12,44 @@ import { Portal } from "@gorhom/portal";
 import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { timeAgo } from "../../constants/datetime";
+import useAuth from "../../app/context/AuthContext";
 
 export const SelectServiceBottomSheet = React.forwardRef(
   ({ selectedService, snapPoints, closeSelectModal, handleSubmit }, ref) => {
-    const [selectedPayment, setSelectedPayment] = useState(null);
+    const { userDetails } = useAuth();
+    const [name, setName] = useState(userDetails.fullname);
+    const [notes, setNotes] = useState(null);
+    const [selectedPayment, setSelectedPayment] = useState("COD");
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
     // const snapPoints = useMemo(() => ["50%", "60%"], []);
+
     const renderBackdrop = (props) => (
       <BottomSheetBackdrop {...props} opacity={0.5} />
     );
+
+    const validateFields = () => {
+      const newErrors = {};
+
+      if (!name) {
+        newErrors.name = "Username is required";
+      }
+      return newErrors;
+    };
+    const handleInputChange = (field) => (value) => {
+      switch (field) {
+        case "name":
+          setName(value);
+          break;
+        default:
+          break;
+      }
+
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [field]: "",
+      }));
+    };
 
     return (
       <>
@@ -59,17 +89,51 @@ export const SelectServiceBottomSheet = React.forwardRef(
 
             <View style={styles.contentContainer}>
               {/* Selected Service */}
-              {/* <Text style={styles.serviceTitle}>{selectedService.title}</Text> */}
-              <Text style={styles.serviceTitle}>Wash</Text>
-              <Text style={styles.serviceDescription}>
-                {/* {selectedService.description} */}
-              </Text>
+              <View style={styles.serviceBox}>
+                <Text style={styles.serviceTitle}>Wash</Text>
+              </View>
 
               {/* Customer Name Input */}
-              <TextInput
-                style={styles.input}
-                placeholder="Enter Customer Name"
-              />
+              <View style={{ marginBottom: 20 }}>
+                <Text style={styles.paymentTitle}>Customer Name:</Text>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 48,
+                    borderColor: errors.name ? COLORS.error : COLORS.border,
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingLeft: 22,
+                  }}
+                >
+                  <TextInput
+                    placeholder="Enter your name"
+                    placeholderTextColor={COLORS.grey}
+                    keyboardType="default"
+                    value={name}
+                    onChangeText={handleInputChange("name")}
+                    style={{ width: "100%", fontFamily: fonts.Regular }}
+                  />
+                </View>
+                {errors.name && (
+                  <Text
+                    style={{
+                      fontFamily: fonts.Regular,
+                      color: COLORS.error,
+                      fontSize: 12,
+                      marginTop: 4,
+                      marginStart: 10,
+                    }}
+                  >
+                    {errors.name}
+                  </Text>
+                )}
+              </View>
+
+              {/* <Text style={styles.paymentTitle}>Customer Name:</Text>
+              <TextInput style={styles.input} placeholder="Enter your name" /> */}
               {/* Payment Options */}
               <Text style={styles.paymentTitle}>Payment Method:</Text>
               <View style={styles.paymentOptions}>
@@ -114,8 +178,9 @@ export const SelectServiceBottomSheet = React.forwardRef(
                 placeholder="Enter any special requests or notes here..."
                 multiline
               />
-
-              {/* Submit Button */}
+            </View>
+            {/* Submit Button */}
+            <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={styles.submitButton}
                 onPress={handleSubmit}
@@ -163,13 +228,20 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   contentContainer: {
+    flex: 1,
     padding: 20,
+  },
+  serviceBox: {
+    backgroundColor: COLORS.secondary_light,
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 20,
   },
   serviceTitle: {
     fontFamily: fonts.Bold,
-    fontSize: 16,
-    color: COLORS.primary,
-    marginBottom: 5,
+    fontSize: 18,
+    color: COLORS.secondary,
+    textAlign: "center",
   },
   serviceDescription: {
     fontFamily: fonts.Regular,
@@ -178,7 +250,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   input: {
-    borderColor: COLORS.light,
+    borderColor: COLORS.border,
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
@@ -222,20 +294,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.primary,
     marginBottom: 5,
+    marginTop: 10,
   },
   notesInput: {
-    borderColor: COLORS.light,
+    borderColor: COLORS.border,
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
-    minHeight: 60,
+    minHeight: 50,
     marginBottom: 15,
+  },
+  buttonContainer: {
+    padding: 20,
+    alignItems: "center",
   },
   submitButton: {
     backgroundColor: COLORS.secondary,
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: "center",
+    width: "100%",
   },
   submitButtonText: {
     color: COLORS.white,
