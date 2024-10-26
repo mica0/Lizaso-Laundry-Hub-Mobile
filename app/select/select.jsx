@@ -5,6 +5,8 @@ import {
   Pressable,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
+  Modal,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
@@ -15,6 +17,8 @@ import { useRoute } from "@react-navigation/native";
 import { fonts } from "../../constants/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { TextInput } from "react-native-gesture-handler";
+import { createNewServiceReuqest } from "../../data/api/postApi";
+import QRCode from "react-native-qrcode-svg";
 
 export default function Select() {
   const { userDetails } = useAuth();
@@ -23,7 +27,9 @@ export default function Select() {
   const { service_id, service_name } = route.params;
   const [name, setName] = useState(userDetails.fullname);
   const [notes, setNotes] = useState(null);
-  const [selectedPayment, setSelectedPayment] = useState("COD");
+  const [selectedPayment, setSelectedPayment] = useState("Cash on Delivery");
+  const [qrCodeData, setQrCodeData] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -31,7 +37,7 @@ export default function Select() {
     const newErrors = {};
 
     if (!name) {
-      newErrors.name = "Username is required";
+      newErrors.name = "Customer name is required";
     }
     return newErrors;
   };
@@ -50,8 +56,54 @@ export default function Select() {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log("Submit data");
+  const handleSubmit = async () => {
+    const newErrors = validateFields();
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      if (!selectedPayment) {
+        Alert.alert("Attention", "You must select a payment method.");
+        return;
+      }
+
+      const data = {
+        store_id: userDetails.storeId,
+        service_type_id: service_id,
+        customer_name: name,
+        notes: notes,
+        payment_method: selectedPayment,
+      };
+
+      setLoading(true);
+
+      try {
+        const response = await createNewServiceReuqest(
+          userDetails.userId,
+          data
+        );
+
+        if (response.success) {
+          setQrCodeData(response.qr_code);
+          setModalVisible(true);
+        } else {
+          console.log(response);
+          Alert.alert("Attention", response.message);
+          return;
+        }
+      } catch (error) {
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleClose = () => {
+    setModalVisible(false);
+
+    setTimeout(() => {
+      navigation.goBack();
+    }, 500);
   };
 
   return (
@@ -71,7 +123,6 @@ export default function Select() {
               <Text style={styles.backText}>Back</Text>
             </Pressable>
           </View>
-
           <View style={{ marginVertical: 10 }}>
             <Text
               style={{
@@ -94,6 +145,7 @@ export default function Select() {
               Complete the details of service request below
             </Text>
           </View>
+
           <View style={styles.contentContainer}>
             <View style={styles.serviceBox}>
               <Text style={styles.serviceTitle}>{service_name}</Text>
@@ -144,14 +196,16 @@ export default function Select() {
                 <TouchableOpacity
                   style={[
                     styles.paymentButton,
-                    selectedPayment === "COD" && styles.selectedPaymentButton,
+                    selectedPayment === "Cash on Delivery" &&
+                      styles.selectedPaymentButton,
                   ]}
-                  onPress={() => setSelectedPayment("COD")}
+                  onPress={() => setSelectedPayment("Cash on Delivery")}
                 >
                   <Text
                     style={[
                       styles.paymentText,
-                      selectedPayment === "COD" && styles.selectedPaymentText,
+                      selectedPayment === "Cash on Delivery" &&
+                        styles.selectedPaymentText,
                     ]}
                   >
                     Cash on Delivery
@@ -190,10 +244,58 @@ export default function Select() {
         {/* Submit Button */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.submitButtonText}>Submit Request</Text>
+            {loading ? (
+              <ActivityIndicator size="large" color={COLORS.white} />
+            ) : (
+              <Text style={styles.submitButtonText}>Submit Request</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.modalView}>
+          <View style={{ padding: 20 }}>
+            <Text style={styles.modalText}>
+              Wait for the staff to scan this QR code to update the progress of
+              your laundry order
+            </Text>
+          </View>
+
+          <View
+            style={{
+              backgroundColor: COLORS.white,
+              padding: 20,
+              borderRadius: 8,
+            }}
+          >
+            <View style={{ borderWidth: 2, borderColor: COLORS.border }}>
+              {qrCodeData && (
+                <QRCode
+                  value={qrCodeData}
+                  size={250}
+                  color="white"
+                  backgroundColor={COLORS.black}
+                />
+              )}
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => handleClose()}
+          >
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -206,6 +308,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 20,
+  },
+  container_sub: {
+    flex: 1,
+    marginHorizontal: 10,
   },
   backButton: {
     flexDirection: "row",
@@ -223,21 +329,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-  submitButton: {
-    backgroundColor: COLORS.secondary,
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-    width: "100%",
-  },
-  submitButtonText: {
-    color: COLORS.white,
-    fontFamily: fonts.Bold,
-    fontSize: 16,
-  },
   contentContainer: {
     flex: 1,
-    padding: 20,
+    padding: 10,
   },
   serviceBox: {
     backgroundColor: COLORS.secondary_light,
@@ -283,6 +377,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flex: 1,
     alignItems: "center",
+    justifyContent: "center",
     marginHorizontal: 5,
   },
   selectedPaymentButton: {
@@ -314,17 +409,41 @@ const styles = StyleSheet.create({
     textAlign: "left", // Aligns text to the left
     textAlignVertical: "top", // Aligns text to the top for multiline
   },
-
   submitButton: {
     backgroundColor: COLORS.secondary,
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: "center",
+    justifyContent: "center",
     width: "100%",
+    height: 60,
   },
   submitButtonText: {
     color: COLORS.white,
     fontFamily: fonts.Bold,
+    fontSize: 16,
+  },
+  modalView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+  },
+  modalText: {
+    fontFamily: fonts.Regular,
+    fontSize: 15,
+    color: COLORS.white,
+    marginBottom: 20,
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: COLORS.secondary,
+    borderRadius: 5,
+    padding: 10,
+  },
+  closeButtonText: {
+    fontFamily: fonts.SemiBold,
+    color: COLORS.white,
     fontSize: 16,
   },
 });

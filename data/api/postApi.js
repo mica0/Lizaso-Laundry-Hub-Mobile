@@ -14,6 +14,17 @@ export const createNewMessage = async (messageData) => {
 };
 
 // CUSTOMER SECTION API REQUEST
+export const createNewServiceReuqest = async (userId, data) => {
+  try {
+    const response = await api.post(
+      `/customers/${userId}/set-service-request`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // STAFF SECTION API REQUEST
 // export const createMessageSenderStaff = async (messageData) => {
@@ -47,18 +58,18 @@ export const createNewMessage = async (messageData) => {
 //   }
 // };
 
-export const createMessageSenderStaff = async (messageData) => {
-  try {
-    console.log("Sending message data:", messageData);
-    const response = await api.post(
-      `/staff/set-messages-sender-staff`,
-      messageData
-    );
+// export const createMessageSenderStaff = async (messageData) => {
+//   try {
+//     console.log("Sending message data:", messageData);
+//     const response = await api.post(
+//       `/staff/set-messages-sender-staff`,
+//       messageData
+//     );
 
-    // console.log("Response from API:", response);
-    return response.data;
-  } catch (error) {
-    console.error("Error in API function:", error);
-    throw error; // This will be caught in the calling function
-  }
-};
+//     // console.log("Response from API:", response);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error in API function:", error);
+//     throw error; // This will be caught in the calling function
+//   }
+// };
