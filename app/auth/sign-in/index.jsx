@@ -22,8 +22,8 @@ import { getCheckCustomerDetails } from "../../../data/api/getApi";
 
 export default function SignIn() {
   const { userDetails, fetchUserDetails } = useAuth();
-  const [username, setUsername] = useState("alexia16");
-  const [password, setPassword] = useState("secret123");
+  const [username, setUsername] = useState("juan12");
+  const [password, setPassword] = useState("lizaso12345");
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});

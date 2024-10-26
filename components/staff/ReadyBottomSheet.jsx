@@ -15,6 +15,8 @@ export const ReadyBottomSheet = React.forwardRef(
       <BottomSheetBackdrop {...props} opacity={0.5} />
     );
 
+    console.log(selectedService.address_line);
+
     return (
       <>
         <Portal>
@@ -61,7 +63,11 @@ const Styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
   },
-  headerTitle: { fontFamily: fonts.Bold, fontSize: 18 },
+  headerTitle: {
+    fontFamily: fonts.SemiBold,
+    fontSize: 18,
+    color: COLORS.primary,
+  },
   closeButton: { padding: 10 },
   divider: {
     height: 1,

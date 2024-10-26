@@ -34,21 +34,27 @@ export default function RootLayout() {
                   presentation: "modal",
                   animation: "slide_from_right",
                 }}
-              />
+              />*/}
               <Stack.Screen
-                name="auth/google/google"
+                name="receipt/receipt"
                 options={{
                   presentation: "modal",
-                  animation: "slide_from_right",
+                  animation: "ios",
                 }}
-              /> */}
+              />
               <Stack.Screen name="index" />
-              <Stack.Screen name="message/chat" />
+              <Stack.Screen
+                name="message/chat"
+                options={{
+                  presentation: "modal",
+                  animation: "ios",
+                }}
+              />
               <Stack.Screen
                 name="select/select"
                 options={{
                   presentation: "modal",
-                  animation: "slide_from_right",
+                  animation: "ios",
                 }}
               />
               <Stack.Screen name="notification/list" />
